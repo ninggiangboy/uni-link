@@ -1,9 +1,18 @@
 package dev.ngb.app.identity.application.usecase.password.forgot_password.dto;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
+import dev.ngb.util.validation.FluentValidator;
 
 public record ForgotPasswordRequest(
-        @NotBlank @Email
         String email
-) {}
+) {
+    public ForgotPasswordRequest {
+        String normalizedEmail = email == null ? null : email.trim();
+        email = normalizedEmail;
+
+        FluentValidator.of(this)
+                .ruleFor("email", ignored -> normalizedEmail)
+                .notNullOrBlank()
+                .email()
+                .validateAndThrow();
+    }
+}

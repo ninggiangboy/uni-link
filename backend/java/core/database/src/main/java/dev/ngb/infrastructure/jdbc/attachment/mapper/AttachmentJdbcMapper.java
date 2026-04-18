@@ -2,6 +2,7 @@ package dev.ngb.infrastructure.jdbc.attachment.mapper;
 
 import dev.ngb.domain.attachment.model.AttachmentUploadStatus;
 import dev.ngb.domain.attachment.model.attachment.Attachment;
+import dev.ngb.domain.attachment.model.attachment.AttachmentType;
 import dev.ngb.infrastructure.jdbc.base.mapper.JdbcMapper;
 import dev.ngb.infrastructure.jdbc.attachment.entity.AttachmentJdbcEntity;
 
@@ -22,7 +23,7 @@ public final class AttachmentJdbcMapper implements JdbcMapper<Attachment, Attach
                 entity.getUpdatedBy(),
                 entity.getUpdatedAt(),
                 entity.getAccountId(),
-                entity.getBucket(),
+                AttachmentType.valueOf(entity.getType()),
                 entity.getObjectKey(),
                 entity.getFileName(),
                 entity.getContentType(),
@@ -45,7 +46,7 @@ public final class AttachmentJdbcMapper implements JdbcMapper<Attachment, Attach
                 .updatedBy(domain.getUpdatedBy())
                 .updatedAt(domain.getUpdatedAt())
                 .accountId(domain.getAccountId())
-                .bucket(domain.getBucket())
+                .type(domain.getType().name())
                 .objectKey(domain.getObjectKey())
                 .fileName(domain.getFileName())
                 .contentType(domain.getContentType())

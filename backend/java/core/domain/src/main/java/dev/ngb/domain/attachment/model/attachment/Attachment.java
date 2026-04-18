@@ -13,7 +13,7 @@ import java.time.Instant;
 public class Attachment extends DomainEntity<Long> {
 
     private Long accountId;
-    private String bucket;
+    private AttachmentType type;
     private String objectKey;
     private String fileName;
     private String contentType;
@@ -29,7 +29,7 @@ public class Attachment extends DomainEntity<Long> {
 
     public static Attachment createPendingPut(
             Long accountId,
-            String bucket,
+            AttachmentType type,
             String objectKey,
             String fileName,
             String contentType,
@@ -40,7 +40,7 @@ public class Attachment extends DomainEntity<Long> {
         Attachment a = new Attachment();
         Instant now = Instant.now(a.clock);
         a.accountId = accountId;
-        a.bucket = bucket;
+        a.type = type;
         a.objectKey = objectKey;
         a.fileName = fileName;
         a.contentType = contentType;
@@ -62,7 +62,7 @@ public class Attachment extends DomainEntity<Long> {
             Long updatedBy,
             Instant updatedAt,
             Long accountId,
-            String bucket,
+            AttachmentType type,
             String objectKey,
             String fileName,
             String contentType,
@@ -81,7 +81,7 @@ public class Attachment extends DomainEntity<Long> {
         a.updatedBy = updatedBy;
         a.updatedAt = updatedAt;
         a.accountId = accountId;
-        a.bucket = bucket;
+        a.type = type;
         a.objectKey = objectKey;
         a.fileName = fileName;
         a.contentType = contentType;
@@ -131,13 +131,13 @@ public class Attachment extends DomainEntity<Long> {
     }
 
     public void markProcessedVariant(
-            String bucket,
+            AttachmentType type,
             String objectKey,
             String contentType,
             long sizeBytes,
             String fileUrl
     ) {
-        this.bucket = bucket;
+        this.type = type;
         this.objectKey = objectKey;
         this.contentType = contentType;
         this.sizeBytes = sizeBytes;

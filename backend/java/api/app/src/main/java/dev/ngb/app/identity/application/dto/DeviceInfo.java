@@ -1,14 +1,26 @@
 package dev.ngb.app.identity.application.dto;
 
 import dev.ngb.domain.identity.model.auth.DeviceType;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import dev.ngb.util.validation.FluentValidator;
 
 public record DeviceInfo(
-        @NotNull
         DeviceType deviceType,
-        @NotBlank
         String deviceName,
-        @NotBlank
         String fingerprint
-) {}
+) {
+    public DeviceInfo {
+        String normalizedDeviceName = deviceName == null ? null : deviceName.trim();
+        String normalizedFingerprint = fingerprint == null ? null : fingerprint.trim();
+        deviceName = normalizedDeviceName;
+        fingerprint = normalizedFingerprint;
+
+        FluentValidator.of(this)
+                .ruleFor("deviceType", ignored -> deviceType)
+                .notNull()
+                .ruleFor("deviceName", ignored -> normalizedDeviceName)
+                .notNullOrBlank()
+                .ruleFor("fingerprint", ignored -> normalizedFingerprint)
+                .notNullOrBlank()
+                .validateAndThrow();
+    }
+}

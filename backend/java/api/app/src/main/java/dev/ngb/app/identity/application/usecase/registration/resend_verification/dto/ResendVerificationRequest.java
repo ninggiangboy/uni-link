@@ -1,9 +1,18 @@
 package dev.ngb.app.identity.application.usecase.registration.resend_verification.dto;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
+import dev.ngb.util.validation.FluentValidator;
 
 public record ResendVerificationRequest(
-        @NotBlank @Email
         String email
-) {}
+) {
+    public ResendVerificationRequest {
+        String normalizedEmail = email == null ? null : email.trim();
+        email = normalizedEmail;
+
+        FluentValidator.of(this)
+                .ruleFor("email", ignored -> normalizedEmail)
+                .notNullOrBlank()
+                .email()
+                .validateAndThrow();
+    }
+}

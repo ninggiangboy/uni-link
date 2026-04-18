@@ -1,6 +1,8 @@
 package dev.ngb.infrastructure.web;
 
 import dev.ngb.domain.DomainException;
+import dev.ngb.util.validation.ValidationError;
+import dev.ngb.util.validation.ValidationException;
 import dev.ngb.web.ErrorResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -12,6 +14,10 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+
+import java.time.Instant;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 @Slf4j
@@ -25,6 +31,26 @@ public class GlobalExceptionHandler {
     )
     public ResponseEntity<ErrorResponse> handleDomainException(DomainException ex) {
         return ResourceResponse.domainError(ex);
+    }
+
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<ErrorResponse> handleValidationException(ValidationException ex) {
+        var details = ex.errors().stream()
+                .collect(Collectors.groupingBy(
+                        ValidationError::field,
+                        Collectors.mapping(
+                                ValidationError::message,
+                                Collectors.toList()
+                        )
+                ));
+
+        var body = new ErrorResponse(
+                "VALIDATION_ERROR",
+                "Request validation failed",
+                Instant.now(),
+                Map.copyOf(details)
+        );
+        return ResourceResponse.badRequest(body);
     }
 
     @ExceptionHandler(Exception.class)

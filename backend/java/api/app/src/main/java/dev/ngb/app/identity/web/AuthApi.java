@@ -14,12 +14,7 @@ import dev.ngb.app.identity.application.usecase.registration.resend_verification
 import dev.ngb.app.identity.application.usecase.registration.verify_email.dto.VerifyEmailRequest;
 import dev.ngb.app.identity.application.usecase.session.logout_account.dto.LogoutAccountRequest;
 import dev.ngb.app.identity.application.usecase.session.refresh_token.dto.RefreshTokenRequest;
-import dev.ngb.web.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;

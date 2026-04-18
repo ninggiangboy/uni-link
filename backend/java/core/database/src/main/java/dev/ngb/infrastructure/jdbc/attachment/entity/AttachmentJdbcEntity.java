@@ -17,7 +17,7 @@ import java.time.Instant;
 public class AttachmentJdbcEntity extends JdbcEntity<Long> {
 
     private Long accountId;
-    private String bucket;
+    private String type;
     private String objectKey;
     private String fileName;
     private String contentType;
