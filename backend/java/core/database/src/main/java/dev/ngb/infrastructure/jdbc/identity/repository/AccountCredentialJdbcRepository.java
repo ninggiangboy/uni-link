@@ -29,13 +29,13 @@ public class AccountCredentialJdbcRepository
 
     @Override
     public List<AccountCredential> findByAccountId(Long accountId) {
-        return findAllByFieldEqual("accountId", accountId);
+        return findAllByFieldEqual("account_id", accountId);
     }
 
     @Override
     public boolean existsByAccountIdAndProvider(Long accountId, AuthProvider provider) {
         Criteria criteria = Criteria
-                .where("accountId").is(accountId)
+                .where("account_id").is(accountId)
                 .and("provider").is(provider.name());
         return exists(criteria);
     }

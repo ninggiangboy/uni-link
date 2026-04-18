@@ -23,7 +23,7 @@ public class ProfileJdbcRepository extends JdbcRepository<Profile, ProfileJdbcEn
 
     @Override
     public boolean existsByAccountId(Long accountId) {
-        return existsByFieldEqual("accountId", accountId);
+        return existsByFieldEqual("account_id", accountId);
     }
 
     @Override

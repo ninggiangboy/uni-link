@@ -27,7 +27,7 @@ public class GroupRuleJdbcRepository extends JdbcRepository<GroupRule, GroupRule
     @Override
     public List<GroupRule> findByGroupId(Long groupId) {
         return findAll(
-                org.springframework.data.relational.core.query.Criteria.where("groupId").is(groupId),
+                org.springframework.data.relational.core.query.Criteria.where("group_id").is(groupId),
                 org.springframework.data.domain.Pageable.unpaged(Sort.by(Sort.Direction.ASC, "position"))
         );
     }

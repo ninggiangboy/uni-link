@@ -27,6 +27,6 @@ public class ProfileSettingJdbcRepository
 
     @Override
     public Optional<ProfileSetting> findByProfileId(Long profileId) {
-        return findFirstByFieldEqual("profileId", profileId);
+        return findFirstByFieldEqual("profile_id", profileId);
     }
 }

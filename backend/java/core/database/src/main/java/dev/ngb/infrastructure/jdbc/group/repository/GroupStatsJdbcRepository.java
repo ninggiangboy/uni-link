@@ -25,6 +25,6 @@ public class GroupStatsJdbcRepository extends JdbcRepository<GroupStats, GroupSt
 
     @Override
     public Optional<GroupStats> findByGroupId(Long groupId) {
-        return findFirstByFieldEqual("groupId", groupId);
+        return findFirstByFieldEqual("group_id", groupId);
     }
 }

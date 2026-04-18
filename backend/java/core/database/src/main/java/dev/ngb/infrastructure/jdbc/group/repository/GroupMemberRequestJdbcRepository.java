@@ -27,21 +27,21 @@ public class GroupMemberRequestJdbcRepository extends JdbcRepository<GroupMember
 
     @Override
     public Optional<GroupMemberRequest> findByGroupIdAndRequesterProfileId(Long groupId, Long requesterProfileId) {
-        return findFirst(Criteria.where("groupId").is(groupId).and("requesterProfileId").is(requesterProfileId));
+        return findFirst(Criteria.where("group_id").is(groupId).and("requester_profile_id").is(requesterProfileId));
     }
 
     @Override
     public List<GroupMemberRequest> findByGroupId(Long groupId) {
-        return findAllByFieldEqual("groupId", groupId);
+        return findAllByFieldEqual("group_id", groupId);
     }
 
     @Override
     public List<GroupMemberRequest> findByRequesterProfileId(Long requesterProfileId) {
-        return findAllByFieldEqual("requesterProfileId", requesterProfileId);
+        return findAllByFieldEqual("requester_profile_id", requesterProfileId);
     }
 
     @Override
     public boolean existsByGroupIdAndRequesterProfileId(Long groupId, Long requesterProfileId) {
-        return exists(Criteria.where("groupId").is(groupId).and("requesterProfileId").is(requesterProfileId));
+        return exists(Criteria.where("group_id").is(groupId).and("requester_profile_id").is(requesterProfileId));
     }
 }

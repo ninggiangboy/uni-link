@@ -33,7 +33,7 @@ public class AccountOtpJdbcRepository extends JdbcRepository<AccountOtp, Account
                 .and("purpose").is(purpose.name())
                 .and("is_used").is(false)
                 .and("expires_at").greaterThan(TimeProvider.now());
-        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
+        Sort sort = Sort.by(Sort.Direction.DESC, "created_at");
         return findFirst(criteria, sort);
     }
 }

@@ -32,16 +32,16 @@ public class GroupInvitationJdbcRepository extends JdbcRepository<GroupInvitatio
 
     @Override
     public Optional<GroupInvitation> findByGroupIdAndInviteeProfileId(Long groupId, Long inviteeProfileId) {
-        return findFirst(Criteria.where("groupId").is(groupId).and("inviteeProfileId").is(inviteeProfileId));
+        return findFirst(Criteria.where("group_id").is(groupId).and("invitee_profile_id").is(inviteeProfileId));
     }
 
     @Override
     public List<GroupInvitation> findByGroupId(Long groupId) {
-        return findAllByFieldEqual("groupId", groupId);
+        return findAllByFieldEqual("group_id", groupId);
     }
 
     @Override
     public List<GroupInvitation> findByInviteeProfileId(Long inviteeProfileId) {
-        return findAllByFieldEqual("inviteeProfileId", inviteeProfileId);
+        return findAllByFieldEqual("invitee_profile_id", inviteeProfileId);
     }
 }

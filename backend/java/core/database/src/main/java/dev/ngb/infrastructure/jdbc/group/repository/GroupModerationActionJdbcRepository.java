@@ -26,11 +26,11 @@ public class GroupModerationActionJdbcRepository extends JdbcRepository<GroupMod
 
     @Override
     public List<GroupModerationAction> findByGroupId(Long groupId) {
-        return findAllByFieldEqual("groupId", groupId);
+        return findAllByFieldEqual("group_id", groupId);
     }
 
     @Override
     public List<GroupModerationAction> findByGroupIdAndTargetProfileId(Long groupId, Long targetProfileId) {
-        return findAll(Criteria.where("groupId").is(groupId).and("targetProfileId").is(targetProfileId));
+        return findAll(Criteria.where("group_id").is(groupId).and("target_profile_id").is(targetProfileId));
     }
 }

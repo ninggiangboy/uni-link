@@ -27,16 +27,16 @@ public class GroupThreadJdbcRepository extends JdbcRepository<GroupThread, Group
 
     @Override
     public List<GroupThread> findByGroupId(Long groupId) {
-        return findAllByFieldEqual("groupId", groupId);
+        return findAllByFieldEqual("group_id", groupId);
     }
 
     @Override
     public Optional<GroupThread> findByGroupIdAndThreadId(Long groupId, Long threadId) {
-        return findFirst(Criteria.where("groupId").is(groupId).and("threadId").is(threadId));
+        return findFirst(Criteria.where("group_id").is(groupId).and("thread_id").is(threadId));
     }
 
     @Override
     public boolean existsByGroupIdAndThreadId(Long groupId, Long threadId) {
-        return exists(Criteria.where("groupId").is(groupId).and("threadId").is(threadId));
+        return exists(Criteria.where("group_id").is(groupId).and("thread_id").is(threadId));
     }
 }
