@@ -1,0 +1,37 @@
+app:
+  security:
+    jwt:
+      public-key: ${JWT_PUBLIC_KEY}
+      private-key: ${JWT_PRIVATE_KEY}
+  storage:
+    s3:
+      region: ${AWS_REGION}
+      bucket: ${AWS_S3_BUCKET}
+      public-base-url: ${AWS_S3_PUBLIC_BASE_URL}
+      endpoint: ${AWS_S3_ENDPOINT}
+      path-style: true
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  otlp:
+    metrics:
+      export:
+        url: ${METRICS_OTLP_URL:http://localhost:14318/v1/metrics}
+  opentelemetry:
+    tracing:
+      export:
+        otlp:
+          endpoint: ${TRACES_OTLP_URL:http://localhost:14318/v1/traces}
+    logging:
+      export:
+        otlp:
+          endpoint: ${LOGS_OTLP_URL:http://localhost:14318/v1/logs}
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, prometheus
+  endpoint:
+    health:
+      show-details: always

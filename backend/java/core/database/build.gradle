@@ -1,0 +1,15 @@
+plugins {
+    id 'java-library'
+    id 'org.springframework.boot'
+}
+
+dependencies {
+    implementation project(':libs:common')
+    implementation project(':libs:utils')
+    implementation project(':core:domain')
+
+    implementation 'org.springframework.boot:spring-boot-jdbc'
+    implementation 'org.springframework.boot:spring-boot-data-jdbc'
+    implementation 'org.springframework.boot:spring-boot-starter'
+    runtimeOnly 'org.postgresql:postgresql'
+}

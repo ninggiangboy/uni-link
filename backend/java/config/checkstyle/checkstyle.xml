@@ -1,0 +1,120 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+        "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+        "https://checkstyle.org/dtds/configuration_1_3.dtd">
+
+<!--
+    Checkstyle configuration based on Google Java Style, relaxed for practical use.
+    https://checkstyle.sourceforge.io/google_style.html
+-->
+<module name="Checker">
+    <property name="charset" value="UTF-8"/>
+    <property name="severity" value="warning"/>
+    <property name="fileExtensions" value="java"/>
+
+    <module name="BeforeExecutionExclusionFileFilter">
+        <property name="fileNamePattern" value="module\-info\.java$"/>
+    </module>
+
+    <module name="SuppressWarningsFilter"/>
+
+    <!-- File-level checks -->
+    <module name="FileTabCharacter">
+        <property name="eachLine" value="true"/>
+    </module>
+
+    <module name="LineLength">
+        <property name="fileExtensions" value="java"/>
+        <property name="max" value="200"/>
+        <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://|ftp://"/>
+    </module>
+
+    <module name="NewlineAtEndOfFile"/>
+
+    <module name="TreeWalker">
+        <module name="SuppressWarningsHolder"/>
+
+        <!-- Naming conventions -->
+        <module name="PackageName">
+            <property name="format" value="^[a-z]+(\.[a-z_][a-z0-9_]*)*$"/>
+        </module>
+        <module name="TypeName"/>
+        <module name="MemberName">
+            <property name="format" value="^[a-z][a-zA-Z0-9]*$|^[A-Z][A-Z0-9_]*$"/>
+        </module>
+        <module name="ParameterName">
+            <property name="format" value="^[a-z][a-zA-Z0-9]*$"/>
+        </module>
+        <module name="LambdaParameterName">
+            <property name="format" value="^(_|[a-z][a-zA-Z0-9]*)$"/>
+        </module>
+        <module name="LocalVariableName">
+            <property name="format" value="^[a-z][a-zA-Z0-9]*$"/>
+        </module>
+        <module name="ClassTypeParameterName">
+            <property name="format" value="^[A-Z][A-Z0-9]*$"/>
+        </module>
+        <module name="MethodTypeParameterName">
+            <property name="format" value="^[A-Z][A-Z0-9]*$"/>
+        </module>
+        <module name="InterfaceTypeParameterName">
+            <property name="format" value="^[A-Z][A-Z0-9]*$"/>
+        </module>
+        <module name="ConstantName"/>
+        <module name="StaticVariableName"/>
+        <module name="MethodName"/>
+
+        <!-- Imports -->
+        <module name="UnusedImports"/>
+        <module name="RedundantImport"/>
+
+        <!-- Braces -->
+        <module name="LeftCurly"/>
+        <module name="RightCurly"/>
+
+        <!-- Whitespace -->
+        <module name="WhitespaceAround">
+            <property name="allowEmptyConstructors" value="true"/>
+            <property name="allowEmptyMethods" value="true"/>
+            <property name="allowEmptyTypes" value="true"/>
+            <property name="allowEmptyLoops" value="true"/>
+            <property name="allowEmptyLambdas" value="true"/>
+        </module>
+        <module name="WhitespaceAfter"/>
+        <module name="NoWhitespaceBefore"/>
+        <module name="GenericWhitespace"/>
+
+        <!-- Block checks -->
+        <module name="EmptyBlock">
+            <property name="option" value="TEXT"/>
+            <property name="tokens" value="LITERAL_TRY, LITERAL_FINALLY, LITERAL_IF, LITERAL_ELSE, LITERAL_SWITCH"/>
+        </module>
+        <module name="EmptyCatchBlock">
+            <property name="exceptionVariableName" value="expected|ignored"/>
+        </module>
+
+        <!-- Coding -->
+        <module name="OneStatementPerLine"/>
+        <module name="MultipleVariableDeclarations"/>
+        <module name="FallThrough"/>
+        <module name="EqualsHashCode"/>
+        <module name="SimplifyBooleanExpression"/>
+        <module name="SimplifyBooleanReturn"/>
+        <module name="StringLiteralEquality"/>
+        <module name="UpperEll"/>
+        <module name="ArrayTypeStyle"/>
+        <module name="DefaultComesLast"/>
+        <module name="ModifierOrder"/>
+
+        <!-- Design -->
+        <module name="OneTopLevelClass"/>
+
+        <!-- Annotations -->
+        <module name="AnnotationLocation">
+            <property name="allowSamelineMultipleAnnotations" value="false"/>
+            <property name="allowSamelineSingleParameterlessAnnotation" value="true"/>
+            <property name="allowSamelineParameterizedAnnotation" value="false"/>
+        </module>
+        <module name="MissingOverride"/>
+    </module>
+</module>

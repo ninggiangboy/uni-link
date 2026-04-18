@@ -1,0 +1,20 @@
+package dev.ngb.infrastructure.jdbc.thread.entity;
+
+import dev.ngb.infrastructure.jdbc.base.entity.JdbcEntity;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+import org.springframework.data.relational.core.mapping.Table;
+
+@Getter
+@Setter
+@SuperBuilder
+@NoArgsConstructor
+@Table("thr_thread_poll_votes")
+public class ThreadPollVoteJdbcEntity extends JdbcEntity<Long> {
+
+    private Long threadId;
+    private Long profileId;
+    private Integer optionIndex;
+}

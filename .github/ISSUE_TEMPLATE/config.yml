@@ -1,0 +1,6 @@
+blank_issues_enabled: true
+
+contact_links:
+  - name: Contributing guide
+    url: https://github.com/ninggiangboy/uni-link/blob/main/CONTRIBUTING.md
+    about: Local setup, Gradle/pnpm commands, and PR expectations

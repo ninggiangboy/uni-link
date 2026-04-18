@@ -1,0 +1,19 @@
+<script setup lang="ts">
+import { AccordionContent as RekaAccordionContent } from 'reka-ui'
+import { cn } from '@/ui/lib/utils'
+
+defineProps<{
+  class?: string
+}>()
+</script>
+
+<template>
+  <RekaAccordionContent
+    data-slot="accordion-content"
+    class="data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down overflow-hidden text-sm"
+  >
+    <div :class="cn('pt-0 pb-4', $props.class)">
+      <slot />
+    </div>
+  </RekaAccordionContent>
+</template>

@@ -1,0 +1,56 @@
+package dev.ngb.infrastructure.web;
+
+import dev.ngb.domain.DomainErrorType;
+import dev.ngb.domain.DomainException;
+import dev.ngb.web.ErrorResponse;
+import lombok.experimental.UtilityClass;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
+import java.util.EnumMap;
+import java.util.Map;
+
+@UtilityClass
+public final class ResourceResponse {
+
+    private static final Map<DomainErrorType, HttpStatus> ERROR_MAP = new EnumMap<>(DomainErrorType.class);
+
+    static {
+        ERROR_MAP.put(DomainErrorType.INVALID, HttpStatus.BAD_REQUEST);
+        ERROR_MAP.put(DomainErrorType.UNAUTHORIZED, HttpStatus.UNAUTHORIZED);
+        ERROR_MAP.put(DomainErrorType.FORBIDDEN, HttpStatus.FORBIDDEN);
+        ERROR_MAP.put(DomainErrorType.NOT_FOUND, HttpStatus.NOT_FOUND);
+        ERROR_MAP.put(DomainErrorType.CONFLICT, HttpStatus.CONFLICT);
+        ERROR_MAP.put(DomainErrorType.VALIDATION, HttpStatus.UNPROCESSABLE_CONTENT);
+        ERROR_MAP.put(DomainErrorType.RATE_LIMITED, HttpStatus.TOO_MANY_REQUESTS);
+    }
+
+    public static <T> ResponseEntity<T> ok(T body) {
+        return ResponseEntity.ok(body);
+    }
+
+    public static <T> ResponseEntity<T> created(T body) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(body);
+    }
+
+    public static ResponseEntity<Void> noContent() {
+        return ResponseEntity.noContent().build();
+    }
+
+    public static ResponseEntity<Void> accepted() {
+        return ResponseEntity.accepted().build();
+    }
+
+    public static ResponseEntity<ErrorResponse> domainError(DomainException ex) {
+        HttpStatus status = ERROR_MAP.getOrDefault(ex.getError().getType(), HttpStatus.BAD_REQUEST);
+        return ResponseEntity.status(status).body(ErrorResponse.of(ex));
+    }
+
+    public static ResponseEntity<ErrorResponse> badRequest(ErrorResponse error) {
+        return ResponseEntity.badRequest().body(error);
+    }
+
+    public static ResponseEntity<ErrorResponse> serverError(ErrorResponse error) {
+        return ResponseEntity.internalServerError().body(error);
+    }
+}

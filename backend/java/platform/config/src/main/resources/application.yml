@@ -1,0 +1,31 @@
+server:
+  port: ${CONFIG_SERVER_PORT:8888}
+
+spring:
+  application:
+    name: config-server
+  profiles:
+    active: ${CONFIG_PROFILES_ACTIVE:native}
+  cloud:
+    config:
+      server:
+        native:
+          search-locations: ${CONFIG_NATIVE_SEARCH_LOCATIONS:classpath:/configs}
+        git:
+          uri: ${CONFIG_GIT_URI:}
+          default-label: ${CONFIG_GIT_BRANCH:main}
+          search-paths: ${CONFIG_GIT_SEARCH_PATHS:}
+          clone-on-start: true
+  security:
+    user:
+      name: ${CONFIG_SERVER_USERNAME:config}
+      password: ${CONFIG_SERVER_PASSWORD:config}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+  endpoint:
+    health:
+      show-details: always

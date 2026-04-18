@@ -1,0 +1,53 @@
+name: Feature request
+description: Suggest an idea or improvement for uni-link
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For large changes, see [CONTRIBUTING.md](https://github.com/ninggiangboy/uni-link/blob/main/CONTRIBUTING.md) — opening an issue first helps align scope.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Backend (API, domain, infrastructure)
+        - Frontend (UI, UX, client)
+        - Documentation
+        - Developer experience / tooling
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or motivation
+      description: What user or developer problem does this address?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: What would you like to see built or changed?
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Optional — other approaches you thought about.
+    validations:
+      required: false
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Mockups, prior art, related issues, or bounded context (Identity, Thread, etc.).
+    validations:
+      required: false

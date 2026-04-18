@@ -1,0 +1,50 @@
+# Test profile: runs without Config Server; DB URL is set by Testcontainers via @DynamicPropertySource.
+# JWT keys: Base64-encoded RSA (PKCS#8 private, X.509 public). Regenerate with:
+#   openssl genrsa 2048 > priv.pem
+#   openssl pkcs8 -topk8 -nocrypt -in priv.pem -outform DER | base64
+#   openssl rsa -in priv.pem -pubout -outform DER | base64
+eureka:
+  client:
+    enabled: false
+
+spring:
+  cloud:
+    config:
+      enabled: false
+  datasource:
+    hikari:
+      maximum-pool-size: 2
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration
+      - org.springframework.boot.autoconfigure.quartz.QuartzAutoConfiguration
+
+management:
+  otlp:
+    metrics:
+      export:
+        enabled: false
+
+logging:
+  level:
+    dev.ngb: DEBUG
+
+app:
+  security:
+    jwt:
+      public-key-base64: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1KCuczbC+wBdfXrW5Ao4XcDpmfR3dp4sU/6QOBZzzocHb2JvPk1t8uDvjpBiiprQPKrHgj4K1twImnbx/DlxCQHNzJjBgPZKQ6dhyvC/bdmNjZdq6kPwv6l+BhDiTm8I4GSENuC8P2i6jZXRxFSb8lOfsolpYCtNg3W0+bAFLXUqadfuC67u1I2xybTVfjnDtGK7LQildSjP5KcgYBxymrlj/Wei2QBgMrfpxHIsVAJw2ap9CnHEeA5k/xoJPtTo7vI62vbnDp9t7BkyhHOfbLGG0UEZvD+9j37D/iM7rQiT2RJaQx0DUc6KED5NZylS6o7eXt/p17wtHNeTBLSvfwIDAQAB
+      private-key-base64: MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDUoK5zNsL7AF19etbkCjhdwOmZ9Hd2nixT/pA4FnPOhwdvYm8+TW3y4O+OkGKKmtA8qseCPgrW3AiadvH8OXEJAc3MmMGA9kpDp2HK8L9t2Y2Nl2rqQ/C/qX4GEOJObwjgZIQ24Lw/aLqNldHEVJvyU5+yiWlgK02DdbT5sAUtdSpp1+4Lru7UjbHJtNV+OcO0YrstCKV1KM/kpyBgHHKauWP9Z6LZAGAyt+nEcixUAnDZqn0KccR4DmT/Ggk+1Oju8jra9ucOn23sGTKEc59ssYbRQRm8P72PfsP+IzutCJPZElpDHQNRzooQPk1nKVLqjt5e3+nXvC0c15MEtK9/AgMBAAECggEAAb5tn9lHoRpgKerLf2RMEQzHfbFBF5J1h5zTXvpkKcH2wCWdBvRInhDVNiSeAkgBxDWcXEeY/Cki0u19z5VDBZFjuDVahO3ALyzcwvbVgxehLxOaV2CGRXQk6fTSflUvy/NXGEIgmR6JRScA6OzOuJ6R9TtmR1kjkhvxh4i3iidjhE770wPQ8VFhmY2SPdQe5l7HvbQNfc5EZivwT8uWmtCDd2vPwsxE6dkxD2fe8hswvD6nSCUxYHNIjD53DPxVeJIVMYD6qxVIxPSZZ+jTrPjv01+nxTkIS0QD28AB6PcIyBlbBtL1A4L4WcncDEHgOgS9HFtJp0hYwR//YSZNWQKBgQD02ebaK004e4Z7knHxkWjGxeAPtBd4bySprUT0DWeSK6rGyI5xrAxFGgSNIpuEly1yw1VcpDE9Vi7aCdJ6ssUd9iBYRmSOHf1DuZaSd0rO9bZqjS0r58yB1dY/r7FltPSZSQVouowEEpcYRgWnFv4xJ4OSZ8o7ES/1Ua38xaJU2QKBgQDeTyrh3ivpuNgZbqqUMi462i7KrTFhe0u7UiHiJnXRPTrGMpKdtw9kJjl6Wm3xz1eRhsmQa73HXJ4OKPMddE193Deu3OJHw6XOozZ8kIBou0X7fjFjxFm+j1xAyWN4oajvyGydn29/JI16elgpeO05Jl1kr7Dx5b5yoKdSi22QFwKBgQCEfwW1OYln7zAu3mhaWF1icuF0nfe1bC9iwih2CGrrZkXbm9u5F2jsW8/qr7eIYGZvm9QtdYxPrLtdscL8MpEITY/jNPRlE0VhyKP6TiNlKwGzVwICqES6XYS6odBVQT67VBBhQ9FQwt6QfBPC/2Y+IyvHpfKBVCOnlLOZ/TiCwQKBgQCgiQ7weJ3Bc8gp5W6tAee8fB5aIeOM/5patR7ezuM5rDurMI4L8kvdCHVtU6wdeJtF7c3UytkLBGjm1M9rL7dd8g8L6VpGdJRhuh74qOjxuHr698/2ua4NHD2EU2nPjP4P2e4FjULYz66TCZJssHSuVnQO54ihxkRXRohN5X3DFQKBgEVCrRWaBqpY20XkpmlQe3ZO8p7dC0FemOerDLts4hCdZIRUdgV8ECPw4ztIvG+DmWBX/j5O/HsNCGtNcRIKMOS9ZqIex6IyZjqrWgyGnDPSNe1rnSaRRFT3i7fTXTGTI2p3oo0v/baUdkt68LdPCUNywQknRmWtVu6+uUokrDvm
+  storage:
+    s3:
+      access-key-id: test-key
+      secret-access-key: test-secret
+      region: eu-central-1
+      bucket: test-bucket
+      public-base-url: https://test-bucket.s3.eu-central-1.amazonaws.com
+      endpoint:
+      path-style: true

@@ -1,0 +1,153 @@
+name: CI
+
+on:
+  push:
+    branches: [ dev, main ]
+  pull_request:
+    branches: [ dev, main ]
+
+permissions:
+  contents: read
+
+jobs:
+  changes:
+    name: Detect changes
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+      github: ${{ steps.filter.outputs.github }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Path filter
+        uses: dorny/paths-filter@v4
+        id: filter
+        with:
+          filters: |
+            backend:
+              - 'backend/java/**'
+            frontend:
+              - 'frontend/vue/**'
+            github:
+              - '.github/**'
+
+  backend:
+    name: Backend (Gradle check)
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.backend == 'true' || needs.changes.outputs.github == 'true'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Java 25
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 25
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+
+      - name: Build, test, and checkstyle
+        working-directory: backend/java
+        run: ./gradlew check
+
+      - name: Upload test reports
+        if: failure()
+        uses: actions/upload-artifact@v6
+        with:
+          name: test-reports
+          path: backend/**/build/reports/tests/
+          retention-days: 7
+
+      - name: Upload checkstyle reports
+        if: failure()
+        uses: actions/upload-artifact@v6
+        with:
+          name: checkstyle-reports
+          path: backend/**/build/reports/checkstyle/
+          retention-days: 7
+
+  frontend:
+    name: Frontend (type-check & build)
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true' || needs.changes.outputs.github == 'true'
+
+    defaults:
+      run:
+        working-directory: frontend/vue
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v5
+        with:
+          version: 9
+
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+          cache: pnpm
+          cache-dependency-path: frontend/vue/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Type check
+        run: pnpm run type-check
+
+      - name: Build
+        run: pnpm run build-only
+
+  ci-status:
+    name: CI status
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [changes, backend, frontend]
+
+    steps:
+      - name: Verify results
+        env:
+          CHANGES_RESULT: ${{ needs.changes.result }}
+          BACK_FILTER: ${{ needs.changes.outputs.backend }}
+          FRONT_FILTER: ${{ needs.changes.outputs.frontend }}
+          GH_FILTER: ${{ needs.changes.outputs.github }}
+          BACK_RESULT: ${{ needs.backend.result }}
+          FRONT_RESULT: ${{ needs.frontend.result }}
+        run: |
+          set -euo pipefail
+          if [[ "$CHANGES_RESULT" != "success" ]]; then
+            echo "::error::Detect changes job did not succeed ($CHANGES_RESULT)"
+            exit 1
+          fi
+
+          need_back=false
+          need_front=false
+          [[ "$BACK_FILTER" == "true" || "$GH_FILTER" == "true" ]] && need_back=true
+          [[ "$FRONT_FILTER" == "true" || "$GH_FILTER" == "true" ]] && need_front=true
+
+          if [[ "$need_back" == false && "$need_front" == false ]]; then
+            echo "No backend, frontend, or .github changes — build jobs skipped."
+            exit 0
+          fi
+
+          if [[ "$need_back" == true && "$BACK_RESULT" != "success" ]]; then
+            echo "::error::Backend job was required but finished with: $BACK_RESULT"
+            exit 1
+          fi
+          if [[ "$need_front" == true && "$FRONT_RESULT" != "success" ]]; then
+            echo "::error::Frontend job was required but finished with: $FRONT_RESULT"
+            exit 1
+          fi
+          echo "All required jobs succeeded."

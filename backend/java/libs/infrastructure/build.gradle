@@ -1,0 +1,64 @@
+plugins {
+    id 'java-library'
+    id 'org.springframework.boot'
+}
+
+dependencies {
+    api project(':libs:common')
+    api project(':libs:utils')
+    api platform('software.amazon.awssdk:bom:2.31.77')
+    api 'software.amazon.awssdk:s3'
+
+    // Web & API
+    api 'org.springframework.boot:spring-boot-starter-webmvc'
+    api 'org.springframework.boot:spring-boot-websocket'
+    api 'org.springframework.boot:spring-boot-graphql'
+
+    // API Documentation
+    api 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5'
+    api 'org.springdoc:springdoc-openapi-starter-webmvc-scalar:2.8.13'
+
+    // Security
+    api 'org.springframework.boot:spring-boot-security'
+    api 'org.springframework.boot:spring-boot-security-oauth2-resource-server'
+
+    // Data & Persistence
+    api 'org.springframework.boot:spring-boot-jdbc'
+    api 'org.springframework.boot:spring-boot-data-jdbc'
+    api 'org.springframework.boot:spring-boot-data-redis'
+    api 'org.springframework.boot:spring-boot-starter-liquibase'
+    api 'org.mybatis.spring.boot:mybatis-spring-boot-starter:4.0.0'
+    runtimeOnly 'org.postgresql:postgresql'
+
+    // Messaging & Scheduling
+    api 'org.springframework.boot:spring-boot-kafka'
+    api 'org.springframework.boot:spring-boot-quartz'
+
+    // Observability & Monitoring
+    api 'org.springframework.boot:spring-boot-starter-actuator'
+    api 'org.springframework.boot:spring-boot-starter-opentelemetry'
+    api 'io.sentry:sentry-spring-boot-4'
+    api "io.opentelemetry.instrumentation:opentelemetry-logback-appender-1.0:2.21.0-alpha"
+
+    // Validation, Serialization & Mail
+    api 'org.springframework.boot:spring-boot-validation'
+    api 'org.springframework.boot:spring-boot-jackson'
+    api 'org.springframework.boot:spring-boot-mail'
+
+    // Cache & Resilience
+    api 'org.springframework.boot:spring-boot-cache'
+    api 'com.github.ben-manes.caffeine:caffeine:3.2.3'
+    api 'org.redisson:redisson:3.52.0'
+    api 'io.github.resilience4j:resilience4j-all:2.3.0'
+    api "com.github.ben-manes.caffeine:caffeine:3.2.3"
+
+    // Modulith
+    api 'org.springframework.modulith:spring-modulith-core'
+    api 'org.springframework.modulith:spring-modulith-events-api'
+    api 'org.springframework.modulith:spring-modulith-starter-jdbc'
+    runtimeOnly 'org.springframework.modulith:spring-modulith-actuator'
+    runtimeOnly 'org.springframework.modulith:spring-modulith-observability'
+
+    // Utilities
+    api 'com.github.f4b6a3:uuid-creator:6.1.0'
+}
