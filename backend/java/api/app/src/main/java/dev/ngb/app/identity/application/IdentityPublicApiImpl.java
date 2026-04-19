@@ -1,6 +1,6 @@
 package dev.ngb.app.identity.application;
 
-import dev.ngb.app.common.public_api.IdentityPublicApi;
+import dev.ngb.app.shared.public_api.IdentityPublicApi;
 import dev.ngb.application.PublicApi;
 import dev.ngb.domain.identity.model.auth.Account;
 import dev.ngb.domain.identity.repository.AccountRepository;

@@ -1,6 +1,7 @@
 package dev.ngb.worker.attachment.application.sweep;
 
 import dev.ngb.application.UseCaseService;
+import dev.ngb.worker.attachment.public_api.SweepStalePendingAttachmentsPublicApi;
 import dev.ngb.application.port.storage.ObjectStorage;
 import dev.ngb.constant.AttachmentConstants;
 import dev.ngb.domain.attachment.model.attachment.Attachment;
@@ -26,7 +27,7 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 @Slf4j
 @RequiredArgsConstructor
-public class SweepStalePendingAttachmentsUseCase implements UseCaseService {
+public class SweepStalePendingAttachmentsUseCase implements UseCaseService, SweepStalePendingAttachmentsPublicApi {
 
     /** Tuned for S3 exists + batched saves rather than {@code BatchExecutorUtils.executeIOBound} defaults. */
     private static final int PIPELINE_SHARDS = 1;

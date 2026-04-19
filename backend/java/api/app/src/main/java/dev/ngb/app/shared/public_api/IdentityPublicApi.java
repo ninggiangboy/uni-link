@@ -1,4 +1,4 @@
-package dev.ngb.app.common.public_api;
+package dev.ngb.app.shared.public_api;
 
 public interface IdentityPublicApi {
 
