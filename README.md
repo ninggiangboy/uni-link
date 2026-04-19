@@ -1,6 +1,6 @@
 # uni-link
 
-[![GitHub](https://img.shields.io/badge/github-ninggiangboy%2Funi-link-181717?style=flat-square&logo=github)](https://github.com/ninggiangboy/uni-link)
+[![GitHub](https://img.shields.io/badge/github-ninggiangboy/uni-link-181717?style=flat-square&logo=github)](https://github.com/ninggiangboy/uni-link)
 [![Stars](https://img.shields.io/github/stars/ninggiangboy/uni-link?style=flat-square)](https://github.com/ninggiangboy/uni-link/stargazers)
 [![Issues](https://img.shields.io/github/issues/ninggiangboy/uni-link?style=flat-square)](https://github.com/ninggiangboy/uni-link/issues)
 [![Last commit](https://img.shields.io/github/last-commit/ninggiangboy/uni-link?style=flat-square)](https://github.com/ninggiangboy/uni-link/commits/main)
