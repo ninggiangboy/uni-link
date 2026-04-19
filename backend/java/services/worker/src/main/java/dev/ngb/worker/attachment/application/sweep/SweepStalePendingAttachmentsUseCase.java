@@ -3,7 +3,6 @@ package dev.ngb.worker.attachment.application.sweep;
 import dev.ngb.application.UseCaseService;
 import dev.ngb.application.port.storage.ObjectStorage;
 import dev.ngb.constant.AttachmentConstants;
-import dev.ngb.domain.attachment.model.AttachmentUploadStatus;
 import dev.ngb.domain.attachment.model.attachment.Attachment;
 import dev.ngb.domain.attachment.repository.AttachmentRepository;
 import dev.ngb.util.batching.BatchExecutorUtils;
@@ -19,7 +18,6 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -29,6 +27,14 @@ import java.util.concurrent.atomic.AtomicLong;
 @Slf4j
 @RequiredArgsConstructor
 public class SweepStalePendingAttachmentsUseCase implements UseCaseService {
+
+    /** Tuned for S3 exists + batched saves rather than {@code BatchExecutorUtils.executeIOBound} defaults. */
+    private static final int PIPELINE_SHARDS = 1;
+    private static final int PIPELINE_BUFFERED_ITEMS = 5_000;
+    private static final int PIPELINE_WRITE_BATCH_SIZE = 200;
+    private static final int PIPELINE_PROCESSOR_CONCURRENCY =
+            Math.max(Runtime.getRuntime().availableProcessors() * 2, 16);
+    private static final int PIPELINE_MAX_INFLIGHT = 8_000;
 
     private final AttachmentRepository attachmentRepository;
     private final ObjectStorage objectStorage;
@@ -40,16 +46,24 @@ public class SweepStalePendingAttachmentsUseCase implements UseCaseService {
                         + AttachmentConstants.PENDING_STALE_GRACE_SECONDS
         );
 
-        AtomicInteger failuresInCurrentChunk = new AtomicInteger(0);
         AtomicLong totalFailed = new AtomicLong(0L);
 
-        IteratorItemReader reader = new IteratorItemReader(attachmentRepository, cutoff, failuresInCurrentChunk);
+        AttachmentItemReader reader = new AttachmentItemReader(attachmentRepository, cutoff);
         ItemProcessor<Attachment, Attachment> processor =
-                attachment -> classifyAttachment(attachment, failuresInCurrentChunk, totalFailed);
+                attachment -> classifyAttachment(attachment, totalFailed);
         ItemWriter<Attachment> writer = attachmentRepository::saveAll;
 
         try {
-            BatchExecutorUtils.executeIOBound(reader, processor, writer);
+            BatchExecutorUtils.execute(
+                    PIPELINE_SHARDS,
+                    reader,
+                    processor,
+                    writer,
+                    PIPELINE_BUFFERED_ITEMS,
+                    PIPELINE_WRITE_BATCH_SIZE,
+                    PIPELINE_PROCESSOR_CONCURRENCY,
+                    PIPELINE_MAX_INFLIGHT
+            );
         } catch (Exception ex) {
             throw new IllegalStateException("Pending attachment sweep pipeline failed", ex);
         }
@@ -69,11 +83,7 @@ public class SweepStalePendingAttachmentsUseCase implements UseCaseService {
         );
     }
 
-    private Attachment classifyAttachment(
-            Attachment attachment,
-            AtomicInteger failuresInCurrentChunk,
-            AtomicLong totalFailed
-    ) {
+    private Attachment classifyAttachment(Attachment attachment, AtomicLong totalFailed) {
         try {
             if (objectStorage.objectExists(attachment.getType().getBucket(), attachment.getObjectKey())) {
                 attachment.markAvailable();
@@ -88,25 +98,23 @@ public class SweepStalePendingAttachmentsUseCase implements UseCaseService {
                     attachment.getUuid(),
                     ex
             );
-            failuresInCurrentChunk.incrementAndGet();
             totalFailed.incrementAndGet();
             return null;
         }
     }
 
     @RequiredArgsConstructor
-    public static class IteratorItemReader implements ItemReader<Attachment> {
+    public static class AttachmentItemReader implements ItemReader<Attachment> {
 
-        private static final int batchSize = 5000;
+        private static final int batchSize = 1_000;
 
         private final AttachmentRepository attachmentRepository;
         private final Instant cutoff;
-        /** Failures in the chunk currently being iterated; reset at each new fetch. */
-        private final AtomicInteger failuresInCurrentChunk;
 
         private Iterator<Attachment> iterator = Collections.emptyIterator();
         private boolean finished = false;
-        private int lastChunkSize = 0;
+        /** Cursor for stable paging: the next query uses strictly greater ids (0 = first page). */
+        private long lastId = 0L;
 
         @Getter
         private long totalFetched;
@@ -134,23 +142,12 @@ public class SweepStalePendingAttachmentsUseCase implements UseCaseService {
         }
 
         private List<Attachment> fetchNextChunk() {
-            if (lastChunkSize > 0 && failuresInCurrentChunk.get() >= lastChunkSize) {
-                finished = true;
-                return List.of();
-            }
+            List<Attachment> staleChunk = attachmentRepository.findPendingPutStaleAfterId(cutoff, lastId, batchSize);
 
-            failuresInCurrentChunk.set(0);
-
-            List<Attachment> staleChunk = attachmentRepository.findByUploadStatusAndCreatedAtBefore(
-                    AttachmentUploadStatus.PENDING_PUT,
-                    cutoff,
-                    batchSize
-            );
-
-            lastChunkSize = staleChunk.size();
             if (!staleChunk.isEmpty()) {
                 chunksLoaded++;
                 totalFetched += staleChunk.size();
+                lastId = staleChunk.stream().mapToLong(Attachment::getId).max().orElse(lastId);
             }
 
             return staleChunk;

@@ -3,6 +3,7 @@ package dev.ngb.infrastructure.aws.s3.storage;
 import dev.ngb.application.port.storage.ObjectStorage;
 import dev.ngb.application.port.config.AppConfig;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.http.SdkHttpRequest;
 import software.amazon.awssdk.regions.Region;
@@ -23,12 +24,20 @@ import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class AwsS3ObjectStorage implements ObjectStorage {
 
     private final S3Client s3Client;

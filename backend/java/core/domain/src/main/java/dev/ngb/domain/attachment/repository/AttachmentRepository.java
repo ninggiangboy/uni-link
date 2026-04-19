@@ -15,15 +15,11 @@ public interface AttachmentRepository extends Repository<Attachment, Long> {
 
     Optional<Attachment> findByUuidAndAccountId(String uuid, Long accountId);
 
-    List<Attachment> findByUploadStatusAndCreatedAtBefore(AttachmentUploadStatus status, Instant createdBefore);
-
-    List<Attachment> findByUploadStatusAndCreatedAtBefore(
-            AttachmentUploadStatus status,
-            Instant createdBefore,
-            int limit
-    );
-
-    List<Attachment> findAvailableUnprocessedImages(int limit);
+    /**
+     * Stale {@code PENDING_PUT} rows with {@code created_at} before the cutoff, using a stable id cursor for paging.
+     * Rows are ordered by ascending id; the next page starts strictly after {@code idAfter} (use {@code 0} for the first page).
+     */
+    List<Attachment> findPendingPutStaleAfterId(Instant createdBefore, long idAfter, int limit);
 
     Optional<Attachment> findByUuid(String uuid);
 }
