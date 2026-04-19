@@ -1,7 +1,7 @@
 package dev.ngb.infrastructure.aws.s3.storage;
 
 import dev.ngb.application.port.storage.ObjectStorage;
-import dev.ngb.application.port.config.AppConfig;
+import dev.ngb.application.port.config.StorageS3Config;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -42,7 +42,7 @@ public class AwsS3ObjectStorage implements ObjectStorage {
 
     private final S3Client s3Client;
     private final S3Presigner s3Presigner;
-    private final AppConfig appConfig;
+    private final StorageS3Config appConfig;
 
     @Override
     public boolean objectExists(String bucket, String objectKey) {

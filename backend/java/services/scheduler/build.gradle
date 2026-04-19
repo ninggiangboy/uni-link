@@ -3,13 +3,11 @@ plugins {
 }
 
 dependencies {
-    implementation project(':core:domain')
-    implementation project(':core:database')
-
     implementation project(':libs:common')
-    implementation project(':libs:infrastructure')
     implementation project(':libs:utils')
-    implementation project(':libs:constant')
+
+    implementation 'org.springframework.boot:spring-boot-quartz'
+    implementation 'org.springframework.kafka:spring-kafka'
 
     implementation 'org.springframework.cloud:spring-cloud-starter-config'
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'

@@ -1,7 +1,7 @@
 package dev.ngb.app.identity.infrastructure.security;
 
 import dev.ngb.app.identity.application.port.TokenProvider;
-import dev.ngb.application.port.config.AppConfig;
+import dev.ngb.application.port.config.SecurityJwtConfig;
 import dev.ngb.application.port.time.TimeProvider;
 import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
 import org.springframework.security.oauth2.jwt.JwsHeader;
@@ -29,7 +29,7 @@ public class JwtTokenProvider implements TokenProvider {
     private final long verificationTokenExpiresInSeconds;
 
     public JwtTokenProvider(
-            AppConfig appConfig,
+            SecurityJwtConfig appConfig,
             TimeProvider timeProvider,
             JwtEncoder jwtEncoder,
             JwtDecoder jwtDecoder

@@ -1,7 +1,7 @@
 package dev.ngb.infrastructure.kafka.cdc.producer;
 
 import dev.ngb.event.Event;
-import dev.ngb.event.Topic;
+import dev.ngb.event.EventTopicResolver;
 import dev.ngb.application.port.event.EventPublisher;
 import dev.ngb.constant.TopicNames;
 import dev.ngb.infrastructure.jdbc.event.entity.EventPublicationEntity;
@@ -27,14 +27,11 @@ public class CdcKafkaEventPublisher implements EventPublisher {
 
     private final EventPublicationRepository eventPublicationRepository;
     private final ObjectMapper objectMapper;
-    private final KafkaTemplate<@NonNull String, @NonNull Object> kafkaTemplate;
+    private final KafkaTemplate<@NonNull String, @NonNull String> kafkaTemplate;
 
     @Override
     public void publish(Event event) {
-        Topic topicAnn = event.getClass().getAnnotation(Topic.class);
-        if (topicAnn == null) {
-            throw new IllegalArgumentException("No Topic information found on " + event.getClass().getName());
-        }
+        String topicName = EventTopicResolver.resolve(event.getClass());
         String payload;
         try {
             payload = objectMapper.writeValueAsString(event);
@@ -43,7 +40,7 @@ public class CdcKafkaEventPublisher implements EventPublisher {
         }
         log.info("Saving outbox event: {}", payload);
         EventPublicationEntity eventPublication = EventPublicationEntity.builder()
-                .type(topicAnn.value())
+                .type(topicName)
                 .typeClazz(event.getClass().getName())
                 .payload(payload)
                 .occurredAt(event.occurredAt())
@@ -57,13 +54,9 @@ public class CdcKafkaEventPublisher implements EventPublisher {
         if (cdcPayload.isCreate() && cdcPayload.payload().after() != null) {
             EventPublicationEntity event = cdcPayload.payload().after();
             Class<?> eventClass = Class.forName(event.getTypeClazz());
-            Topic annotation = eventClass.getAnnotation(Topic.class);
-            if (annotation == null) {
-                throw new IllegalArgumentException("No Topic information found on " + event.getTypeClazz());
-            }
-            String topic = annotation.value();
+            String topic = EventTopicResolver.resolve(eventClass);
             log.info("Publishing event topic: {}, payload: {}", topic, event.getPayload());
-            ProducerRecord<String, Object> record = new ProducerRecord<>(topic, event.getUuid(), event);
+            ProducerRecord<String, String> record = new ProducerRecord<>(topic, event.getUuid(), event.getPayload());
             record.headers().add(new RecordHeader("__TypeId__", eventClass.getName().getBytes(StandardCharsets.UTF_8)));
             kafkaTemplate.send(record);
         }

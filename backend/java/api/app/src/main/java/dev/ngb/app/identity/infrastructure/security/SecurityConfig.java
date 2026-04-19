@@ -3,7 +3,7 @@ package dev.ngb.app.identity.infrastructure.security;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
-import dev.ngb.application.port.config.AppConfig;
+import dev.ngb.application.port.config.SecurityJwtConfig;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,7 +30,7 @@ import java.util.Base64;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final AppConfig appConfig;
+    private final SecurityJwtConfig appConfig;
 
     /**
      * Public auth endpoints stay outside the OAuth2 resource-server filter chain so domain errors

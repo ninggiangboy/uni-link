@@ -1,6 +1,6 @@
 package dev.ngb.infrastructure.aws.s3;
 
-import dev.ngb.application.port.config.AppConfig;
+import dev.ngb.application.port.config.StorageS3Config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,7 +17,7 @@ import java.net.URI;
 @RequiredArgsConstructor
 public class AwsS3Config {
 
-    private final AppConfig appConfig;
+    private final StorageS3Config appConfig;
 
     private AwsBasicCredentials getCredentials() {
         return AwsBasicCredentials.create(
