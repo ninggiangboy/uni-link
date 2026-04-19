@@ -7,9 +7,26 @@
 [![Commits (last month)](https://img.shields.io/github/commit-activity/m/ninggiangboy/uni-link?style=flat-square)](https://github.com/ninggiangboy/uni-link/graphs/commit-activity)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](LICENSE)
 
-A social/thread-style platform backend built with **Java 25** and **Spring Boot 4**. The system follows domain-driven design and is organized as a Gradle multi-module project with bounded contexts for identity, profiles, threads, chat, hashtags, and notifications.
+A social/thread-style platform with a Vue 3 frontend and Java 25/Spring Boot 4 backend. The system follows domain-driven design and is organized as a Gradle multi-module project with bounded contexts for identity, profiles, threads, chat, hashtags, and notifications.
 
 ## Tech Stack
+
+### Frontend (Vue)
+
+| Layer | Technologies |
+|---|---|
+| Framework | Vue 3.5, Vue Router 5 |
+| State Management | Pinia 3.0 |
+| UI Components | Reka UI 2.9 |
+| Styling | TailwindCSS 4.2 |
+| Data Fetching | TanStack Vue Query |
+| Form Validation | Vee-validate, Zod |
+| HTTP Client | Axios |
+| Build Tool | Vite 8 |
+| Language | TypeScript 6 |
+| Testing | Vitest, Playwright |
+
+### Backend (Java)
 
 | Layer | Technologies |
 |---|---|
@@ -26,6 +43,9 @@ A social/thread-style platform backend built with **Java 25** and **Spring Boot 
 ## Project Structure
 
 ```
+frontend/
+└── vue                    # Vue 3 application
+
 backend/
 ├── apps/
 │   └── app                  # Main Spring Boot application
@@ -62,6 +82,10 @@ backend/
 
 ### Prerequisites
 
+#### Frontend
+- Node.js 20+
+
+#### Backend
 - Java 25+
 - PostgreSQL
 - Redis
@@ -81,6 +105,27 @@ The application uses Spring Cloud Config. Key environment variables:
 | `APP_PORT` | Application port | `8080` |
 
 ### Build & Run
+
+#### Frontend
+
+```bash
+cd frontend/vue
+
+# Install dependencies
+npm install
+
+# Run development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Run tests
+npm run test:unit
+npm run test:e2e
+```
+
+#### Backend
 
 ```bash
 cd backend
