@@ -4,8 +4,12 @@ plugins {
 }
 
 dependencies {
+    implementation project(':core:database')
+    implementation project(':libs:constant')
+
     api project(':libs:common')
     api project(':libs:utils')
+
     api platform('software.amazon.awssdk:bom:2.31.77')
     api 'software.amazon.awssdk:s3'
 

@@ -44,6 +44,19 @@ public class AttachmentJdbcRepository extends JdbcRepository<Attachment, Attachm
     }
 
     @Override
+    public List<Attachment> findByUploadStatusAndCreatedAtBefore(
+            AttachmentUploadStatus status,
+            Instant createdBefore,
+            int limit
+    ) {
+        Criteria criteria = Criteria.where("upload_status")
+                .is(status.name())
+                .and("created_at").lessThan(createdBefore);
+        Pageable pageable = PageRequest.of(0, limit, Sort.by(Sort.Direction.ASC, "created_at"));
+        return findAll(criteria, pageable);
+    }
+
+    @Override
     public List<Attachment> findAvailableUnprocessedImages(int limit) {
         Criteria criteria = Criteria.where("upload_status").is(AttachmentUploadStatus.AVAILABLE.name())
                 .and("processed_at").isNull()

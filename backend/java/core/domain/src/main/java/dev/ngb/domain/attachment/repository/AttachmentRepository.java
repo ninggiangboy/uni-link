@@ -17,6 +17,12 @@ public interface AttachmentRepository extends Repository<Attachment, Long> {
 
     List<Attachment> findByUploadStatusAndCreatedAtBefore(AttachmentUploadStatus status, Instant createdBefore);
 
+    List<Attachment> findByUploadStatusAndCreatedAtBefore(
+            AttachmentUploadStatus status,
+            Instant createdBefore,
+            int limit
+    );
+
     List<Attachment> findAvailableUnprocessedImages(int limit);
 
     Optional<Attachment> findByUuid(String uuid);
