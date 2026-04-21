@@ -3,5 +3,6 @@ plugins {
 }
 
 dependencies {
+    api project(':libs:constant')
     api 'io.projectreactor:reactor-core:3.7.6'
 }

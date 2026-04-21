@@ -1,0 +1,30 @@
+server:
+  port: ${REALTIME_PORT:8081}
+  servlet:
+    async:
+      timeout: -1
+
+spring:
+  application:
+    name: realtime
+  threads:
+    virtual:
+      enabled: true
+  config:
+    import: optional:configserver:${CONFIG_SERVER_URI:http://localhost:8888}
+  cloud:
+    config:
+      username: ${CONFIG_SERVER_USERNAME:config}
+      password: ${CONFIG_SERVER_PASSWORD:config}
+      fail-fast: ${CONFIG_FAIL_FAST:false}
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+

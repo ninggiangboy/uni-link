@@ -1,0 +1,21 @@
+plugins {
+    id 'org.springframework.boot'
+}
+
+dependencies {
+    implementation project(':libs:common')
+    implementation project(':libs:constant')
+
+    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+    implementation 'org.springframework.boot:spring-boot-websocket'
+    implementation 'org.springframework.boot:spring-boot-data-redis'
+    implementation 'org.redisson:redisson:3.52.0'
+
+    implementation 'org.springframework.boot:spring-boot-security'
+    implementation 'org.springframework.boot:spring-boot-security-oauth2-resource-server'
+
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-jackson'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
