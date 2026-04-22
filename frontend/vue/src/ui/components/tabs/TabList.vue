@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { TabsList as RekaTabsList } from 'reka-ui'
-import { cn } from '@/ui/lib/utils'
+import { TabsList as RekaTabsList } from 'reka-ui';
+import { cn } from '@/ui/lib/utils';
 
 defineProps<{
-  class?: string
-}>()
+  class?: string;
+}>();
 </script>
 
 <template>

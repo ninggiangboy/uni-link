@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { CheckboxGroupRoot } from 'reka-ui'
-import { cn } from '@/ui/lib/utils'
+import { CheckboxGroupRoot } from 'reka-ui';
+import { cn } from '@/ui/lib/utils';
 
 defineProps<{
-  class?: string
-}>()
+  class?: string;
+}>();
 
-const model = defineModel<string[]>({ default: () => [] })
+const model = defineModel<string[]>({ default: () => [] });
 </script>
 
 <template>

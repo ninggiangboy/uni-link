@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { Checkbox } from '@/ui/components/checkbox'
-import { cn } from '@/ui/lib/utils'
+import { Checkbox } from '@/ui/components/checkbox';
+import { cn } from '@/ui/lib/utils';
 
 const props = defineProps<{
-  class?: string
-  showCheckbox?: boolean
-}>()
+  class?: string;
+  showCheckbox?: boolean;
+}>();
 
-const selected = defineModel<boolean>('selected', { default: false })
+const selected = defineModel<boolean>('selected', { default: false });
 </script>
 
 <template>

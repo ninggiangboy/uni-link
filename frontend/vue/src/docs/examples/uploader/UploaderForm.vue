@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { docFormToast } from '@/docs/examples/_internal/docFormSubmit'
-import { z } from 'zod'
-import { Button } from '@/ui/components/button'
+import { docFormToast } from '@/docs/examples/_internal/docFormSubmit';
+import { z } from 'zod';
+import { Button } from '@/ui/components/button';
 import {
   Form,
   FormField,
@@ -10,16 +10,16 @@ import {
   FormMessage,
   FormControl,
   useForm,
-} from '@/ui/components/form'
-import { Input } from '@/ui/components/textfield'
-import { Uploader } from '@/ui/components/uploader'
-import type { UploaderFile } from '@/ui/components/uploader/uploaderTypes'
-import { TmpfilesUploaderAction } from '@/docs/examples/uploader/tmpfilesUploaderAction'
+} from '@/ui/components/form';
+import { Input } from '@/ui/components/textfield';
+import { Uploader } from '@/ui/components/uploader';
+import type { UploaderFile } from '@/ui/components/uploader/uploaderTypes';
+import { TmpfilesUploaderAction } from '@/docs/examples/uploader/tmpfilesUploaderAction';
 
 const { handleSubmit } = useForm<{ name: string; attachments: UploaderFile[] }>({
   initialValues: { name: '', attachments: [] },
-})
-const onSubmit = handleSubmit((v) => docFormToast(v))
+});
+const onSubmit = handleSubmit((v) => docFormToast(v));
 </script>
 <template>
   <Form class="w-full space-y-4" @submit="onSubmit">

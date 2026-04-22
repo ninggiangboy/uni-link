@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { cn } from '@/ui/lib/utils'
+import { cn } from '@/ui/lib/utils';
 
 const props = withDefaults(
   defineProps<{
-    withName?: boolean
-    class?: string
+    withName?: boolean;
+    class?: string;
   }>(),
   { withName: true },
-)
+);
 </script>
 
 <template>

@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { TabsRoot } from 'reka-ui'
-import { cn } from '@/ui/lib/utils'
+import { TabsRoot } from 'reka-ui';
+import { cn } from '@/ui/lib/utils';
 
 defineProps<{
-  class?: string
-  orientation?: 'horizontal' | 'vertical'
-  defaultValue?: string | number
-}>()
+  class?: string;
+  orientation?: 'horizontal' | 'vertical';
+  defaultValue?: string | number;
+}>();
 
-const tab = defineModel<string | number>('modelValue')
+const tab = defineModel<string | number>('modelValue');
 </script>
 
 <template>

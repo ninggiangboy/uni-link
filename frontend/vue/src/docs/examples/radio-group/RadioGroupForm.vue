@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { docFormToast } from '@/docs/examples/_internal/docFormSubmit'
-import { z } from 'zod'
-import { Button } from '@/ui/components/button'
-import { Label } from '@/ui/components/field'
+import { docFormToast } from '@/docs/examples/_internal/docFormSubmit';
+import { z } from 'zod';
+import { Button } from '@/ui/components/button';
+import { Label } from '@/ui/components/field';
 import {
   Form,
   FormField,
@@ -11,11 +11,11 @@ import {
   FormMessage,
   FormControl,
   useForm,
-} from '@/ui/components/form'
-import { RadioGroup, RadioGroupItem } from '@/ui/components/radio-group'
+} from '@/ui/components/form';
+import { RadioGroup, RadioGroupItem } from '@/ui/components/radio-group';
 
-const { handleSubmit } = useForm({ initialValues: { plan: 'pro' } })
-const onSubmit = handleSubmit((v) => docFormToast(v))
+const { handleSubmit } = useForm({ initialValues: { plan: 'pro' } });
+const onSubmit = handleSubmit((v) => docFormToast(v));
 </script>
 <template>
   <Form class="space-y-4" @submit="onSubmit">

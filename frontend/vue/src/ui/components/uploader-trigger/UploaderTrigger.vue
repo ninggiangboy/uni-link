@@ -1,30 +1,30 @@
 <script setup lang="ts">
-import { Button } from '@/ui/components/button'
-import { cn } from '@/ui/lib/utils'
-import { formatFileSize } from '@/ui/lib/file'
+import { Button } from '@/ui/components/button';
+import { cn } from '@/ui/lib/utils';
+import { formatFileSize } from '@/ui/lib/file';
 
-defineOptions({ inheritAttrs: false })
+defineOptions({ inheritAttrs: false });
 
 const props = withDefaults(
   defineProps<{
-    class?: string
-    accept?: string
-    multiple?: boolean
+    class?: string;
+    accept?: string;
+    multiple?: boolean;
     /** Max total bytes */
-    maxSize?: number
-    disabled?: boolean
+    maxSize?: number;
+    disabled?: boolean;
   }>(),
   { multiple: true },
-)
+);
 
 const emit = defineEmits<{
-  change: [files: FileList | null]
-}>()
+  change: [files: FileList | null];
+}>();
 
 function onChange(e: Event) {
-  const input = e.target as HTMLInputElement
-  emit('change', input.files)
-  input.value = ''
+  const input = e.target as HTMLInputElement;
+  emit('change', input.files);
+  input.value = '';
 }
 </script>
 

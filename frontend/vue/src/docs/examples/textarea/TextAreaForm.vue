@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { z } from 'zod'
-import { docFormToast } from '@/docs/examples/_internal/docFormSubmit'
-import { Button } from '@/ui/components/button'
+import { z } from 'zod';
+import { docFormToast } from '@/docs/examples/_internal/docFormSubmit';
+import { Button } from '@/ui/components/button';
 import {
   Form,
   FormField,
@@ -10,13 +10,13 @@ import {
   FormMessage,
   FormControl,
   useForm,
-} from '@/ui/components/form'
-import { TextArea } from '@/ui/components/textfield'
+} from '@/ui/components/form';
+import { TextArea } from '@/ui/components/textfield';
 
 const { handleSubmit } = useForm({
   initialValues: { bio: '' },
-})
-const onSubmit = handleSubmit((v) => docFormToast(v))
+});
+const onSubmit = handleSubmit((v) => docFormToast(v));
 </script>
 
 <template>

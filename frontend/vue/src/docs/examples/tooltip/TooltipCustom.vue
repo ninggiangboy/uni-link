@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Button } from '@/ui/components/button'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/components/tooltip'
+import { Button } from '@/ui/components/button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/components/tooltip';
 </script>
 
 <template>

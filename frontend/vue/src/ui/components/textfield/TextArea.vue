@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { cn } from '@/ui/lib/utils'
+import { cn } from '@/ui/lib/utils';
 
-defineOptions({ inheritAttrs: false })
+defineOptions({ inheritAttrs: false });
 
 defineProps<{
-  class?: string
-}>()
+  class?: string;
+}>();
 </script>
 
 <template>

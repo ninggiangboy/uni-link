@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ChevronRight } from 'lucide-vue-next'
-import { Button } from '@/ui/components/button'
+import { ChevronRight } from 'lucide-vue-next';
+import { Button } from '@/ui/components/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,14 +9,14 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from '@/ui/components/menu'
-import { cn } from '@/ui/lib/utils'
+} from '@/ui/components/menu';
+import { cn } from '@/ui/lib/utils';
 
 const subTriggerClass = cn(
   'relative flex cursor-default select-none items-center gap-2.5 rounded-sm px-2 py-1.5 text-sm outline-none',
   'data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
   'data-[highlighted]:bg-primary data-[highlighted]:text-white',
-)
+);
 </script>
 
 <template>

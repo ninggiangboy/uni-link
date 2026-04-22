@@ -1,1 +1,1 @@
-export { default as DatePicker, type DatePickerProps } from './DatePicker.vue'
+export { default as DatePicker, type DatePickerProps } from './DatePicker.vue';

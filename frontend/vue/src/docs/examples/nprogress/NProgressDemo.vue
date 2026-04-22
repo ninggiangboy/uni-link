@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { Button } from '@/ui/components/button'
-import { useNProgress } from '@/ui'
+import { ref } from 'vue';
+import { Button } from '@/ui/components/button';
+import { useNProgress } from '@/ui';
 
-const isFetching = ref(false)
-useNProgress(isFetching)
+const isFetching = ref(false);
+useNProgress(isFetching);
 
 function refetch() {
-  isFetching.value = true
+  isFetching.value = true;
   window.setTimeout(() => {
-    isFetching.value = false
-  }, 1000)
+    isFetching.value = false;
+  }, 1000);
 }
 </script>
 

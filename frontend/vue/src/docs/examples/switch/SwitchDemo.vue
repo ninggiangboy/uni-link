@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { Switch } from '@/ui/components/switch-ui'
+import { ref } from 'vue';
+import { Switch } from '@/ui/components/switch-ui';
 
-const v = ref(true)
+const v = ref(true);
 </script>
 
 <template>

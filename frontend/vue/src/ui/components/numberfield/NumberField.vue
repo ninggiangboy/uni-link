@@ -1,41 +1,41 @@
 <script setup lang="ts">
-import { ChevronDown, ChevronUp } from 'lucide-vue-next'
-import { FieldGroup } from '@/ui/components/field'
-import { Separator } from '@/ui/components/separator'
+import { ChevronDown, ChevronUp } from 'lucide-vue-next';
+import { FieldGroup } from '@/ui/components/field';
+import { Separator } from '@/ui/components/separator';
 import {
   NumberFieldDecrement,
   NumberFieldIncrement,
   NumberFieldInput,
   NumberFieldRoot,
-} from 'reka-ui'
-import { cn } from '@/ui/lib/utils'
+} from 'reka-ui';
+import { cn } from '@/ui/lib/utils';
 
-defineOptions({ inheritAttrs: false })
+defineOptions({ inheritAttrs: false });
 
 const props = withDefaults(
   defineProps<{
-    class?: string
-    min?: number
-    max?: number
-    step?: number
-    formatOptions?: Intl.NumberFormatOptions
-    locale?: string
-    disabled?: boolean
-    readonly?: boolean
+    class?: string;
+    min?: number;
+    max?: number;
+    step?: number;
+    formatOptions?: Intl.NumberFormatOptions;
+    locale?: string;
+    disabled?: boolean;
+    readonly?: boolean;
     /** @default true */
-    showStepper?: boolean
-    placeholder?: string
-    'aria-invalid'?: boolean
+    showStepper?: boolean;
+    placeholder?: string;
+    'aria-invalid'?: boolean;
   }>(),
   { showStepper: true },
-)
+);
 
-const model = defineModel<number | null>({ default: null })
+const model = defineModel<number | null>({ default: null });
 
 const stepperBtnClass = cn(
   'flex size-4 shrink-0 grow cursor-pointer items-center justify-center rounded-none px-0.5 text-muted-foreground',
   'hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50',
-)
+);
 </script>
 
 <template>

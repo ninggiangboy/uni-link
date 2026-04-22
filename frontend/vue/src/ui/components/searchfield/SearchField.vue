@@ -1,32 +1,32 @@
 <script setup lang="ts">
-import { Search, X } from 'lucide-vue-next'
-import { computed, useAttrs } from 'vue'
-import { FieldGroup } from '@/ui/components/field'
-import { cn } from '@/ui/lib/utils'
+import { Search, X } from 'lucide-vue-next';
+import { computed, useAttrs } from 'vue';
+import { FieldGroup } from '@/ui/components/field';
+import { cn } from '@/ui/lib/utils';
 
-defineOptions({ inheritAttrs: false })
+defineOptions({ inheritAttrs: false });
 
 const props = withDefaults(
   defineProps<{
-    class?: string
-    placeholder?: string
+    class?: string;
+    placeholder?: string;
   }>(),
   {
     placeholder: 'Search...',
   },
-)
+);
 
-const model = defineModel<string>({ default: '' })
+const model = defineModel<string>({ default: '' });
 
-const attrs = useAttrs()
+const attrs = useAttrs();
 
 const inputAttrs = computed(() => {
-  const a = { ...attrs } as Record<string, unknown>
-  delete a.class
-  return a
-})
+  const a = { ...attrs } as Record<string, unknown>;
+  delete a.class;
+  return a;
+});
 
-const hasValue = computed(() => String(model.value ?? '').length > 0)
+const hasValue = computed(() => String(model.value ?? '').length > 0);
 </script>
 
 <template>

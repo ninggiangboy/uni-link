@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { Button } from '@/ui/components/button'
+import { Button } from '@/ui/components/button';
 import {
   DialogClose,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/ui/components/dialog'
-import { Label } from '@/ui/components/field'
-import { Sheet, SheetContent, SheetTrigger } from '@/ui/components/sheet'
-import { Input } from '@/ui/components/textfield'
+} from '@/ui/components/dialog';
+import { Label } from '@/ui/components/field';
+import { Sheet, SheetContent, SheetTrigger } from '@/ui/components/sheet';
+import { Input } from '@/ui/components/textfield';
 </script>
 
 <template>

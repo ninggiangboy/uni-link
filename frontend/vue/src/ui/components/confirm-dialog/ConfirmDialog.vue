@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { CircleX, Info } from 'lucide-vue-next'
-import { Button } from '@/ui/components/button'
+import { CircleX, Info } from 'lucide-vue-next';
+import { Button } from '@/ui/components/button';
 import {
   Dialog,
   DialogContent,
@@ -8,17 +8,17 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/ui/components/dialog'
-import { closeConfirm, confirmDialogData, confirmDialogOpen } from '@/ui/lib/confirmDialog'
+} from '@/ui/components/dialog';
+import { closeConfirm, confirmDialogData, confirmDialogOpen } from '@/ui/lib/confirmDialog';
 
 function handleCancel() {
-  confirmDialogData.value?.cancel?.onClick?.()
-  closeConfirm()
+  confirmDialogData.value?.cancel?.onClick?.();
+  closeConfirm();
 }
 
 async function handleAction() {
-  await confirmDialogData.value?.action?.onClick?.()
-  closeConfirm()
+  await confirmDialogData.value?.action?.onClick?.();
+  closeConfirm();
 }
 </script>
 

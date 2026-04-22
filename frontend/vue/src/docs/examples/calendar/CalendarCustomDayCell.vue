@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { DateValue } from '@internationalized/date'
-import { Calendar } from '@/ui/components/calendar'
+import type { DateValue } from '@internationalized/date';
+import { Calendar } from '@/ui/components/calendar';
 
 function isWeekend(date: DateValue) {
-  const day = date.toDate('UTC').getDay()
-  return day === 0 || day === 6
+  const day = date.toDate('UTC').getDay();
+  return day === 0 || day === 6;
 }
 </script>
 

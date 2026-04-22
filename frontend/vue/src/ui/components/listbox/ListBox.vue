@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import type { AcceptableValue } from 'reka-ui'
-import { ListboxRoot } from 'reka-ui'
-import { cn } from '@/ui/lib/utils'
+import type { AcceptableValue } from 'reka-ui';
+import { ListboxRoot } from 'reka-ui';
+import { cn } from '@/ui/lib/utils';
 
 defineProps<{
-  class?: string
-}>()
+  class?: string;
+}>();
 
-const model = defineModel<AcceptableValue | AcceptableValue[] | undefined>()
+const model = defineModel<AcceptableValue | AcceptableValue[] | undefined>();
 </script>
 
 <template>

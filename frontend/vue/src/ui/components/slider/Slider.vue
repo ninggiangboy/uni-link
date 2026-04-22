@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import { SliderRange, SliderRoot, SliderThumb, SliderTrack } from 'reka-ui'
-import { cn } from '@/ui/lib/utils'
+import { SliderRange, SliderRoot, SliderThumb, SliderTrack } from 'reka-ui';
+import { cn } from '@/ui/lib/utils';
 
-defineOptions({ inheritAttrs: false })
+defineOptions({ inheritAttrs: false });
 
 defineProps<{
-  class?: string
-  min?: number
-  max?: number
-  step?: number
-}>()
+  class?: string;
+  min?: number;
+  max?: number;
+  step?: number;
+}>();
 
-const model = defineModel<number[]>({ default: () => [50] })
+const model = defineModel<number[]>({ default: () => [50] });
 </script>
 
 <template>

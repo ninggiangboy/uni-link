@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { Button } from '@/ui/components/button'
-import { Popover, PopoverContent, PopoverTrigger } from '@/ui/components/popover'
-import { Switch } from '@/ui/components/switch-ui'
+import { ref } from 'vue';
+import { Button } from '@/ui/components/button';
+import { Popover, PopoverContent, PopoverTrigger } from '@/ui/components/popover';
+import { Switch } from '@/ui/components/switch-ui';
 
-const wifi = ref(true)
-const bt = ref(true)
-const mute = ref(false)
+const wifi = ref(true);
+const bt = ref(true);
+const mute = ref(false);
 </script>
 
 <template>

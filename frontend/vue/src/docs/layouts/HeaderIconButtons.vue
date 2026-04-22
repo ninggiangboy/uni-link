@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import ThemeSwitcher from '@/docs/components/ThemeSwitcher.vue'
-import { Button } from '@/ui/components/button'
-import { Github } from 'lucide-vue-next'
+import ThemeSwitcher from '@/docs/components/ThemeSwitcher.vue';
+import { Button } from '@/ui/components/button';
+import { Github } from 'lucide-vue-next';
 
-const GITHUB_URL = 'https://github.com'
+const GITHUB_URL = 'https://github.com';
 </script>
 
 <template>

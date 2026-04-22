@@ -1,13 +1,13 @@
 /** Subset of doc payments fixture for DataTable demos (mirrors frontend-sample payments.data). */
 export type DemoPayment = {
-  id: string
-  amount: string
-  status: 'pending' | 'processing' | 'success' | 'failed'
-  email: string
-  paymentMethod: 'credit_card' | 'debit_card' | 'paypal' | 'bank_transfer'
-  transactionDate: string
-  paymentReference: string
-}
+  id: string;
+  amount: string;
+  status: 'pending' | 'processing' | 'success' | 'failed';
+  email: string;
+  paymentMethod: 'credit_card' | 'debit_card' | 'paypal' | 'bank_transfer';
+  transactionDate: string;
+  paymentReference: string;
+};
 
 export const demoPayments: DemoPayment[] = [
   {
@@ -100,4 +100,4 @@ export const demoPayments: DemoPayment[] = [
     transactionDate: '2025-08-24',
     paymentReference: 'PAY-OQE1T6',
   },
-]
+];

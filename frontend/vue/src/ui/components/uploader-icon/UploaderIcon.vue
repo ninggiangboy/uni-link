@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { cn } from '@/ui/lib/utils'
+import { computed } from 'vue';
+import { cn } from '@/ui/lib/utils';
 
 const iconColors: Record<string, string> = {
   pdf: '#C02626',
@@ -22,18 +22,18 @@ const iconColors: Record<string, string> = {
   mp4: '#7C3AED',
   avi: '#BE123C',
   other: '#1D4ED8',
-}
+};
 
 const props = withDefaults(
   defineProps<{
-    extension?: string
-    class?: string
+    extension?: string;
+    class?: string;
   }>(),
   { extension: 'txt' },
-)
+);
 
-const fill = computed(() => iconColors[props.extension] ?? '#1D4ED8')
-const label = computed(() => props.extension.toUpperCase())
+const fill = computed(() => iconColors[props.extension] ?? '#1D4ED8');
+const label = computed(() => props.extension.toUpperCase());
 </script>
 
 <template>

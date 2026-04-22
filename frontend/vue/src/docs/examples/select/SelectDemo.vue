@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Select } from '@/ui/components/select'
-import { languageOptions } from './selectLanguages'
+import { Select } from '@/ui/components/select';
+import { languageOptions } from './selectLanguages';
 </script>
 
 <template>

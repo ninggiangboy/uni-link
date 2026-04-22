@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ListboxGroup } from 'reka-ui'
+import { ListboxGroup } from 'reka-ui';
 </script>
 
 <template>

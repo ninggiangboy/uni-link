@@ -1,4 +1,4 @@
-import { cva } from 'class-variance-authority'
+import { cva } from 'class-variance-authority';
 
 /** Range calendar inner cell label variants (ported from React Calendar.helper) */
 export const rangeCalendarCellLabelVariants = cva(
@@ -19,4 +19,4 @@ export const rangeCalendarCellLabelVariants = cva(
       },
     },
   },
-)
+);

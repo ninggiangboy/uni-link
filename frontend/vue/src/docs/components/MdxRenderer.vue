@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { DocSegment } from '@/docs/mdx/renderDoc'
-import ComponentPreview from './ComponentPreview.vue'
+import type { DocSegment } from '@/docs/mdx/renderDoc';
+import ComponentPreview from './ComponentPreview.vue';
 
 defineProps<{
-  segments: DocSegment[]
-}>()
+  segments: DocSegment[];
+}>();
 </script>
 
 <template>

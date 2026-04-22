@@ -2,11 +2,11 @@
 /**
  * Minimal app sidebar shell — expand with full layout (header, groups, mobile sheet) as needed.
  */
-import { cn } from '@/ui/lib/utils'
+import { cn } from '@/ui/lib/utils';
 
 defineProps<{
-  class?: string
-}>()
+  class?: string;
+}>();
 </script>
 
 <template>

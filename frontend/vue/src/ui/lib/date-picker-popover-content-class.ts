@@ -1,4 +1,4 @@
-import { cn } from '@/ui/lib/utils'
+import { cn } from '@/ui/lib/utils';
 
 /** Surface + enter/exit motion for Reka DatePicker / DateRangePicker popovers (Presence + tailwindcss-animate). */
 export function datePickerPopoverContentClass(className?: string) {
@@ -10,5 +10,5 @@ export function datePickerPopoverContentClass(className?: string) {
     'data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
     'duration-200 ease-out',
     className,
-  )
+  );
 }

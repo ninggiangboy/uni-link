@@ -1,30 +1,30 @@
 <script setup lang="ts">
-import { ProgressIndicator, ProgressRoot } from 'reka-ui'
-import { computed } from 'vue'
-import { cn } from '@/ui/lib/utils'
+import { ProgressIndicator, ProgressRoot } from 'reka-ui';
+import { computed } from 'vue';
+import { cn } from '@/ui/lib/utils';
 
 const props = withDefaults(
   defineProps<{
-    class?: string
-    iconClassName?: string
-    max?: number
+    class?: string;
+    iconClassName?: string;
+    max?: number;
   }>(),
   { max: 100 },
-)
+);
 
-const model = defineModel<number | null>({ default: 0 })
+const model = defineModel<number | null>({ default: 0 });
 
-const center = 16
-const strokeWidth = 4
-const r = 16 - strokeWidth
-const c = 2 * r * Math.PI
+const center = 16;
+const strokeWidth = 4;
+const r = 16 - strokeWidth;
+const c = 2 * r * Math.PI;
 
 const pct = computed(() => {
-  if (model.value == null) return 0
-  return Math.min(100, Math.max(0, (model.value / props.max) * 100))
-})
+  if (model.value == null) return 0;
+  return Math.min(100, Math.max(0, (model.value / props.max) * 100));
+});
 
-const dashOffset = computed(() => c - (pct.value / 100) * c)
+const dashOffset = computed(() => c - (pct.value / 100) * c);
 </script>
 
 <template>

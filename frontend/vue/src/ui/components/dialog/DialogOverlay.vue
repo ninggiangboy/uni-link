@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { DialogOverlay as RekaDialogOverlay } from 'reka-ui'
-import { cn } from '@/ui/lib/utils'
+import { DialogOverlay as RekaDialogOverlay } from 'reka-ui';
+import { cn } from '@/ui/lib/utils';
 
 defineProps<{
-  class?: string
-}>()
+  class?: string;
+}>();
 </script>
 
 <template>

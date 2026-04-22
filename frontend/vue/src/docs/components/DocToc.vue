@@ -1,45 +1,45 @@
 <script setup lang="ts">
-import type { TocItem } from '@/docs/mdx/renderDoc'
-import { cn } from '@/ui/lib/utils'
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import type { TocItem } from '@/docs/mdx/renderDoc';
+import { cn } from '@/ui/lib/utils';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 
 const props = defineProps<{
-  toc: TocItem[]
-}>()
+  toc: TocItem[];
+}>();
 
-const activeId = ref<string | null>(null)
-let observer: IntersectionObserver | null = null
+const activeId = ref<string | null>(null);
+let observer: IntersectionObserver | null = null;
 
-const ids = computed(() => props.toc.map((t) => t.id))
+const ids = computed(() => props.toc.map((t) => t.id));
 
 function rebuildObserver() {
-  observer?.disconnect()
-  activeId.value = null
-  if (!props.toc.length) return
+  observer?.disconnect();
+  activeId.value = null;
+  if (!props.toc.length) return;
 
   observer = new IntersectionObserver(
     (entries) => {
       for (const entry of entries) {
         if (entry.isIntersecting) {
-          activeId.value = entry.target.id
+          activeId.value = entry.target.id;
         }
       }
     },
     { rootMargin: '0% 0% -80% 0%' },
-  )
+  );
 
   for (const id of ids.value) {
-    const el = document.getElementById(id)
-    if (el) observer.observe(el)
+    const el = document.getElementById(id);
+    if (el) observer.observe(el);
   }
 }
 
-onMounted(rebuildObserver)
-watch(ids, rebuildObserver, { deep: true })
+onMounted(rebuildObserver);
+watch(ids, rebuildObserver, { deep: true });
 
 onUnmounted(() => {
-  observer?.disconnect()
-})
+  observer?.disconnect();
+});
 </script>
 
 <template>

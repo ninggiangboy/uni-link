@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { RadioGroupIndicator, RadioGroupItem as RekaRadioGroupItem } from 'reka-ui'
-import { cn } from '@/ui/lib/utils'
-import { labelVariants } from '@/ui/components/field/field-variants'
+import { RadioGroupIndicator, RadioGroupItem as RekaRadioGroupItem } from 'reka-ui';
+import { cn } from '@/ui/lib/utils';
+import { labelVariants } from '@/ui/components/field/field-variants';
 
-defineOptions({ inheritAttrs: false })
+defineOptions({ inheritAttrs: false });
 
 defineProps<{
-  class?: string
-  value: string
-}>()
+  class?: string;
+  value: string;
+}>();
 </script>
 
 <template>

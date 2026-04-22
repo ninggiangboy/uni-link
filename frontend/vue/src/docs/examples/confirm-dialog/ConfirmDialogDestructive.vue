@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { Button } from '@/ui/components/button'
-import { confirm } from '@/ui/components/confirm-dialog'
-import { toast } from '@/ui/components/sonner'
+import { Button } from '@/ui/components/button';
+import { confirm } from '@/ui/components/confirm-dialog';
+import { toast } from '@/ui/components/sonner';
 
 function handleArchive() {
   confirm({
@@ -13,10 +13,10 @@ function handleArchive() {
       onClick: () => {
         toast.success('Project Archived', {
           description: 'Project archived successfully',
-        })
+        });
       },
     },
-  })
+  });
 }
 </script>
 

@@ -1,21 +1,21 @@
 <script setup lang="ts">
-import type { Component, HTMLAttributes } from 'vue'
-import { computed, useAttrs } from 'vue'
-import { buttonVariants, type ButtonVariants } from './button-variants'
-import { Spinner } from '@/ui/components/spinner'
-import { cn } from '@/ui/lib/utils'
+import type { Component, HTMLAttributes } from 'vue';
+import { computed, useAttrs } from 'vue';
+import { buttonVariants, type ButtonVariants } from './button-variants';
+import { Spinner } from '@/ui/components/spinner';
+import { cn } from '@/ui/lib/utils';
 
-defineOptions({ inheritAttrs: false })
+defineOptions({ inheritAttrs: false });
 
 const props = withDefaults(
   defineProps<{
-    variant?: ButtonVariants['variant']
-    size?: ButtonVariants['size']
+    variant?: ButtonVariants['variant'];
+    size?: ButtonVariants['size'];
     /** Root element, e.g. `'button'`, `'a'`, or `RouterLink` */
-    as?: string | Component
-    class?: HTMLAttributes['class']
-    loading?: boolean
-    iconPosition?: 'left' | 'right'
+    as?: string | Component;
+    class?: HTMLAttributes['class'];
+    loading?: boolean;
+    iconPosition?: 'left' | 'right';
   }>(),
   {
     variant: 'default',
@@ -24,9 +24,9 @@ const props = withDefaults(
     loading: false,
     iconPosition: 'left',
   },
-)
+);
 
-const attrs = useAttrs()
+const attrs = useAttrs();
 
 const mergedClass = computed(() =>
   cn(
@@ -34,26 +34,26 @@ const mergedClass = computed(() =>
     props.class,
     attrs.class as string,
   ),
-)
+);
 
 const passthrough = computed(() => {
-  const rest = { ...attrs } as Record<string, unknown>
-  delete rest.class
-  delete rest.type
-  return rest
-})
+  const rest = { ...attrs } as Record<string, unknown>;
+  delete rest.class;
+  delete rest.type;
+  return rest;
+});
 
-const isNativeButton = computed(() => props.as === 'button')
+const isNativeButton = computed(() => props.as === 'button');
 
 const resolvedType = computed(() => {
-  if (!isNativeButton.value) return undefined
-  const t = attrs.type as string | undefined
-  return (t ?? 'button') as 'button' | 'submit' | 'reset'
-})
+  if (!isNativeButton.value) return undefined;
+  const t = attrs.type as string | undefined;
+  return (t ?? 'button') as 'button' | 'submit' | 'reset';
+});
 
 const disabled = computed(() => {
-  return props.loading || (attrs.disabled as boolean | undefined)
-})
+  return props.loading || (attrs.disabled as boolean | undefined);
+});
 </script>
 
 <template>

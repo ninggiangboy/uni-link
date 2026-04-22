@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { TooltipTrigger as RekaTooltipTrigger } from 'reka-ui'
+import { TooltipTrigger as RekaTooltipTrigger } from 'reka-ui';
 </script>
 
 <template>

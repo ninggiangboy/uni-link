@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { Component } from 'vue'
-import { computed } from 'vue'
-import { RouterLink, useRoute } from 'vue-router'
+import type { Component } from 'vue';
+import { computed } from 'vue';
+import { RouterLink, useRoute } from 'vue-router';
 import {
   Blocks,
   BookOpen,
@@ -11,39 +11,39 @@ import {
   Network,
   Settings,
   SquareTerminal,
-} from 'lucide-vue-next'
-import { ScrollArea } from '@/ui/components/scroll-area'
-import { cn } from '@/ui/lib/utils'
+} from 'lucide-vue-next';
+import { ScrollArea } from '@/ui/components/scroll-area';
+import { cn } from '@/ui/lib/utils';
 
 const props = defineProps<{
-  class?: string
-}>()
+  class?: string;
+}>();
 
 type MenuItem = {
-  title: string
-  href: string
-  icon?: Component
+  title: string;
+  href: string;
+  icon?: Component;
   /** YYYY-MM-DD — shows “new” dot when within the last week */
-  createdAt?: string
-}
+  createdAt?: string;
+};
 
 type MenuGroup = {
-  title: string
-  items: MenuItem[]
-}
+  title: string;
+  items: MenuItem[];
+};
 
-const route = useRoute()
+const route = useRoute();
 
-const selectedModule = computed(() => (route.path.includes('/docs/ui') ? 'ui' : 'guide'))
+const selectedModule = computed(() => (route.path.includes('/docs/ui') ? 'ui' : 'guide'));
 
 function isNew(createdAt?: string): boolean {
-  if (!createdAt) return false
-  const t = new Date(`${createdAt}T12:00:00`).getTime()
-  return t > Date.now() - 7 * 86400000
+  if (!createdAt) return false;
+  const t = new Date(`${createdAt}T12:00:00`).getTime();
+  return t > Date.now() - 7 * 86400000;
 }
 
 function uiItem(title: string, slug: string, createdAt?: string): MenuItem {
-  return { title, href: `/docs/ui/${slug}`, createdAt }
+  return { title, href: `/docs/ui/${slug}`, createdAt };
 }
 
 /** Parity with `frontend-sample` DocsLayout `getMenuGroups` (paths adapted for uni-link router). */
@@ -127,7 +127,7 @@ function getMenuGroups(module: 'guide' | 'ui'): MenuGroup[] {
           { title: 'Enhancing User Experience', href: '/docs/guide/data-fetching-enhance-ux' },
         ],
       },
-    ]
+    ];
   }
 
   if (module === 'ui') {
@@ -202,13 +202,13 @@ function getMenuGroups(module: 'guide' | 'ui'): MenuGroup[] {
           uiItem('Skeleton', 'skeleton'),
         ],
       },
-    ]
+    ];
   }
 
-  return []
+  return [];
 }
 
-const groups = computed(() => getMenuGroups(selectedModule.value))
+const groups = computed(() => getMenuGroups(selectedModule.value));
 </script>
 
 <template>
@@ -217,17 +217,10 @@ const groups = computed(() => getMenuGroups(selectedModule.value))
       class="pointer-events-none absolute top-0 right-6 left-0 z-[1] h-7 bg-gradient-to-b from-background to-transparent"
     />
     <div class="absolute inset-0 min-h-0">
-      <ScrollArea
-        class="h-full min-h-0 -translate-x-px"
-        :show-horizontal-scrollbar="false"
-      >
+      <ScrollArea class="h-full min-h-0 -translate-x-px" :show-horizontal-scrollbar="false">
         <div class="pb-24">
           <div class="h-6" />
-          <div
-            v-for="group in groups"
-            :key="group.title"
-            class="mb-6 space-y-1"
-          >
+          <div v-for="group in groups" :key="group.title" class="mb-6 space-y-1">
             <div v-if="group.title">
               <h3
                 class="flex items-center px-6 text-xs tracking-wide text-muted-foreground/70 uppercase"

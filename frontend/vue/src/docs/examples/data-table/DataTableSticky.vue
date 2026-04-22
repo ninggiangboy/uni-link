@@ -1,21 +1,21 @@
 <script setup lang="ts">
-import { createColumnHelper } from '@tanstack/vue-table'
-import { h } from 'vue'
-import { Pencil, Trash2 } from 'lucide-vue-next'
-import { Button } from '@/ui/components/button'
-import { DataTable } from '@/ui/components/datatable'
+import { createColumnHelper } from '@tanstack/vue-table';
+import { h } from 'vue';
+import { Pencil, Trash2 } from 'lucide-vue-next';
+import { Button } from '@/ui/components/button';
+import { DataTable } from '@/ui/components/datatable';
 
 interface Order {
-  id: string
-  orderNumber: string
-  customer: string
-  email: string
-  product: string
-  quantity: number
-  price: number
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled'
-  orderDate: string
-  total: number
+  id: string;
+  orderNumber: string;
+  customer: string;
+  email: string;
+  product: string;
+  quantity: number;
+  price: number;
+  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  orderDate: string;
+  total: number;
 }
 
 const data: Order[] = [
@@ -55,9 +55,9 @@ const data: Order[] = [
     orderDate: '2024-01-17',
     total: 149.99,
   },
-]
+];
 
-const columnHelper = createColumnHelper<Order>()
+const columnHelper = createColumnHelper<Order>();
 const columns = [
   columnHelper.accessor('orderNumber', { header: 'Order #', size: 90 }),
   columnHelper.accessor('customer', { header: 'Customer', size: 150 }),
@@ -105,7 +105,7 @@ const columns = [
     enableSorting: false,
     meta: { className: 'text-center' },
   }),
-]
+];
 </script>
 
 <template>

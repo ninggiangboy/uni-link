@@ -4,12 +4,12 @@ import type {
   ColumnPinningState,
   RowSelectionState,
   SortingState,
-} from '@tanstack/vue-table'
-import { FlexRender, getCoreRowModel, useVueTable } from '@tanstack/vue-table'
-import { ArrowDown, ArrowUp, FileSearch } from 'lucide-vue-next'
-import { computed, h, toRef } from 'vue'
-import { Checkbox } from '@/ui/components/checkbox'
-import { Spinner } from '@/ui/components/spinner'
+} from '@tanstack/vue-table';
+import { FlexRender, getCoreRowModel, useVueTable } from '@tanstack/vue-table';
+import { ArrowDown, ArrowUp, FileSearch } from 'lucide-vue-next';
+import { computed, h, toRef } from 'vue';
+import { Checkbox } from '@/ui/components/checkbox';
+import { Spinner } from '@/ui/components/spinner';
 import {
   Table,
   TableBody,
@@ -17,26 +17,26 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/ui/components/table'
-import { cn } from '@/ui/lib/utils'
-import type { DataTableSorting } from './dataTableUtils'
+} from '@/ui/components/table';
+import { cn } from '@/ui/lib/utils';
+import type { DataTableSorting } from './dataTableUtils';
 import {
   getCommonPinningStyles,
   getDataTableColumnMetaClassName,
   sortRowsByDataTableSorting,
-} from './dataTableUtils'
+} from './dataTableUtils';
 
 const props = withDefaults(
   defineProps<{
-    data: TData[]
+    data: TData[];
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TValue must accept heterogeneous accessor columns
-    columns: ColumnDef<TData, any>[]
-    containerClassName?: string
-    enableSorting?: boolean
-    isLoading?: boolean
-    enableRowSelection?: boolean
-    rowSelection?: RowSelectionState
-    columnPinning?: ColumnPinningState
+    columns: ColumnDef<TData, any>[];
+    containerClassName?: string;
+    enableSorting?: boolean;
+    isLoading?: boolean;
+    enableRowSelection?: boolean;
+    rowSelection?: RowSelectionState;
+    columnPinning?: ColumnPinningState;
   }>(),
   {
     enableSorting: false,
@@ -45,29 +45,29 @@ const props = withDefaults(
     rowSelection: undefined,
     columnPinning: undefined,
   },
-)
+);
 
 const emit = defineEmits<{
-  'update:rowSelection': [value: RowSelectionState]
-}>()
+  'update:rowSelection': [value: RowSelectionState];
+}>();
 
-const sorting = defineModel<DataTableSorting | null>('sorting', { default: null })
+const sorting = defineModel<DataTableSorting | null>('sorting', { default: null });
 
-const dataRef = toRef(props, 'data')
+const dataRef = toRef(props, 'data');
 
 const sortedData = computed(() => {
-  if (!props.enableSorting || !sorting.value) return dataRef.value
-  return sortRowsByDataTableSorting(dataRef.value, sorting.value)
-})
+  if (!props.enableSorting || !sorting.value) return dataRef.value;
+  return sortRowsByDataTableSorting(dataRef.value, sorting.value);
+});
 
 const tanstackSorting = computed<SortingState>(() => {
-  if (!props.enableSorting) return []
+  if (!props.enableSorting) return [];
   return sorting.value
     ? [{ id: sorting.value.sortBy, desc: sorting.value.sortDirection === 'desc' }]
-    : []
-})
+    : [];
+});
 
-const selectCheckboxClass = 'gap-0 justify-center'
+const selectCheckboxClass = 'gap-0 justify-center';
 
 const selectColumn: ColumnDef<TData, unknown> = {
   id: 'select',
@@ -84,7 +84,7 @@ const selectColumn: ColumnDef<TData, unknown> = {
             ? 'indeterminate'
             : false,
         'onUpdate:modelValue': (v: boolean | 'indeterminate') => {
-          table.toggleAllRowsSelected(v === true)
+          table.toggleAllRowsSelected(v === true);
         },
       }),
     ),
@@ -98,7 +98,7 @@ const selectColumn: ColumnDef<TData, unknown> = {
         modelValue: row.getIsSelected(),
         disabled: !row.getCanSelect(),
         'onUpdate:modelValue': (v: boolean | 'indeterminate') => {
-          row.toggleSelected(v === true)
+          row.toggleSelected(v === true);
         },
       }),
     ),
@@ -107,26 +107,24 @@ const selectColumn: ColumnDef<TData, unknown> = {
   meta: {
     className: 'w-12 min-w-12 max-w-12 !p-0 text-center align-middle',
   },
-}
+};
 
 const displayColumns = computed(() =>
   props.enableRowSelection ? [selectColumn, ...props.columns] : props.columns,
-)
+);
 
 const resolvedColumnPinning = computed<ColumnPinningState>(
   () =>
     props.columnPinning ??
-    (props.enableRowSelection
-      ? { left: ['select'], right: ['actions'] }
-      : { left: [], right: [] }),
-)
+    (props.enableRowSelection ? { left: ['select'], right: ['actions'] } : { left: [], right: [] }),
+);
 
 const table = useVueTable({
   get data() {
-    return sortedData.value
+    return sortedData.value;
   },
   get columns() {
-    return displayColumns.value
+    return displayColumns.value;
   },
   getRowId: (row) => String(row.id),
   enableRowSelection: props.enableRowSelection,
@@ -138,47 +136,47 @@ const table = useVueTable({
   },
   state: {
     get sorting() {
-      return tanstackSorting.value
+      return tanstackSorting.value;
     },
     get rowSelection() {
-      return props.rowSelection ?? {}
+      return props.rowSelection ?? {};
     },
     get columnPinning() {
-      return resolvedColumnPinning.value
+      return resolvedColumnPinning.value;
     },
   },
   onSortingChange: (updater) => {
-    if (!props.enableSorting) return
+    if (!props.enableSorting) return;
     const oldTanstack: SortingState = sorting.value
       ? [{ id: sorting.value.sortBy, desc: sorting.value.sortDirection === 'desc' }]
-      : []
-    const next = typeof updater === 'function' ? updater(oldTanstack) : updater
+      : [];
+    const next = typeof updater === 'function' ? updater(oldTanstack) : updater;
     if (next[0]?.id) {
       sorting.value = {
         sortBy: next[0].id,
         sortDirection: next[0].desc ? 'desc' : 'asc',
-      }
+      };
     } else {
-      sorting.value = null
+      sorting.value = null;
     }
   },
   onRowSelectionChange: (updater) => {
-    const base = props.rowSelection ?? {}
-    const next = typeof updater === 'function' ? updater(base) : updater
-    emit('update:rowSelection', next)
+    const base = props.rowSelection ?? {};
+    const next = typeof updater === 'function' ? updater(base) : updater;
+    emit('update:rowSelection', next);
   },
-})
+});
 
-const leafColumnCount = computed(() => table.getAllLeafColumns().length)
+const leafColumnCount = computed(() => table.getAllLeafColumns().length);
 
 function sortTitle(header: {
-  column: { getCanSort: () => boolean; getNextSortingOrder: () => false | 'asc' | 'desc' }
+  column: { getCanSort: () => boolean; getNextSortingOrder: () => false | 'asc' | 'desc' };
 }) {
-  if (!header.column.getCanSort()) return undefined
-  const next = header.column.getNextSortingOrder()
-  if (next === 'asc') return 'Sort ascending'
-  if (next === 'desc') return 'Sort descending'
-  return 'Clear sort'
+  if (!header.column.getCanSort()) return undefined;
+  const next = header.column.getNextSortingOrder();
+  if (next === 'asc') return 'Sort ascending';
+  if (next === 'desc') return 'Sort descending';
+  return 'Clear sort';
 }
 </script>
 
@@ -211,14 +209,8 @@ function sortTitle(header: {
             @click="header.column.getToggleSortingHandler()?.($event)"
           >
             <FlexRender :render="header.column.columnDef.header" :props="header.getContext()" />
-            <span
-              v-if="header.column.getCanSort()"
-              class="-translate-y-px ml-0.5 inline-block"
-            >
-              <ArrowUp
-                v-if="header.column.getIsSorted() === 'asc'"
-                class="inline-block size-4!"
-              />
+            <span v-if="header.column.getCanSort()" class="-translate-y-px ml-0.5 inline-block">
+              <ArrowUp v-if="header.column.getIsSorted() === 'asc'" class="inline-block size-4!" />
               <ArrowDown
                 v-else-if="header.column.getIsSorted() === 'desc'"
                 class="inline-block size-4!"
@@ -240,12 +232,8 @@ function sortTitle(header: {
             v-for="cell in row.getVisibleCells()"
             :key="cell.id"
             :style="{
-              minWidth: cell.column.columnDef.size
-                ? `${cell.column.columnDef.size}px`
-                : undefined,
-              maxWidth: cell.column.columnDef.size
-                ? `${cell.column.columnDef.size}px`
-                : undefined,
+              minWidth: cell.column.columnDef.size ? `${cell.column.columnDef.size}px` : undefined,
+              maxWidth: cell.column.columnDef.size ? `${cell.column.columnDef.size}px` : undefined,
             }"
             :class="
               cn(
@@ -261,9 +249,7 @@ function sortTitle(header: {
       </template>
       <TableRow v-else class="h-20">
         <TableCell :colspan="Math.max(1, leafColumnCount)" class="relative p-0">
-          <div
-            class="absolute inset-0 top-10 flex flex-col items-center justify-center gap-2"
-          >
+          <div class="absolute inset-0 top-10 flex flex-col items-center justify-center gap-2">
             <template v-if="isLoading">
               <Spinner class="size-6 text-primary-foreground" />
             </template>

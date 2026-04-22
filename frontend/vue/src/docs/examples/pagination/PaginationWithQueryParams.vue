@@ -1,21 +1,21 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { Pagination } from '@/ui/components/pagination'
+import { computed } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { Pagination } from '@/ui/components/pagination';
 
-const route = useRoute()
-const router = useRouter()
-const pageCount = 10
+const route = useRoute();
+const router = useRouter();
+const pageCount = 10;
 
 const page = computed({
   get: () => {
-    const n = Number(route.query.page ?? 1)
-    return Number.isFinite(n) && n >= 1 ? Math.min(n, pageCount) : 1
+    const n = Number(route.query.page ?? 1);
+    return Number.isFinite(n) && n >= 1 ? Math.min(n, pageCount) : 1;
   },
   set: (p: number) => {
-    void router.replace({ query: { ...route.query, page: String(p) } })
+    void router.replace({ query: { ...route.query, page: String(p) } });
   },
-})
+});
 </script>
 
 <template>

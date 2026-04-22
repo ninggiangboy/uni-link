@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { Upload } from 'lucide-vue-next'
-import { Avatar, AvatarFallback, AvatarImage } from '@/ui/components/avatar'
-import { Button } from '@/ui/components/button'
+import { computed, ref } from 'vue';
+import { Upload } from 'lucide-vue-next';
+import { Avatar, AvatarFallback, AvatarImage } from '@/ui/components/avatar';
+import { Button } from '@/ui/components/button';
 
-const picked = ref<File | null>(null)
-const previewUrl = computed(() => (picked.value ? URL.createObjectURL(picked.value) : null))
+const picked = ref<File | null>(null);
+const previewUrl = computed(() => (picked.value ? URL.createObjectURL(picked.value) : null));
 
 function onPick(e: Event) {
-  const t = e.target as HTMLInputElement
-  const f = t.files?.[0]
-  picked.value = f ?? null
-  t.value = ''
+  const t = e.target as HTMLInputElement;
+  const f = t.files?.[0];
+  picked.value = f ?? null;
+  t.value = '';
 }
 </script>
 

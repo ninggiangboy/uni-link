@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { CheckboxIndicator, CheckboxRoot } from 'reka-ui'
-import { Check, Minus } from 'lucide-vue-next'
-import { cn } from '@/ui/lib/utils'
-import { labelVariants } from '@/ui/components/field/field-variants'
+import { CheckboxIndicator, CheckboxRoot } from 'reka-ui';
+import { Check, Minus } from 'lucide-vue-next';
+import { cn } from '@/ui/lib/utils';
+import { labelVariants } from '@/ui/components/field/field-variants';
 
-defineOptions({ inheritAttrs: false })
+defineOptions({ inheritAttrs: false });
 
 defineProps<{
-  class?: string
-}>()
+  class?: string;
+}>();
 
-const model = defineModel<boolean | 'indeterminate'>({ default: false })
+const model = defineModel<boolean | 'indeterminate'>({ default: false });
 </script>
 
 <template>

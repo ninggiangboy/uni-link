@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { Button } from '@/ui/components/button'
+import { Button } from '@/ui/components/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/ui/components/menu'
-import { Copy, FolderOpen, Menu, Pencil, Share2, Trash2 } from 'lucide-vue-next'
+} from '@/ui/components/menu';
+import { Copy, FolderOpen, Menu, Pencil, Share2, Trash2 } from 'lucide-vue-next';
 </script>
 
 <template>

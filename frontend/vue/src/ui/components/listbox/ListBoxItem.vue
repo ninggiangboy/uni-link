@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { ListboxItem as RekaListboxItem, ListboxItemIndicator } from 'reka-ui'
-import { Check } from 'lucide-vue-next'
-import { cn } from '@/ui/lib/utils'
+import { ListboxItem as RekaListboxItem, ListboxItemIndicator } from 'reka-ui';
+import { Check } from 'lucide-vue-next';
+import { cn } from '@/ui/lib/utils';
 
 defineProps<{
-  class?: string
-  value: string
-}>()
+  class?: string;
+  value: string;
+}>();
 </script>
 
 <template>

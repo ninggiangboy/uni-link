@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { cn } from '@/ui/lib/utils'
+import { cn } from '@/ui/lib/utils';
 
 defineProps<{
-  class?: string
-}>()
+  class?: string;
+}>();
 </script>
 
 <template>

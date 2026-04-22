@@ -1,4 +1,4 @@
-import { cn } from '@/ui/lib/utils'
+import { cn } from '@/ui/lib/utils';
 
 /** Reka date/time segment inputs — tight padding + primary highlight when editing (see frontend-sample Datefield.tsx DateSegment). */
 export function dateFieldSegmentClassName(className?: string) {
@@ -9,5 +9,5 @@ export function dateFieldSegmentClassName(className?: string) {
     'data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50',
     'focus:bg-primary focus:text-white focus:data-[placeholder]:text-white',
     className,
-  )
+  );
 }

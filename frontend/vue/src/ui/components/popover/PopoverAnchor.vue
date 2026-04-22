@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PopoverAnchor as RekaPopoverAnchor } from 'reka-ui'
+import { PopoverAnchor as RekaPopoverAnchor } from 'reka-ui';
 </script>
 
 <template>

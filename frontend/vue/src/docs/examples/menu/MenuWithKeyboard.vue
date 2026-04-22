@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { Button } from '@/ui/components/button'
+import { Button } from '@/ui/components/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/ui/components/menu'
+} from '@/ui/components/menu';
 </script>
 
 <template>

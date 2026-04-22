@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Button } from '@/ui/components/button'
-import { Input } from '@/ui/components/textfield'
+import { Button } from '@/ui/components/button';
+import { Input } from '@/ui/components/textfield';
 </script>
 <template>
   <div class="flex w-full max-w-sm items-center gap-2">

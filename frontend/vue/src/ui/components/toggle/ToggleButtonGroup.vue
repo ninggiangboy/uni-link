@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import type { AcceptableValue } from 'reka-ui'
-import { ToggleGroupRoot } from 'reka-ui'
-import { cn } from '@/ui/lib/utils'
+import type { AcceptableValue } from 'reka-ui';
+import { ToggleGroupRoot } from 'reka-ui';
+import { cn } from '@/ui/lib/utils';
 
-defineOptions({ inheritAttrs: false })
+defineOptions({ inheritAttrs: false });
 
 defineProps<{
-  class?: string
-  type?: 'single' | 'multiple'
-  orientation?: 'horizontal' | 'vertical'
-}>()
+  class?: string;
+  type?: 'single' | 'multiple';
+  orientation?: 'horizontal' | 'vertical';
+}>();
 
-const model = defineModel<AcceptableValue | AcceptableValue[] | undefined>()
+const model = defineModel<AcceptableValue | AcceptableValue[] | undefined>();
 </script>
 
 <template>

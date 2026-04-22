@@ -1,55 +1,47 @@
 <script setup lang="ts">
-import { ChevronLeft, ChevronRight } from 'lucide-vue-next'
-import { computed, watch } from 'vue'
-import { useIsMobile } from '@/ui/composables/useIsMobile'
-import { getPaginationItems } from './paginationModel'
-import { cn } from '@/ui/lib/utils'
+import { ChevronLeft, ChevronRight } from 'lucide-vue-next';
+import { computed, watch } from 'vue';
+import { useIsMobile } from '@/ui/composables/useIsMobile';
+import { getPaginationItems } from './paginationModel';
+import { cn } from '@/ui/lib/utils';
 
 const baseClass =
-  'cursor-pointer select-none text-[13px] font-medium flex w-8 h-8 items-center justify-center rounded-sm hover:bg-background-secondary'
+  'cursor-pointer select-none text-[13px] font-medium flex w-8 h-8 items-center justify-center rounded-sm hover:bg-background-secondary';
 
 const props = defineProps<{
   /** Total number of pages. */
-  pageCount: number
-  class?: string
-}>()
+  pageCount: number;
+  class?: string;
+}>();
 
 /** Current page, 1-based (v-model). */
-const page = defineModel<number>({ default: 1 })
+const page = defineModel<number>({ default: 1 });
 
-const { isMobile } = useIsMobile()
+const { isMobile } = useIsMobile();
 
 const pageItems = computed(() =>
-  getPaginationItems(
-    page.value,
-    props.pageCount,
-    isMobile.value ? 1 : 2,
-    1,
-  ),
-)
+  getPaginationItems(page.value, props.pageCount, isMobile.value ? 1 : 2, 1),
+);
 
 watch(
   () => props.pageCount,
   (c) => {
-    if (c >= 1 && page.value > c) page.value = c
+    if (c >= 1 && page.value > c) page.value = c;
   },
-)
+);
 
 function clampPage(p: number, count: number) {
-  if (count < 1) return 1
-  return Math.min(Math.max(1, p), count)
+  if (count < 1) return 1;
+  return Math.min(Math.max(1, p), count);
 }
 
 function goTo(p: number) {
-  page.value = clampPage(p, props.pageCount)
+  page.value = clampPage(p, props.pageCount);
 }
 </script>
 
 <template>
-  <nav
-    :class="cn('flex items-center justify-center gap-1', props.class)"
-    aria-label="Pagination"
-  >
+  <nav :class="cn('flex items-center justify-center gap-1', props.class)" aria-label="Pagination">
     <button
       type="button"
       :class="cn(baseClass, page <= 1 && 'opacity-50 cursor-not-allowed! hover:bg-transparent!')"
@@ -72,7 +64,12 @@ function goTo(p: number) {
       <button
         v-else
         type="button"
-        :class="cn(baseClass, item === page && 'bg-background-secondary shadow-sm border  text-foreground')"
+        :class="
+          cn(
+            baseClass,
+            item === page && 'bg-background-secondary shadow-sm border  text-foreground',
+          )
+        "
         :aria-current="item === page ? 'page' : undefined"
         :aria-label="`Page ${item}`"
         @click="goTo(item)"
@@ -86,7 +83,8 @@ function goTo(p: number) {
       :class="
         cn(
           baseClass,
-          (page >= pageCount || pageCount < 1) && 'opacity-50 cursor-not-allowed! hover:bg-transparent!',
+          (page >= pageCount || pageCount < 1) &&
+            'opacity-50 cursor-not-allowed! hover:bg-transparent!',
         )
       "
       :disabled="page >= pageCount || pageCount < 1"

@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { RadioGroupRoot } from 'reka-ui'
-import { cn } from '@/ui/lib/utils'
+import { RadioGroupRoot } from 'reka-ui';
+import { cn } from '@/ui/lib/utils';
 
 defineProps<{
-  class?: string
-}>()
+  class?: string;
+}>();
 
-const model = defineModel<string | undefined>()
+const model = defineModel<string | undefined>();
 </script>
 
 <template>

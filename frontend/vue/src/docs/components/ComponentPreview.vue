@@ -1,37 +1,37 @@
 <script setup lang="ts">
-import { ChevronDown, ChevronUp } from 'lucide-vue-next'
-import { computed, nextTick, onMounted, ref, shallowRef, watch } from 'vue'
-import { getPreviewComponent, loadPreviewSource } from '@/docs/examples/previewRegistry'
-import { getShikiHighlighter } from '@/docs/mdx/shikiHighlighter'
-import { Button } from '@/ui/components/button'
-import { cn } from '@/ui/lib/utils'
+import { ChevronDown, ChevronUp } from 'lucide-vue-next';
+import { computed, nextTick, onMounted, ref, shallowRef, watch } from 'vue';
+import { getPreviewComponent, loadPreviewSource } from '@/docs/examples/previewRegistry';
+import { getShikiHighlighter } from '@/docs/mdx/shikiHighlighter';
+import { Button } from '@/ui/components/button';
+import { cn } from '@/ui/lib/utils';
 
 const props = withDefaults(
   defineProps<{
-    name: string
-    class?: string
-    withPreview?: boolean
+    name: string;
+    class?: string;
+    withPreview?: boolean;
   }>(),
   {
     withPreview: true,
   },
-)
+);
 
-const Preview = shallowRef<ReturnType<typeof getPreviewComponent>>(null)
-const html = ref('')
-const copyDone = ref(false)
+const Preview = shallowRef<ReturnType<typeof getPreviewComponent>>(null);
+const html = ref('');
+const copyDone = ref(false);
 
-const codeRoot = ref<HTMLElement | null>(null)
-const codeExpanded = ref(false)
-const needsToggle = ref(false)
+const codeRoot = ref<HTMLElement | null>(null);
+const codeExpanded = ref(false);
+const needsToggle = ref(false);
 
 /** Match sample `CodeCollapsible`: show expand when content taller than this (px). */
-const COLLAPSE_AT_PX = 200
+const COLLAPSE_AT_PX = 200;
 
-const rootClass = computed(() => cn('w-full mt-4 border-b border-border pb-8'))
+const rootClass = computed(() => cn('w-full mt-4 border-b border-border pb-8'));
 
 async function highlightSource(code: string) {
-  const highlighter = await getShikiHighlighter()
+  const highlighter = await getShikiHighlighter();
   return highlighter.codeToHtml(code, {
     lang: 'vue',
     themes: {
@@ -39,41 +39,41 @@ async function highlightSource(code: string) {
       dark: 'github-dark',
     },
     defaultColor: false,
-  })
+  });
 }
 
 function measureCodeHeight() {
-  const root = codeRoot.value
-  const pre = root?.querySelector('pre')
-  needsToggle.value = pre != null && pre.scrollHeight > COLLAPSE_AT_PX
-  if (!needsToggle.value) codeExpanded.value = false
+  const root = codeRoot.value;
+  const pre = root?.querySelector('pre');
+  needsToggle.value = pre != null && pre.scrollHeight > COLLAPSE_AT_PX;
+  if (!needsToggle.value) codeExpanded.value = false;
 }
 
 async function refresh() {
-  copyDone.value = false
-  const comp = getPreviewComponent(props.name)
-  Preview.value = comp
-  const source = await loadPreviewSource(props.name)
-  html.value = source ? await highlightSource(source) : '<pre>Source not found</pre>'
+  copyDone.value = false;
+  const comp = getPreviewComponent(props.name);
+  Preview.value = comp;
+  const source = await loadPreviewSource(props.name);
+  html.value = source ? await highlightSource(source) : '<pre>Source not found</pre>';
 }
 
 watch(html, async () => {
-  codeExpanded.value = false
-  await nextTick()
-  measureCodeHeight()
-})
+  codeExpanded.value = false;
+  await nextTick();
+  measureCodeHeight();
+});
 
-onMounted(refresh)
-watch(() => props.name, refresh)
+onMounted(refresh);
+watch(() => props.name, refresh);
 
 async function copy() {
-  const source = await loadPreviewSource(props.name)
-  if (!source) return
-  await navigator.clipboard.writeText(source)
-  copyDone.value = true
+  const source = await loadPreviewSource(props.name);
+  if (!source) return;
+  await navigator.clipboard.writeText(source);
+  copyDone.value = true;
   setTimeout(() => {
-    copyDone.value = false
-  }, 2000)
+    copyDone.value = false;
+  }, 2000);
 }
 </script>
 
@@ -83,10 +83,7 @@ async function copy() {
       <div
         v-if="withPreview"
         :class="
-          cn(
-            'p-5 min-h-25 docs-not-prose flex items-center justify-center mx-auto',
-            props.class,
-          )
+          cn('p-5 min-h-25 docs-not-prose flex items-center justify-center mx-auto', props.class)
         "
       >
         <component :is="Preview" v-if="Preview" />
@@ -132,10 +129,7 @@ async function copy() {
                 Expand code
               </Button>
             </div>
-            <div
-              v-else
-              class="flex justify-center bg-background-secondary py-2"
-            >
+            <div v-else class="flex justify-center bg-background-secondary py-2">
               <Button
                 type="button"
                 variant="ghost"

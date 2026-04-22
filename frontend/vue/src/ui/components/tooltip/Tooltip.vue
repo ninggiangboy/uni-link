@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { TooltipRoot } from 'reka-ui'
+import { TooltipRoot } from 'reka-ui';
 
-const open = defineModel<boolean>('open', { default: undefined })
+const open = defineModel<boolean>('open', { default: undefined });
 </script>
 
 <template>

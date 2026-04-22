@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { Button } from '@/ui/components/button'
-import { Label } from '@/ui/components/field'
-import { LoadingOverlay } from '@/ui/components/loading-overlay'
-import { Input } from '@/ui/components/textfield'
+import { Button } from '@/ui/components/button';
+import { Label } from '@/ui/components/field';
+import { LoadingOverlay } from '@/ui/components/loading-overlay';
+import { Input } from '@/ui/components/textfield';
 </script>
 
 <template>

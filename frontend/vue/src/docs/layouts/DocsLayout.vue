@@ -1,28 +1,28 @@
 <script setup lang="ts">
-import CrossIcon from '@/docs/components/CrossIcon.vue'
-import { useIsMobile } from '@/ui/composables/useIsMobile'
-import { onUnmounted, ref, watchEffect } from 'vue'
-import { useRoute } from 'vue-router'
-import HeaderIconButtons from './HeaderIconButtons.vue'
-import HamburgerMenu from './HamburgerMenu.vue'
-import ModulePicker from './ModulePicker.vue'
-import SidebarHeader from './SidebarHeader.vue'
-import SidebarMenu from './SidebarMenu.vue'
-import TopNavLinks from './TopNavLinks.vue'
+import CrossIcon from '@/docs/components/CrossIcon.vue';
+import { useIsMobile } from '@/ui/composables/useIsMobile';
+import { onUnmounted, ref, watchEffect } from 'vue';
+import { useRoute } from 'vue-router';
+import HeaderIconButtons from './HeaderIconButtons.vue';
+import HamburgerMenu from './HamburgerMenu.vue';
+import ModulePicker from './ModulePicker.vue';
+import SidebarHeader from './SidebarHeader.vue';
+import SidebarMenu from './SidebarMenu.vue';
+import TopNavLinks from './TopNavLinks.vue';
 
-const { isMobile } = useIsMobile({ breakpointPx: 1024 })
-const mobileMenuOpen = ref(false)
+const { isMobile } = useIsMobile({ breakpointPx: 1024 });
+const mobileMenuOpen = ref(false);
 
-const route = useRoute()
+const route = useRoute();
 watchEffect(() => {
-  if (typeof document === 'undefined') return
-  document.documentElement.classList.toggle('docs-scrollbar-root', route.path.startsWith('/docs'))
-})
+  if (typeof document === 'undefined') return;
+  document.documentElement.classList.toggle('docs-scrollbar-root', route.path.startsWith('/docs'));
+});
 onUnmounted(() => {
   if (typeof document !== 'undefined') {
-    document.documentElement.classList.remove('docs-scrollbar-root')
+    document.documentElement.classList.remove('docs-scrollbar-root');
   }
-})
+});
 </script>
 
 <template>
@@ -62,7 +62,9 @@ onUnmounted(() => {
 
     <div class="min-h-screen grid lg:grid-cols-[260px_1fr] xl:grid-cols-[260px_1fr_260px]">
       <div class="h-full max-lg:hidden">
-        <div class="w-65 h-full fixed border-l border-border pt-16 bg-background flex flex-col min-h-0">
+        <div
+          class="w-65 h-full fixed border-l border-border pt-16 bg-background flex flex-col min-h-0"
+        >
           <ModulePicker />
           <SidebarMenu class="min-h-0 flex-1 overflow-hidden" />
         </div>

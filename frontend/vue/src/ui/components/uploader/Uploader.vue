@@ -1,28 +1,28 @@
 <script setup lang="ts">
-import axios, { type AxiosRequestConfig } from 'axios'
-import { ref, watch } from 'vue'
-import { toast } from '@/ui/components/sonner'
-import { Dropzone } from '@/ui/components/dropzone'
-import { UploaderTrigger } from '@/ui/components/uploader-trigger'
-import { cn } from '@/ui/lib/utils'
-import UploaderItem from './UploaderItem.vue'
-import { UploaderAction } from './uploaderAction'
-import type { UploaderFile } from './uploaderTypes'
-import { useValidateFiles, type UploaderRules } from './useValidateFiles'
+import axios, { type AxiosRequestConfig } from 'axios';
+import { ref, watch } from 'vue';
+import { toast } from '@/ui/components/sonner';
+import { Dropzone } from '@/ui/components/dropzone';
+import { UploaderTrigger } from '@/ui/components/uploader-trigger';
+import { cn } from '@/ui/lib/utils';
+import UploaderItem from './UploaderItem.vue';
+import { UploaderAction } from './uploaderAction';
+import type { UploaderFile } from './uploaderTypes';
+import { useValidateFiles, type UploaderRules } from './useValidateFiles';
 
 const props = withDefaults(
   defineProps<{
-    action: UploaderAction
-    defaultFileList?: UploaderFile[]
-    listType?: 'list' | 'card'
-    triggerType?: 'dropzone' | 'button'
-    acceptedFileExtensions?: UploaderRules['acceptedFileExtensions']
-    maxFiles?: number
-    maxFileSize?: number
-    allowMultiple?: boolean
-    isDisabled?: boolean
-    class?: string
-    'aria-invalid'?: boolean
+    action: UploaderAction;
+    defaultFileList?: UploaderFile[];
+    listType?: 'list' | 'card';
+    triggerType?: 'dropzone' | 'button';
+    acceptedFileExtensions?: UploaderRules['acceptedFileExtensions'];
+    maxFiles?: number;
+    maxFileSize?: number;
+    allowMultiple?: boolean;
+    isDisabled?: boolean;
+    class?: string;
+    'aria-invalid'?: boolean;
   }>(),
   {
     listType: 'list',
@@ -31,21 +31,21 @@ const props = withDefaults(
     allowMultiple: true,
     isDisabled: false,
   },
-)
+);
 
 const emit = defineEmits<{
-  fileListChange: [files: UploaderFile[]]
-}>()
+  fileListChange: [files: UploaderFile[]];
+}>();
 
-const files = ref<UploaderFile[]>([...(props.defaultFileList ?? [])])
+const files = ref<UploaderFile[]>([...(props.defaultFileList ?? [])]);
 
 watch(
   () => props.defaultFileList,
   (v) => {
-    if (v) files.value = [...v]
+    if (v) files.value = [...v];
   },
   { deep: true },
-)
+);
 
 function getValidate() {
   return useValidateFiles({
@@ -53,13 +53,13 @@ function getValidate() {
     maxFileSize: props.maxFileSize,
     maxFiles: props.maxFiles,
     allowMultiple: props.allowMultiple ?? true,
-  })
+  });
 }
 
 async function addFiles(list: FileList | null) {
-  if (!list?.length || props.isDisabled) return
-  const validate = getValidate()
-  const ok = validate(Array.from(list))
+  if (!list?.length || props.isDisabled) return;
+  const validate = getValidate();
+  const ok = validate(Array.from(list));
   for (const file of ok) {
     const state: UploaderFile = {
       file,
@@ -68,48 +68,48 @@ async function addFiles(list: FileList | null) {
       extension: file.name.split('.').pop() ?? 'txt',
       status: 'uploading',
       progress: 0,
-    }
-    files.value = [...files.value, state]
-    const idx = files.value.length - 1
+    };
+    files.value = [...files.value, state];
+    const idx = files.value.length - 1;
     try {
-      const cfg = props.action.buildRequest(files.value[idx]!)
+      const cfg = props.action.buildRequest(files.value[idx]!);
       const res = await axios.request({
         ...cfg,
         onUploadProgress: (e) => {
           if (e.total) {
-            const p = Math.round((e.loaded / e.total) * 100)
-            const copy = [...files.value]
-            copy[idx] = { ...copy[idx]!, progress: p }
-            files.value = copy
+            const p = Math.round((e.loaded / e.total) * 100);
+            const copy = [...files.value];
+            copy[idx] = { ...copy[idx]!, progress: p };
+            files.value = copy;
           }
         },
-      } as AxiosRequestConfig)
-      const copy = [...files.value]
+      } as AxiosRequestConfig);
+      const copy = [...files.value];
       copy[idx] = {
         ...copy[idx]!,
         ...props.action.formatResponse(res),
         status: 'success',
         progress: 100,
-      }
-      files.value = copy
+      };
+      files.value = copy;
     } catch (e) {
-      const copy = [...files.value]
+      const copy = [...files.value];
       copy[idx] = {
         ...copy[idx]!,
         status: 'error',
         error: props.action.formatResponseError(e),
-      }
-      files.value = copy
-      toast.error(copy[idx]!.error ?? 'Upload failed')
+      };
+      files.value = copy;
+      toast.error(copy[idx]!.error ?? 'Upload failed');
     }
-    emit('fileListChange', files.value)
+    emit('fileListChange', files.value);
   }
 }
 
 function removeAt(i: number) {
-  if (props.isDisabled) return
-  files.value = files.value.filter((_, j) => j !== i)
-  emit('fileListChange', files.value)
+  if (props.isDisabled) return;
+  files.value = files.value.filter((_, j) => j !== i);
+  emit('fileListChange', files.value);
 }
 </script>
 

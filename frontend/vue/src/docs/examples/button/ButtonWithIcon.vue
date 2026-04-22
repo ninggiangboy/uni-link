@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Button } from '@/ui/components/button'
-import { Plus } from 'lucide-vue-next'
+import { Button } from '@/ui/components/button';
+import { Plus } from 'lucide-vue-next';
 </script>
 
 <template>

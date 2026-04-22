@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import { cn } from '@/ui/lib/utils'
-import { RouterLink, useRoute } from 'vue-router'
+import { cn } from '@/ui/lib/utils';
+import { RouterLink, useRoute } from 'vue-router';
 
-const route = useRoute()
+const route = useRoute();
 
 const navLinks = [
   { label: 'Guide', href: '/docs/guide/introduction' },
   { label: 'Components', href: '/docs/ui/button' },
-]
+];
 
 function isActive(href: string) {
-  if (href.includes('/guide')) return route.path.includes('/docs/guide')
-  return route.path.includes('/docs/ui')
+  if (href.includes('/guide')) return route.path.includes('/docs/guide');
+  return route.path.includes('/docs/ui');
 }
 </script>
 

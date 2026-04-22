@@ -1,21 +1,21 @@
 <script setup lang="ts">
-import Logo from '@/docs/components/Logo.vue'
-import { Button } from '@/ui/components/button'
-import { Menu } from 'lucide-vue-next'
-import { watch } from 'vue'
-import { useRoute } from 'vue-router'
-import ModulePicker from './ModulePicker.vue'
-import SidebarMenu from './SidebarMenu.vue'
+import Logo from '@/docs/components/Logo.vue';
+import { Button } from '@/ui/components/button';
+import { Menu } from 'lucide-vue-next';
+import { watch } from 'vue';
+import { useRoute } from 'vue-router';
+import ModulePicker from './ModulePicker.vue';
+import SidebarMenu from './SidebarMenu.vue';
 
-const route = useRoute()
-const open = defineModel<boolean>({ default: false })
+const route = useRoute();
+const open = defineModel<boolean>({ default: false });
 
 watch(
   () => route.path,
   () => {
-    open.value = false
+    open.value = false;
   },
-)
+);
 </script>
 
 <template>

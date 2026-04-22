@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { DateValue } from '@internationalized/date'
-import { ref } from 'vue'
-import { Calendar } from '@/ui/components/calendar'
+import type { DateValue } from '@internationalized/date';
+import { ref } from 'vue';
+import { Calendar } from '@/ui/components/calendar';
 
-const value = ref<DateValue | undefined>()
+const value = ref<DateValue | undefined>();
 </script>
 
 <template>

@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { SwitchRoot, SwitchThumb } from 'reka-ui'
-import { cn } from '@/ui/lib/utils'
+import { SwitchRoot, SwitchThumb } from 'reka-ui';
+import { cn } from '@/ui/lib/utils';
 
-defineOptions({ inheritAttrs: false })
+defineOptions({ inheritAttrs: false });
 
 defineProps<{
-  class?: string
-}>()
+  class?: string;
+}>();
 
-const model = defineModel<boolean>({ default: false })
+const model = defineModel<boolean>({ default: false });
 </script>
 
 <template>

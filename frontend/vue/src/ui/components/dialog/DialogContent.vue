@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import { DialogClose, DialogContent as RekaDialogContent } from 'reka-ui'
-import { X } from 'lucide-vue-next'
-import { Button } from '@/ui/components/button'
-import { cn } from '@/ui/lib/utils'
-import DialogOverlay from './DialogOverlay.vue'
-import DialogPortal from './DialogPortal.vue'
+import { DialogClose, DialogContent as RekaDialogContent } from 'reka-ui';
+import { X } from 'lucide-vue-next';
+import { Button } from '@/ui/components/button';
+import { cn } from '@/ui/lib/utils';
+import DialogOverlay from './DialogOverlay.vue';
+import DialogPortal from './DialogPortal.vue';
 
 withDefaults(
   defineProps<{
-    class?: string
-    closeButton?: boolean
+    class?: string;
+    closeButton?: boolean;
   }>(),
   { closeButton: true },
-)
+);
 </script>
 
 <template>

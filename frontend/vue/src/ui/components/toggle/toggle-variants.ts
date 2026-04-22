@@ -1,4 +1,4 @@
-import { cva, type VariantProps } from 'class-variance-authority'
+import { cva, type VariantProps } from 'class-variance-authority';
 
 export const toggleVariants = cva(
   [
@@ -25,6 +25,6 @@ export const toggleVariants = cva(
       size: 'default',
     },
   },
-)
+);
 
-export type ToggleVariants = VariantProps<typeof toggleVariants>
+export type ToggleVariants = VariantProps<typeof toggleVariants>;

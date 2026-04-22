@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { Select, type SelectOption } from '@/ui/components/select'
+import { Select, type SelectOption } from '@/ui/components/select';
 
 const languages: (SelectOption & { flag: string })[] = [
   { id: 1, name: 'English', flag: '🇬🇧' },
   { id: 2, name: 'Spanish', flag: '🇪🇸' },
   { id: 3, name: 'French', flag: '🇫🇷' },
-]
+];
 </script>
 
 <template>

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { docFormToast } from '@/docs/examples/_internal/docFormSubmit'
-import { z } from 'zod'
-import { DateRangePicker } from '@/ui/components/date-range-picker'
-import { Button } from '@/ui/components/button'
+import { docFormToast } from '@/docs/examples/_internal/docFormSubmit';
+import { z } from 'zod';
+import { DateRangePicker } from '@/ui/components/date-range-picker';
+import { Button } from '@/ui/components/button';
 import {
   Form,
   FormField,
@@ -11,10 +11,10 @@ import {
   FormMessage,
   FormControl,
   useForm,
-} from '@/ui/components/form'
+} from '@/ui/components/form';
 
-const { handleSubmit } = useForm()
-const onSubmit = handleSubmit((v) => docFormToast(v))
+const { handleSubmit } = useForm();
+const onSubmit = handleSubmit((v) => docFormToast(v));
 </script>
 <template>
   <Form class="space-y-4" @submit="onSubmit">

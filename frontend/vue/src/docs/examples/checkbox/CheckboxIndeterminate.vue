@@ -1,30 +1,30 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { Checkbox } from '@/ui/components/checkbox'
+import { computed, ref } from 'vue';
+import { Checkbox } from '@/ui/components/checkbox';
 
-const checkedItems = ref([false, false, false])
+const checkedItems = ref([false, false, false]);
 
-const allChecked = computed(() => checkedItems.value.every(Boolean))
-const someChecked = computed(() => checkedItems.value.some(Boolean))
+const allChecked = computed(() => checkedItems.value.every(Boolean));
+const someChecked = computed(() => checkedItems.value.some(Boolean));
 
-const isIndeterminate = computed(() => someChecked.value && !allChecked.value)
+const isIndeterminate = computed(() => someChecked.value && !allChecked.value);
 
 const selectAllModel = computed<boolean | 'indeterminate'>({
   get() {
-    if (allChecked.value) return true
-    if (isIndeterminate.value) return 'indeterminate'
-    return false
+    if (allChecked.value) return true;
+    if (isIndeterminate.value) return 'indeterminate';
+    return false;
   },
   set(next: boolean | 'indeterminate') {
-    if (next === 'indeterminate') return
-    checkedItems.value = checkedItems.value.map(() => next)
+    if (next === 'indeterminate') return;
+    checkedItems.value = checkedItems.value.map(() => next);
   },
-})
+});
 
 function setItem(i: number, v: boolean | string) {
-  const next = [...checkedItems.value]
-  next[i] = v === true
-  checkedItems.value = next
+  const next = [...checkedItems.value];
+  next[i] = v === true;
+  checkedItems.value = next;
 }
 </script>
 

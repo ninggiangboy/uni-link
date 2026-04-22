@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { DialogTitle as RekaDialogTitle } from 'reka-ui'
-import { cn } from '@/ui/lib/utils'
+import { DialogTitle as RekaDialogTitle } from 'reka-ui';
+import { cn } from '@/ui/lib/utils';
 
 defineProps<{
-  class?: string
-}>()
+  class?: string;
+}>();
 </script>
 
 <template>

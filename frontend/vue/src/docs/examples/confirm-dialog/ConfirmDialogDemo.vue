@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { Button } from '@/ui/components/button'
-import { confirm } from '@/ui/components/confirm-dialog'
-import { toast } from '@/ui/components/sonner'
+import { Button } from '@/ui/components/button';
+import { confirm } from '@/ui/components/confirm-dialog';
+import { toast } from '@/ui/components/sonner';
 
 function handleDeleteUsers() {
   confirm({
@@ -12,10 +12,10 @@ function handleDeleteUsers() {
       onClick: () => {
         toast.success('Users Deleted', {
           description: 'Users deleted successfully',
-        })
+        });
       },
     },
-  })
+  });
 }
 </script>
 

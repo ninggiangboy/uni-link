@@ -1,21 +1,21 @@
 <script setup lang="ts">
-import { Button } from '@/ui/components/button'
-import { Progress } from '@/ui/components/progress'
-import { UploaderIcon } from '@/ui/components/uploader-icon'
-import { shortenFilename } from '@/ui/lib/file'
-import { cn } from '@/ui/lib/utils'
-import type { UploaderFile } from './uploaderTypes'
+import { Button } from '@/ui/components/button';
+import { Progress } from '@/ui/components/progress';
+import { UploaderIcon } from '@/ui/components/uploader-icon';
+import { shortenFilename } from '@/ui/lib/file';
+import { cn } from '@/ui/lib/utils';
+import type { UploaderFile } from './uploaderTypes';
 
 defineProps<{
-  fileState: UploaderFile
-  class?: string
+  fileState: UploaderFile;
+  class?: string;
   /** When true, remove control is hidden (e.g. read-only / disabled uploader) */
-  isDisabled?: boolean
-}>()
+  isDisabled?: boolean;
+}>();
 
 const emit = defineEmits<{
-  remove: []
-}>()
+  remove: [];
+}>();
 </script>
 
 <template>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { DropdownMenuRoot } from 'reka-ui'
+import { DropdownMenuRoot } from 'reka-ui';
 
-const open = defineModel<boolean>('open', { default: false })
+const open = defineModel<boolean>('open', { default: false });
 </script>
 
 <template>

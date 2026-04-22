@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { Checkbox, CheckboxGroup } from '@/ui/components/checkbox'
-import { Label } from '@/ui/components/field'
+import { ref } from 'vue';
+import { Checkbox, CheckboxGroup } from '@/ui/components/checkbox';
+import { Label } from '@/ui/components/field';
 
-const sel = ref<string[]>([])
+const sel = ref<string[]>([]);
 </script>
 
 <template>

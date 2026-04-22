@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { AvatarImage as RekaAvatarImage } from 'reka-ui'
-import { cn } from '@/ui/lib/utils'
+import { AvatarImage as RekaAvatarImage } from 'reka-ui';
+import { cn } from '@/ui/lib/utils';
 
-defineOptions({ inheritAttrs: false })
+defineOptions({ inheritAttrs: false });
 
 const props = withDefaults(
   defineProps<{
-    class?: string
-    src?: string
+    class?: string;
+    src?: string;
   }>(),
   { src: '' },
-)
+);
 </script>
 
 <template>

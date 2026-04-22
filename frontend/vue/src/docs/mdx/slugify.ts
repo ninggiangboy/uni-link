@@ -4,5 +4,5 @@ export function docSlugify(input: string): string {
     .trim()
     .toLowerCase()
     .replace(/\s+/g, '-')
-    .replace(/[^\w-]+/g, '')
+    .replace(/[^\w-]+/g, '');
 }

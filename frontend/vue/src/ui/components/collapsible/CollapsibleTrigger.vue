@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CollapsibleTrigger as RekaCollapsibleTrigger } from 'reka-ui'
+import { CollapsibleTrigger as RekaCollapsibleTrigger } from 'reka-ui';
 </script>
 
 <template>

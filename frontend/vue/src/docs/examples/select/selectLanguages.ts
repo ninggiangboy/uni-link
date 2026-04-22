@@ -1,4 +1,4 @@
-import type { SelectOption } from '@/ui/components/select'
+import type { SelectOption } from '@/ui/components/select';
 
 export const languageOptions: SelectOption[] = [
   { id: 1, name: 'English' },
@@ -6,4 +6,4 @@ export const languageOptions: SelectOption[] = [
   { id: 3, name: 'French' },
   { id: 4, name: 'German' },
   { id: 5, name: 'Italian' },
-]
+];

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { NumberField } from '@/ui/components/numberfield'
+import { NumberField } from '@/ui/components/numberfield';
 </script>
 <template>
   <div class="w-full max-w-xs">

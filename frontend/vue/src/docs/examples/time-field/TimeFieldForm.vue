@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { docFormToast } from '@/docs/examples/_internal/docFormSubmit'
-import { z } from 'zod'
-import { Button } from '@/ui/components/button'
-import { DatePicker } from '@/ui/components/date-picker'
-import { BsTimeField } from '@/ui/components/datefield'
+import { docFormToast } from '@/docs/examples/_internal/docFormSubmit';
+import { z } from 'zod';
+import { Button } from '@/ui/components/button';
+import { DatePicker } from '@/ui/components/date-picker';
+import { BsTimeField } from '@/ui/components/datefield';
 import {
   Form,
   FormField,
@@ -12,10 +12,10 @@ import {
   FormMessage,
   FormControl,
   useForm,
-} from '@/ui/components/form'
+} from '@/ui/components/form';
 
-const { handleSubmit } = useForm()
-const onSubmit = handleSubmit((v) => docFormToast(v))
+const { handleSubmit } = useForm();
+const onSubmit = handleSubmit((v) => docFormToast(v));
 </script>
 <template>
   <Form class="flex w-full max-w-lg flex-col gap-4" @submit="onSubmit">

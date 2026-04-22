@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { PopoverContent as RekaPopoverContent, PopoverPortal } from 'reka-ui'
-import { cn } from '@/ui/lib/utils'
+import { PopoverContent as RekaPopoverContent, PopoverPortal } from 'reka-ui';
+import { cn } from '@/ui/lib/utils';
 
 withDefaults(
   defineProps<{
-    class?: string
+    class?: string;
     /** side offset in px for floating-ui */
-    sideOffset?: number
+    sideOffset?: number;
   }>(),
   { sideOffset: 4 },
-)
+);
 </script>
 
 <template>

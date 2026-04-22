@@ -1,9 +1,9 @@
-import { cva, type VariantProps } from 'class-variance-authority'
+import { cva, type VariantProps } from 'class-variance-authority';
 
 export const labelVariants = cva([
   'text-sm font-medium',
   'data-[disabled]:cursor-not-allowed data-[disabled]:opacity-70',
-])
+]);
 
 export const fieldGroupVariants = cva('', {
   variants: {
@@ -21,6 +21,6 @@ export const fieldGroupVariants = cva('', {
   defaultVariants: {
     variant: 'default',
   },
-})
+});
 
-export type FieldGroupVariant = VariantProps<typeof fieldGroupVariants>['variant']
+export type FieldGroupVariant = VariantProps<typeof fieldGroupVariants>['variant'];

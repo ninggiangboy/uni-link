@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { TmpfilesUploaderAction } from '@/docs/examples/uploader/tmpfilesUploaderAction'
-import { Uploader } from '@/ui/components/uploader'
-import type { UploaderFile } from '@/ui/components/uploader/uploaderTypes'
+import { TmpfilesUploaderAction } from '@/docs/examples/uploader/tmpfilesUploaderAction';
+import { Uploader } from '@/ui/components/uploader';
+import type { UploaderFile } from '@/ui/components/uploader/uploaderTypes';
 
 const exampleFileList: UploaderFile[] = [
   {
@@ -24,7 +24,7 @@ const exampleFileList: UploaderFile[] = [
     url: 'https://filesamples.com/samples/document/doc/sample2.doc',
     progress: 100,
   },
-]
+];
 </script>
 
 <template>

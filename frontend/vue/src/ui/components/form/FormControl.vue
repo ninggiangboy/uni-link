@@ -1,15 +1,15 @@
 <script setup lang="ts" generic="TModel = unknown">
-import type { ComponentFieldBindingObject } from 'vee-validate'
-import type { HTMLAttributes } from 'vue'
-import FormControlBase from './FormControlBase.vue'
-import type { FormControlVModelBinds } from './formControlVmBinds'
+import type { ComponentFieldBindingObject } from 'vee-validate';
+import type { HTMLAttributes } from 'vue';
+import FormControlBase from './FormControlBase.vue';
+import type { FormControlVModelBinds } from './formControlVmBinds';
 
-defineOptions({ inheritAttrs: false })
+defineOptions({ inheritAttrs: false });
 
 const props = defineProps<{
-  componentField?: ComponentFieldBindingObject<TModel>
-  class?: HTMLAttributes['class']
-}>()
+  componentField?: ComponentFieldBindingObject<TModel>;
+  class?: HTMLAttributes['class'];
+}>();
 </script>
 
 <template>

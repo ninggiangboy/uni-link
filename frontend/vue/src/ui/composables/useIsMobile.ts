@@ -1,9 +1,9 @@
-import { onMounted, onUnmounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue';
 
-const DEFAULT_MOBILE_BREAKPOINT = 768
+const DEFAULT_MOBILE_BREAKPOINT = 768;
 
 interface UseIsMobileProps {
-  breakpointPx?: number
+  breakpointPx?: number;
 }
 
 export function useIsMobile({ breakpointPx = DEFAULT_MOBILE_BREAKPOINT }: UseIsMobileProps = {}) {
@@ -11,26 +11,26 @@ export function useIsMobile({ breakpointPx = DEFAULT_MOBILE_BREAKPOINT }: UseIsM
     return (
       typeof window !== 'undefined' &&
       window.matchMedia(`(max-width: ${breakpointPx - 1}px)`).matches
-    )
+    );
   }
 
-  const isMobile = ref(matches())
+  const isMobile = ref(matches());
 
   function update() {
-    isMobile.value = matches()
+    isMobile.value = matches();
   }
 
-  let mq: MediaQueryList | null = null
+  let mq: MediaQueryList | null = null;
 
   onMounted(() => {
-    mq = window.matchMedia(`(max-width: ${breakpointPx - 1}px)`)
-    update()
-    mq.addEventListener('change', update)
-  })
+    mq = window.matchMedia(`(max-width: ${breakpointPx - 1}px)`);
+    update();
+    mq.addEventListener('change', update);
+  });
 
   onUnmounted(() => {
-    mq?.removeEventListener('change', update)
-  })
+    mq?.removeEventListener('change', update);
+  });
 
-  return { isMobile }
+  return { isMobile };
 }

@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { Avatar, AvatarFallback } from '@/ui/components/avatar'
-import { Select, type SelectOption } from '@/ui/components/select'
+import { Avatar, AvatarFallback } from '@/ui/components/avatar';
+import { Select, type SelectOption } from '@/ui/components/select';
 
 const users: (SelectOption & { email: string; color: string })[] = [
   { id: 1, name: 'John Doe', email: 'john@example.com', color: 'bg-sky-500' },
   { id: 2, name: 'Jane Smith', email: 'jane@example.com', color: 'bg-red-500' },
   { id: 3, name: 'Bob Johnson', email: 'bob@example.com', color: 'bg-green-500' },
-]
+];
 </script>
 
 <template>

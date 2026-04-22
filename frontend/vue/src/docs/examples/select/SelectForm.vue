@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { docFormToast } from '@/docs/examples/_internal/docFormSubmit'
-import { Button } from '@/ui/components/button'
+import { docFormToast } from '@/docs/examples/_internal/docFormSubmit';
+import { Button } from '@/ui/components/button';
 import {
   Form,
   FormField,
@@ -9,9 +9,9 @@ import {
   FormMessage,
   FormControl,
   useForm,
-} from '@/ui/components/form'
-import { Select, type SelectOption } from '@/ui/components/select'
-import { z } from 'zod'
+} from '@/ui/components/form';
+import { Select, type SelectOption } from '@/ui/components/select';
+import { z } from 'zod';
 
 const languageOptions: SelectOption[] = [
   { id: 'en', name: 'English' },
@@ -19,23 +19,23 @@ const languageOptions: SelectOption[] = [
   { id: 'fr', name: 'French' },
   { id: 'de', name: 'German' },
   { id: 'it', name: 'Italian' },
-]
+];
 
 const roleOptions: SelectOption[] = [
   { id: 'admin', name: 'Admin' },
   { id: 'user', name: 'User' },
-]
+];
 
 const { handleSubmit } = useForm({
   initialValues: {
     role: 'admin',
     languages: [] as string[],
   },
-})
+});
 
 const onSubmit = handleSubmit((values) => {
-  docFormToast(values)
-})
+  docFormToast(values);
+});
 </script>
 
 <template>
@@ -54,7 +54,11 @@ const onSubmit = handleSubmit((values) => {
         <FormMessage />
       </FormItem>
     </FormField>
-    <FormField v-slot="{ componentField }" name="languages" :rules="z.array(z.string()).optional().ruleFn()">
+    <FormField
+      v-slot="{ componentField }"
+      name="languages"
+      :rules="z.array(z.string()).optional().ruleFn()"
+    >
       <FormItem>
         <FormLabel>Language</FormLabel>
         <FormControl generic="string[]" v-slot="vm" :component-field="componentField">

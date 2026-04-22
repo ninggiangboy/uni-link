@@ -1,1 +1,1 @@
-export { default as UploaderIcon } from './UploaderIcon.vue'
+export { default as UploaderIcon } from './UploaderIcon.vue';

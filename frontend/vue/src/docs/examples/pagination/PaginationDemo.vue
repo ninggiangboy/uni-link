@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Pagination } from '@/ui/components/pagination'
+import { Pagination } from '@/ui/components/pagination';
 </script>
 
 <template>

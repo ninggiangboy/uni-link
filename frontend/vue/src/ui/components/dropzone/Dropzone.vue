@@ -1,19 +1,19 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { cn } from '@/ui/lib/utils'
+import { computed, ref } from 'vue';
+import { cn } from '@/ui/lib/utils';
 
 const props = defineProps<{
-  class?: string
+  class?: string;
   /** When true, drops are ignored and the zone looks inactive */
-  disabled?: boolean
-}>()
+  disabled?: boolean;
+}>();
 
 const emit = defineEmits<{
-  dropFiles: [files: FileList | null]
-}>()
+  dropFiles: [files: FileList | null];
+}>();
 
-const isOver = ref(false)
-const rootRef = ref<HTMLDivElement | null>(null)
+const isOver = ref(false);
+const rootRef = ref<HTMLDivElement | null>(null);
 
 const rootClass = computed(() =>
   cn(
@@ -24,20 +24,20 @@ const rootClass = computed(() =>
     props.disabled && 'cursor-not-allowed opacity-60',
     props.class,
   ),
-)
+);
 
 function onDragOver(e: DragEvent) {
-  e.preventDefault()
-  if (!props.disabled) isOver.value = true
+  e.preventDefault();
+  if (!props.disabled) isOver.value = true;
 }
 function onDragLeave() {
-  isOver.value = false
+  isOver.value = false;
 }
 function onDrop(e: DragEvent) {
-  e.preventDefault()
-  isOver.value = false
-  if (props.disabled) return
-  emit('dropFiles', e.dataTransfer?.files ?? null)
+  e.preventDefault();
+  isOver.value = false;
+  if (props.disabled) return;
+  emit('dropFiles', e.dataTransfer?.files ?? null);
 }
 </script>
 

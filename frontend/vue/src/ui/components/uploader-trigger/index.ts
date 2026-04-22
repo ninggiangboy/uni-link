@@ -1,1 +1,1 @@
-export { default as UploaderTrigger } from './UploaderTrigger.vue'
+export { default as UploaderTrigger } from './UploaderTrigger.vue';

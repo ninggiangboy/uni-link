@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { DateValue } from '@internationalized/date'
-import { computed } from 'vue'
-import { Calendar } from 'lucide-vue-next'
+import type { DateValue } from '@internationalized/date';
+import { computed } from 'vue';
+import { Calendar } from 'lucide-vue-next';
 import {
   DateRangePickerAnchor,
   DateRangePickerCalendar,
@@ -11,48 +11,49 @@ import {
   DateRangePickerRoot,
   type DateRangePickerRootProps,
   DateRangePickerTrigger,
-} from 'reka-ui'
-import { useIsMobile } from '@/ui/composables/useIsMobile'
-import RangeCalendarPanelGrids from '@/ui/components/calendar/RangeCalendarPanelGrids.vue'
-import { buttonVariants } from '@/ui/components/button/button-variants'
-import { FieldGroup } from '@/ui/components/field'
-import { dateFieldSegmentClassName } from '@/ui/lib/date-field-segment-classes'
-import { UI_DATE_FIELD_LOCALE } from '@/ui/lib/date-field-locale'
-import { datePickerPopoverContentClass } from '@/ui/lib/date-picker-popover-content-class'
-import { omitUndefinedProps } from '@/ui/lib/omit-undefined-props'
-import { cn } from '@/ui/lib/utils'
+} from 'reka-ui';
+import { useIsMobile } from '@/ui/composables/useIsMobile';
+import RangeCalendarPanelGrids from '@/ui/components/calendar/RangeCalendarPanelGrids.vue';
+import { buttonVariants } from '@/ui/components/button/button-variants';
+import { FieldGroup } from '@/ui/components/field';
+import { dateFieldSegmentClassName } from '@/ui/lib/date-field-segment-classes';
+import { UI_DATE_FIELD_LOCALE } from '@/ui/lib/date-field-locale';
+import { datePickerPopoverContentClass } from '@/ui/lib/date-picker-popover-content-class';
+import { omitUndefinedProps } from '@/ui/lib/omit-undefined-props';
+import { cn } from '@/ui/lib/utils';
 
-type DateRangeModel = { start: DateValue | undefined; end: DateValue | undefined }
+type DateRangeModel = { start: DateValue | undefined; end: DateValue | undefined };
 
-defineOptions({ inheritAttrs: false })
+defineOptions({ inheritAttrs: false });
 
-export type DateRangePickerProps = Omit<DateRangePickerRootProps, 'modelValue'> & { class?: string }
+export type DateRangePickerProps = Omit<DateRangePickerRootProps, 'modelValue'> & {
+  class?: string;
+};
 
 const props = withDefaults(defineProps<DateRangePickerProps>(), {
   locale: UI_DATE_FIELD_LOCALE,
-})
+});
 
 const rootProps = computed(() => {
-  const raw = { ...(props as Record<string, unknown>) }
-  delete raw.class
-  delete raw.open
-  delete raw['onUpdate:open']
-  return omitUndefinedProps(raw)
-})
+  const raw = { ...(props as Record<string, unknown>) };
+  delete raw.class;
+  delete raw.open;
+  delete raw['onUpdate:open'];
+  return omitUndefinedProps(raw);
+});
 
-const model = defineModel<DateRangeModel | undefined>()
+const model = defineModel<DateRangeModel | undefined>();
 
 const rangeForRoot = computed({
-  get: () =>
-    model.value == null ? { start: undefined, end: undefined } : model.value,
+  get: () => (model.value == null ? { start: undefined, end: undefined } : model.value),
   set: (v: DateRangeModel) => {
-    const cleared = v.start == null && v.end == null
-    model.value = cleared ? undefined : v
+    const cleared = v.start == null && v.end == null;
+    model.value = cleared ? undefined : v;
   },
-})
+});
 
-const { isMobile } = useIsMobile({ breakpointPx: 768 })
-const numberOfMonths = computed(() => (isMobile.value ? 1 : 2))
+const { isMobile } = useIsMobile({ breakpointPx: 768 });
+const numberOfMonths = computed(() => (isMobile.value ? 1 : 2));
 </script>
 
 <template>

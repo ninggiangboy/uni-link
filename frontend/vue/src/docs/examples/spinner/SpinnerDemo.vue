@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Spinner } from '@/ui/components/spinner'
+import { Spinner } from '@/ui/components/spinner';
 </script>
 
 <template>

@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { AccordionRoot } from 'reka-ui'
+import { AccordionRoot } from 'reka-ui';
 
 defineProps<{
-  type?: 'single' | 'multiple'
-  collapsible?: boolean
-  defaultValue?: string | string[]
-}>()
+  type?: 'single' | 'multiple';
+  collapsible?: boolean;
+  defaultValue?: string | string[];
+}>();
 </script>
 
 <template>

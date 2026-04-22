@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { Button } from '@/ui/components/button'
-import { cn } from '@/ui/lib/utils'
-import { AlertTriangle, CircleCheck, CircleX, Info, X } from 'lucide-vue-next'
+import { Button } from '@/ui/components/button';
+import { cn } from '@/ui/lib/utils';
+import { AlertTriangle, CircleCheck, CircleX, Info, X } from 'lucide-vue-next';
 
-defineOptions({ inheritAttrs: false })
+defineOptions({ inheritAttrs: false });
 
 const props = defineProps<{
-  title: string
-  description?: string
-  variant?: 'success' | 'error' | 'info' | 'warning' | 'neutral'
-  onCloseToast?: () => void
-}>()
+  title: string;
+  description?: string;
+  variant?: 'success' | 'error' | 'info' | 'warning' | 'neutral';
+  onCloseToast?: () => void;
+}>();
 </script>
 
 <template>

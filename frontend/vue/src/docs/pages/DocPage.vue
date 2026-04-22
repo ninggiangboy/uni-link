@@ -1,43 +1,43 @@
 <script setup lang="ts">
-import DocToc from '@/docs/components/DocToc.vue'
-import MdxRenderer from '@/docs/components/MdxRenderer.vue'
-import DocsLayout from '@/docs/layouts/DocsLayout.vue'
-import { loadDocSource } from '@/docs/lib/loadDocSource'
-import { renderDoc, type ParsedDoc } from '@/docs/mdx/renderDoc'
-import { ScrollArea } from '@/ui/components/scroll-area'
-import { Button } from '@/ui/components/button'
-import { ArrowUpRight, Github } from 'lucide-vue-next'
-import { useQuery } from '@tanstack/vue-query'
-import { computed, unref } from 'vue'
-import { useRoute } from 'vue-router'
+import DocToc from '@/docs/components/DocToc.vue';
+import MdxRenderer from '@/docs/components/MdxRenderer.vue';
+import DocsLayout from '@/docs/layouts/DocsLayout.vue';
+import { loadDocSource } from '@/docs/lib/loadDocSource';
+import { renderDoc, type ParsedDoc } from '@/docs/mdx/renderDoc';
+import { ScrollArea } from '@/ui/components/scroll-area';
+import { Button } from '@/ui/components/button';
+import { ArrowUpRight, Github } from 'lucide-vue-next';
+import { useQuery } from '@tanstack/vue-query';
+import { computed, unref } from 'vue';
+import { useRoute } from 'vue-router';
 
-const route = useRoute()
+const route = useRoute();
 
 const slug = computed(() => {
-  const section = route.params.section as string
-  const s = route.params.slug as string
-  return `${section}/${s}`
-})
+  const section = route.params.section as string;
+  const s = route.params.slug as string;
+  return `${section}/${s}`;
+});
 
 const docQuery = useQuery(
   computed(() => ({
     queryKey: ['docs', slug.value] as const,
     queryFn: async (): Promise<ParsedDoc | null> => {
-      const raw = await loadDocSource(slug.value)
-      if (!raw) return null
-      return renderDoc(raw)
+      const raw = await loadDocSource(slug.value);
+      if (!raw) return null;
+      return renderDoc(raw);
     },
   })),
-)
+);
 
-const doc = computed(() => unref(docQuery.data))
-const isLoading = computed(() => unref(docQuery.isLoading))
-const isError = computed(() => unref(docQuery.isError))
+const doc = computed(() => unref(docQuery.data));
+const isLoading = computed(() => unref(docQuery.isLoading));
+const isError = computed(() => unref(docQuery.isError));
 
 const loadErrorMessage = computed(() => {
-  const err = unref(docQuery.error)
-  return err instanceof Error ? err.message : 'Failed to load document.'
-})
+  const err = unref(docQuery.error);
+  return err instanceof Error ? err.message : 'Failed to load document.';
+});
 </script>
 
 <template>

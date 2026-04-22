@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Uploader } from '@/ui/components/uploader'
-import { UploaderAction } from '@/ui/components/uploader/uploaderAction'
+import { Uploader } from '@/ui/components/uploader';
+import { UploaderAction } from '@/ui/components/uploader/uploaderAction';
 </script>
 <template>
   <Uploader

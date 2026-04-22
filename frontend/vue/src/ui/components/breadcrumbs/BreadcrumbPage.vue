@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import type { HTMLAttributes } from 'vue'
-import { cn } from '@/ui/lib/utils'
+import type { HTMLAttributes } from 'vue';
+import { cn } from '@/ui/lib/utils';
 
 defineProps<{
-  class?: HTMLAttributes['class']
+  class?: HTMLAttributes['class'];
   /** When true, marks current page for a11y */
-  current?: boolean
-}>()
+  current?: boolean;
+}>();
 </script>
 
 <template>

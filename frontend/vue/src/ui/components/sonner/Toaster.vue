@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Toaster as VueSonnerToaster } from 'vue-sonner'
+import { Toaster as VueSonnerToaster } from 'vue-sonner';
 </script>
 
 <template>

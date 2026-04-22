@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { AccordionContent as RekaAccordionContent } from 'reka-ui'
-import { cn } from '@/ui/lib/utils'
+import { AccordionContent as RekaAccordionContent } from 'reka-ui';
+import { cn } from '@/ui/lib/utils';
 
 defineProps<{
-  class?: string
-}>()
+  class?: string;
+}>();
 </script>
 
 <template>

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { z } from 'zod'
-import { docFormToast } from '@/docs/examples/_internal/docFormSubmit'
-import { Button } from '@/ui/components/button'
-import { Checkbox, CheckboxGroup } from '@/ui/components/checkbox'
+import { z } from 'zod';
+import { docFormToast } from '@/docs/examples/_internal/docFormSubmit';
+import { Button } from '@/ui/components/button';
+import { Checkbox, CheckboxGroup } from '@/ui/components/checkbox';
 import {
   Form,
   FormDescription,
@@ -12,8 +12,8 @@ import {
   FormMessage,
   FormControl,
   useForm,
-} from '@/ui/components/form'
-import { TextArea } from '@/ui/components/textfield'
+} from '@/ui/components/form';
+import { TextArea } from '@/ui/components/textfield';
 
 const { handleSubmit } = useForm({
   initialValues: {
@@ -21,9 +21,9 @@ const { handleSubmit } = useForm({
     bio: '',
     acceptTerm: false,
   },
-})
+});
 
-const onSubmit = handleSubmit((v) => docFormToast(v))
+const onSubmit = handleSubmit((v) => docFormToast(v));
 </script>
 
 <template>
@@ -47,7 +47,11 @@ const onSubmit = handleSubmit((v) => docFormToast(v))
       </FormItem>
     </FormField>
 
-    <FormField v-slot="{ componentField }" name="bio" :rules="z.string().min(1, 'Required').ruleFn()">
+    <FormField
+      v-slot="{ componentField }"
+      name="bio"
+      :rules="z.string().min(1, 'Required').ruleFn()"
+    >
       <FormItem>
         <FormLabel>Bio</FormLabel>
         <FormControl v-slot="controlProps">
@@ -65,10 +69,19 @@ const onSubmit = handleSubmit((v) => docFormToast(v))
       v-slot="{ componentField }"
       name="acceptTerm"
       type="checkbox"
-      :rules="z.boolean().refine((v) => v, { message: 'Please accept the terms and conditions' }).ruleFn()"
+      :rules="
+        z
+          .boolean()
+          .refine((v) => v, { message: 'Please accept the terms and conditions' })
+          .ruleFn()
+      "
     >
       <FormItem>
-        <FormControl generic="boolean | 'indeterminate'" v-slot="vm" :component-field="componentField">
+        <FormControl
+          generic="boolean | 'indeterminate'"
+          v-slot="vm"
+          :component-field="componentField"
+        >
           <Checkbox v-bind="vm"> I accept the terms and conditions </Checkbox>
         </FormControl>
         <FormMessage />

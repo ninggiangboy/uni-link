@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import type { DateValue } from '@internationalized/date'
-import { ChevronLeft, ChevronRight } from 'lucide-vue-next'
+import { computed } from 'vue';
+import type { DateValue } from '@internationalized/date';
+import { ChevronLeft, ChevronRight } from 'lucide-vue-next';
 import {
   RangeCalendarCell,
   RangeCalendarCellTrigger,
@@ -14,70 +14,70 @@ import {
   RangeCalendarHeading,
   RangeCalendarNext,
   RangeCalendarPrev,
-} from 'reka-ui'
-import { buttonVariants } from '@/ui/components/button/button-variants'
-import { rangeCalendarCellLabelVariants } from './calendar-cell-styles'
-import { cn } from '@/ui/lib/utils'
+} from 'reka-ui';
+import { buttonVariants } from '@/ui/components/button/button-variants';
+import { rangeCalendarCellLabelVariants } from './calendar-cell-styles';
+import { cn } from '@/ui/lib/utils';
 
 const props = withDefaults(
   defineProps<{
-    grid: { value: DateValue; rows: DateValue[][] }[]
-    weekDays: string[]
-    unstyled?: boolean
-    placeholder?: DateValue
-    onPlaceholderChange?: (date: DateValue) => void
-    locale?: string
-    captionLayout?: 'buttons' | 'dropdown'
-    minValue?: DateValue
-    maxValue?: DateValue
+    grid: { value: DateValue; rows: DateValue[][] }[];
+    weekDays: string[];
+    unstyled?: boolean;
+    placeholder?: DateValue;
+    onPlaceholderChange?: (date: DateValue) => void;
+    locale?: string;
+    captionLayout?: 'buttons' | 'dropdown';
+    minValue?: DateValue;
+    maxValue?: DateValue;
   }>(),
   { unstyled: false, captionLayout: 'buttons' },
-)
+);
 
-const isUnstyled = computed(() => props.unstyled)
+const isUnstyled = computed(() => props.unstyled);
 const isDropdownCaption = computed(
   () => props.captionLayout === 'dropdown' && !!props.placeholder && !!props.locale,
-)
-const weekColIndexes = [0, 1, 2, 3, 4, 5, 6] as const
+);
+const weekColIndexes = [0, 1, 2, 3, 4, 5, 6] as const;
 
 const monthOptions = computed(() => {
-  const placeholder = props.placeholder
-  const locale = props.locale
-  if (!placeholder || !locale) return []
-  const monthsInYear = placeholder.calendar.getMonthsInYear(placeholder)
+  const placeholder = props.placeholder;
+  const locale = props.locale;
+  if (!placeholder || !locale) return [];
+  const monthsInYear = placeholder.calendar.getMonthsInYear(placeholder);
   return Array.from({ length: monthsInYear }, (_, i) => {
-    const month = i + 1
-    const d = placeholder.set({ day: 1, month })
-    const label = d.toDate('UTC').toLocaleString(locale, { month: 'short' })
-    return { value: month, label }
-  })
-})
+    const month = i + 1;
+    const d = placeholder.set({ day: 1, month });
+    const label = d.toDate('UTC').toLocaleString(locale, { month: 'short' });
+    return { value: month, label };
+  });
+});
 
 const yearOptions = computed(() => {
-  if (!props.placeholder) return []
-  const currentYear = props.placeholder.year
-  const minYear = props.minValue?.year ?? currentYear - 100
-  const maxYear = props.maxValue?.year ?? currentYear + 100
-  return Array.from({ length: maxYear - minYear + 1 }, (_, i) => minYear + i)
-})
+  if (!props.placeholder) return [];
+  const currentYear = props.placeholder.year;
+  const minYear = props.minValue?.year ?? currentYear - 100;
+  const maxYear = props.maxValue?.year ?? currentYear + 100;
+  return Array.from({ length: maxYear - minYear + 1 }, (_, i) => minYear + i);
+});
 
 function onMonthChange(event: Event) {
-  if (!props.placeholder) return
-  const selectEl = event.target as HTMLSelectElement
-  const value = Number(selectEl.value)
+  if (!props.placeholder) return;
+  const selectEl = event.target as HTMLSelectElement;
+  const value = Number(selectEl.value);
   if (!Number.isNaN(value)) {
-    props.onPlaceholderChange?.(props.placeholder.set({ day: 1, month: value }))
-    requestAnimationFrame(() => selectEl.blur())
+    props.onPlaceholderChange?.(props.placeholder.set({ day: 1, month: value }));
+    requestAnimationFrame(() => selectEl.blur());
   }
 }
 
 function onYearChange(event: Event) {
-  if (!props.placeholder) return
-  const selectEl = event.target as HTMLSelectElement
-  const value = Number(selectEl.value)
+  if (!props.placeholder) return;
+  const selectEl = event.target as HTMLSelectElement;
+  const value = Number(selectEl.value);
   if (!Number.isNaN(value)) {
-    props.onPlaceholderChange?.(props.placeholder.set({ day: 1, year: value }))
-    requestAnimationFrame(() => selectEl.blur())
+    props.onPlaceholderChange?.(props.placeholder.set({ day: 1, year: value }));
+    requestAnimationFrame(() => selectEl.blur());
   }
 }
 
@@ -87,28 +87,28 @@ const navBtnClass = computed(() =>
     !isUnstyled.value &&
       'shrink-0 rounded-full text-primary-foreground hover:bg-muted-foreground/10',
   ),
-)
+);
 
 const triggerShellClass = computed(() =>
   cn(
     'group relative text-sm outline outline-0',
     !isUnstyled.value && 'cursor-pointer data-[outside-view]:hidden',
   ),
-)
+);
 
 function cellVariant(flags: {
-  selected: boolean
-  selectionStart: boolean
-  selectionEnd: boolean
-  highlighted: boolean
-  highlightedStart: boolean
-  highlightedEnd: boolean
+  selected: boolean;
+  selectionStart: boolean;
+  selectionEnd: boolean;
+  highlighted: boolean;
+  highlightedStart: boolean;
+  highlightedEnd: boolean;
 }): 'none' | 'middle' | 'cap' {
-  if (flags.selectionStart || flags.selectionEnd) return 'cap'
-  if (flags.highlightedStart || flags.highlightedEnd) return 'cap'
-  if (flags.selected) return 'middle'
-  if (flags.highlighted) return 'middle'
-  return 'none'
+  if (flags.selectionStart || flags.selectionEnd) return 'cap';
+  if (flags.highlightedStart || flags.highlightedEnd) return 'cap';
+  if (flags.selected) return 'middle';
+  if (flags.highlighted) return 'middle';
+  return 'none';
 }
 
 function rangeBgState(
@@ -116,32 +116,32 @@ function rangeBgState(
   selectionStart: boolean,
   selectionEnd: boolean,
 ): 'none' | 'middle' | 'cap' {
-  if (selected && (selectionStart || selectionEnd)) return 'cap'
-  if (selected) return 'middle'
-  return 'none'
+  if (selected && (selectionStart || selectionEnd)) return 'cap';
+  if (selected) return 'middle';
+  return 'none';
 }
 
 function monthFadeFlags(date: DateValue, bg: 'none' | 'middle' | 'cap') {
-  const isEndOfMonth = date.calendar.getDaysInMonth(date) === date.day
-  const isStartOfMonth = date.day === 1
+  const isEndOfMonth = date.calendar.getDaysInMonth(date) === date.day;
+  const isStartOfMonth = date.day === 1;
   return {
     fadeRight: bg === 'middle' && isEndOfMonth,
     fadeLeft: bg === 'middle' && isStartOfMonth,
-  }
+  };
 }
 
 function rangeInnerTrackClass(
   date: DateValue,
   opts: {
-    disabled: boolean
-    selected: boolean
-    selectionStart: boolean
-    selectionEnd: boolean
+    disabled: boolean;
+    selected: boolean;
+    selectionStart: boolean;
+    selectionEnd: boolean;
   },
 ) {
-  const { disabled, selected, selectionStart, selectionEnd } = opts
-  const bg = rangeBgState(selected, selectionStart, selectionEnd)
-  const { fadeLeft, fadeRight } = monthFadeFlags(date, bg)
+  const { disabled, selected, selectionStart, selectionEnd } = opts;
+  const bg = rangeBgState(selected, selectionStart, selectionEnd);
+  const { fadeLeft, fadeRight } = monthFadeFlags(date, bg);
   return cn(
     'flex size-8 items-center justify-center',
     !disabled && 'cursor-pointer',
@@ -151,7 +151,7 @@ function rangeInnerTrackClass(
     selectionEnd && 'rounded-e-full',
     fadeRight && 'bg-transparent bg-gradient-to-r from-neutral-400/15 to-neutral-400/0',
     fadeLeft && 'bg-transparent bg-gradient-to-l from-neutral-400/15 to-neutral-400/0',
-  )
+  );
 }
 </script>
 

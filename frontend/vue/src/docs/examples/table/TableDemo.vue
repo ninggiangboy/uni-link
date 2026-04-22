@@ -7,7 +7,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/ui/components/table'
+} from '@/ui/components/table';
 const invoices = [
   {
     invoice: 'INV001',
@@ -41,7 +41,7 @@ const invoices = [
     totalAmount: '$300.00',
     paymentMethod: 'Credit Card',
   },
-]
+];
 </script>
 <template>
   <div class="w-full">

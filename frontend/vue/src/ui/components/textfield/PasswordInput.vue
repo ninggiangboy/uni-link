@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { Eye, EyeOff } from 'lucide-vue-next'
-import { FieldGroup } from '@/ui/components/field'
-import { Button } from '@/ui/components/button'
-import { cn } from '@/ui/lib/utils'
+import { ref } from 'vue';
+import { Eye, EyeOff } from 'lucide-vue-next';
+import { FieldGroup } from '@/ui/components/field';
+import { Button } from '@/ui/components/button';
+import { cn } from '@/ui/lib/utils';
 
-defineOptions({ inheritAttrs: false })
+defineOptions({ inheritAttrs: false });
 
 defineProps<{
-  class?: string
-  placeholder?: string
-}>()
+  class?: string;
+  placeholder?: string;
+}>();
 
-const visible = ref(false)
+const visible = ref(false);
 </script>
 
 <template>

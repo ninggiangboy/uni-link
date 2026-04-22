@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { Checkbox } from '@/ui/components/checkbox'
+import { ref } from 'vue';
+import { Checkbox } from '@/ui/components/checkbox';
 
-const v = ref(false)
+const v = ref(false);
 </script>
 
 <template>

@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { TooltipContent as RekaTooltipContent, TooltipPortal } from 'reka-ui'
-import { cn } from '@/ui/lib/utils'
+import { TooltipContent as RekaTooltipContent, TooltipPortal } from 'reka-ui';
+import { cn } from '@/ui/lib/utils';
 
 withDefaults(
   defineProps<{
-    class?: string
-    sideOffset?: number
+    class?: string;
+    sideOffset?: number;
   }>(),
   { sideOffset: 4 },
-)
+);
 </script>
 
 <template>

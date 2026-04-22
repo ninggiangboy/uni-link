@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Label } from '@/ui/components/field'
-import { Input } from '@/ui/components/textfield'
+import { Label } from '@/ui/components/field';
+import { Input } from '@/ui/components/textfield';
 </script>
 
 <template>

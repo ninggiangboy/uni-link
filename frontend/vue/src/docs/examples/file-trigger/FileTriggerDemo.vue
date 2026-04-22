@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { Upload } from 'lucide-vue-next'
-import { Button } from '@/ui/components/button'
-import { shortenFilename } from '@/ui/lib/file'
+import { ref } from 'vue';
+import { Upload } from 'lucide-vue-next';
+import { Button } from '@/ui/components/button';
+import { shortenFilename } from '@/ui/lib/file';
 
-const file = ref('')
+const file = ref('');
 
 function onPick(e: Event) {
-  const t = e.target as HTMLInputElement
-  file.value = t.files?.[0]?.name ?? ''
-  t.value = ''
+  const t = e.target as HTMLInputElement;
+  file.value = t.files?.[0]?.name ?? '';
+  t.value = '';
 }
 </script>
 

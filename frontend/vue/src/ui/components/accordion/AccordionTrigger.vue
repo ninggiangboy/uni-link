@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { AccordionHeader, AccordionTrigger as RekaAccordionTrigger } from 'reka-ui'
-import { ChevronDown } from 'lucide-vue-next'
-import { cn } from '@/ui/lib/utils'
+import { AccordionHeader, AccordionTrigger as RekaAccordionTrigger } from 'reka-ui';
+import { ChevronDown } from 'lucide-vue-next';
+import { cn } from '@/ui/lib/utils';
 
 defineProps<{
-  class?: string
-}>()
+  class?: string;
+}>();
 </script>
 
 <template>

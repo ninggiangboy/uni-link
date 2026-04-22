@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Check, ChevronDown, X } from 'lucide-vue-next'
-import { computed, nextTick, onBeforeUnmount, ref, useSlots, watch } from 'vue'
+import { Check, ChevronDown, X } from 'lucide-vue-next';
+import { computed, nextTick, onBeforeUnmount, ref, useSlots, watch } from 'vue';
 import {
   SelectContent,
   SelectItem,
@@ -11,30 +11,30 @@ import {
   SelectTrigger,
   SelectValue,
   SelectViewport,
-} from 'reka-ui'
-import { Badge } from '@/ui/components/badge'
-import { cn } from '@/ui/lib/utils'
+} from 'reka-ui';
+import { Badge } from '@/ui/components/badge';
+import { cn } from '@/ui/lib/utils';
 
-export type SelectOption = { id: string | number; name: string }
+export type SelectOption = { id: string | number; name: string };
 
 const props = withDefaults(
   defineProps<{
-    options: SelectOption[]
-    placeholder?: string
-    class?: string
-    disabled?: boolean
-    multiple?: boolean
+    options: SelectOption[];
+    placeholder?: string;
+    class?: string;
+    disabled?: boolean;
+    multiple?: boolean;
     /** Số badge tối đa hiển thị trước khi gộp `+N` (giống sample `maxVisibleBadges`) */
-    maxVisibleBadges?: number
-    clearable?: boolean
+    maxVisibleBadges?: number;
+    clearable?: boolean;
     /** Giống sample `<Select isSearchable />`: ô tìm trong panel, trigger vẫn là nút Select */
-    searchable?: boolean
+    searchable?: boolean;
     /** Placeholder trên ô search trong panel (khác `placeholder` của trigger) */
-    searchPlaceholder?: string
-    emptyMessage?: string
-    defaultValue?: string | string[]
+    searchPlaceholder?: string;
+    emptyMessage?: string;
+    defaultValue?: string | string[];
     /** Extra classes on the dropdown panel (sample: `popoverClassName`) */
-    contentClass?: string
+    contentClass?: string;
   }>(),
   {
     disabled: false,
@@ -46,98 +46,98 @@ const props = withDefaults(
     emptyMessage: 'No results found',
     defaultValue: undefined,
   },
-)
+);
 
-type Model = string | string[] | undefined
-const model = defineModel<Model>()
-const slots = useSlots()
-const menuOpen = ref(false)
-const filterQuery = ref('')
-const searchInputRef = ref<HTMLInputElement | null>(null)
-let searchFocusTimer: ReturnType<typeof setTimeout> | undefined
+type Model = string | string[] | undefined;
+const model = defineModel<Model>();
+const slots = useSlots();
+const menuOpen = ref(false);
+const filterQuery = ref('');
+const searchInputRef = ref<HTMLInputElement | null>(null);
+let searchFocusTimer: ReturnType<typeof setTimeout> | undefined;
 
 const hasValue = computed(() => {
-  const v = model.value
-  if (v == null) return false
-  if (Array.isArray(v)) return v.length > 0
-  return String(v).length > 0
-})
+  const v = model.value;
+  if (v == null) return false;
+  if (Array.isArray(v)) return v.length > 0;
+  return String(v).length > 0;
+});
 
 const filteredOptions = computed(() => {
-  if (!props.searchable) return props.options
-  const q = filterQuery.value.trim().toLowerCase()
-  if (!q) return props.options
-  return props.options.filter((o) => o.name.toLowerCase().includes(q))
-})
+  if (!props.searchable) return props.options;
+  const q = filterQuery.value.trim().toLowerCase();
+  if (!q) return props.options;
+  return props.options.filter((o) => o.name.toLowerCase().includes(q));
+});
 
 const selectedOptionsOrdered = computed(() => {
-  const mv = model.value
-  if (!props.multiple || !Array.isArray(mv)) return []
+  const mv = model.value;
+  if (!props.multiple || !Array.isArray(mv)) return [];
   return mv
     .map((id) => props.options.find((o) => String(o.id) === String(id)))
-    .filter((o): o is SelectOption => o != null)
-})
+    .filter((o): o is SelectOption => o != null);
+});
 
 const visibleBadgeOptions = computed(() =>
   selectedOptionsOrdered.value.slice(0, props.maxVisibleBadges),
-)
+);
 
 const badgeOverflowCount = computed(() => {
-  const n = selectedOptionsOrdered.value.length
-  const max = props.maxVisibleBadges
-  return n > max ? n - max : 0
-})
+  const n = selectedOptionsOrdered.value.length;
+  const max = props.maxVisibleBadges;
+  return n > max ? n - max : 0;
+});
 
 function removeSelectedOption(opt: SelectOption, e: Event) {
-  e.preventDefault()
-  e.stopPropagation()
-  const mv = model.value
-  if (!Array.isArray(mv)) return
-  const id = String(opt.id)
-  model.value = mv.filter((v) => String(v) !== id)
+  e.preventDefault();
+  e.stopPropagation();
+  const mv = model.value;
+  if (!Array.isArray(mv)) return;
+  const id = String(opt.id);
+  model.value = mv.filter((v) => String(v) !== id);
 }
 
 function focusSearchInput() {
-  searchInputRef.value?.focus({ preventScroll: true })
+  searchInputRef.value?.focus({ preventScroll: true });
 }
 
 watch(menuOpen, (open) => {
-  if (!props.searchable) return
+  if (!props.searchable) return;
   if (searchFocusTimer !== undefined) {
-    clearTimeout(searchFocusTimer)
-    searchFocusTimer = undefined
+    clearTimeout(searchFocusTimer);
+    searchFocusTimer = undefined;
   }
   if (!open) {
-    filterQuery.value = ''
-    return
+    filterQuery.value = '';
+    return;
   }
   // SelectContent sau khi popper `placed` gọi focusSelectedItem() — focus ô search phải chạy sau đó
   void nextTick().then(() => {
-    focusSearchInput()
+    focusSearchInput();
     searchFocusTimer = setTimeout(() => {
-      focusSearchInput()
-      searchFocusTimer = undefined
-    }, 32)
-  })
-})
+      focusSearchInput();
+      searchFocusTimer = undefined;
+    }, 32);
+  });
+});
 
 function onSearchKeydown(e: KeyboardEvent) {
-  if (['Escape', 'Tab'].includes(e.key)) return
+  if (['Escape', 'Tab'].includes(e.key)) return;
   if (['ArrowDown', 'ArrowUp', 'Home', 'End', 'PageUp', 'PageDown'].includes(e.key)) {
-    return
+    return;
   }
-  e.stopPropagation()
+  e.stopPropagation();
 }
 
 function clearSelection(ev: Event) {
-  ev.preventDefault()
-  ev.stopPropagation()
-  model.value = props.multiple ? [] : undefined
+  ev.preventDefault();
+  ev.stopPropagation();
+  model.value = props.multiple ? [] : undefined;
 }
 
 onBeforeUnmount(() => {
-  if (searchFocusTimer !== undefined) clearTimeout(searchFocusTimer)
-})
+  if (searchFocusTimer !== undefined) clearTimeout(searchFocusTimer);
+});
 </script>
 
 <template>
@@ -149,67 +149,62 @@ onBeforeUnmount(() => {
     :default-value="defaultValue"
   >
     <div class="relative w-full">
-    <SelectTrigger
-      :class="
-        cn(
-          'flex w-full items-center justify-between rounded-sm border border-input bg-background-secondary px-3 text-start text-sm font-normal outline-none',
-          multiple ? 'min-h-8 h-auto items-center py-1' : 'h-8 items-center',
-          'hover:bg-background-secondary focus:ring-2 focus:ring-primary disabled:cursor-not-allowed disabled:opacity-50',
-          props.class,
-        )
-      "
-    >
-      <SelectValue
-        :placeholder="placeholder ?? 'Select'"
+      <SelectTrigger
         :class="
           cn(
-            'min-w-0 flex-1',
-            clearable && hasValue && 'pr-6',
+            'flex w-full items-center justify-between rounded-sm border border-input bg-background-secondary px-3 text-start text-sm font-normal outline-none',
+            multiple ? 'min-h-8 h-auto items-center py-1' : 'h-8 items-center',
+            'hover:bg-background-secondary focus:ring-2 focus:ring-primary disabled:cursor-not-allowed disabled:opacity-50',
+            props.class,
           )
         "
       >
-        <template v-if="multiple && !slots.value" #default>
-          <div v-if="!selectedOptionsOrdered.length" class="text-muted-foreground">
-            {{ placeholder ?? 'Select' }}
-          </div>
-          <div v-else class="pointer-events-auto flex min-w-0 flex-1 flex-wrap gap-1">
-            <Badge
-              v-for="opt in visibleBadgeOptions"
-              :key="opt.id"
-              variant="secondary"
-              class="grid max-w-full grid-cols-[1fr_16px] pr-0.5"
-            >
-              <span class="truncate">{{ opt.name }}</span>
-              <button
-                type="button"
-                class="flex !size-4 cursor-pointer items-center justify-center rounded bg-transparent hover:bg-neutral-400/15"
-                :aria-label="`Remove ${opt.name}`"
-                @click.stop="removeSelectedOption(opt, $event)"
-                @pointerdown.stop.prevent
+        <SelectValue
+          :placeholder="placeholder ?? 'Select'"
+          :class="cn('min-w-0 flex-1', clearable && hasValue && 'pr-6')"
+        >
+          <template v-if="multiple && !slots.value" #default>
+            <div v-if="!selectedOptionsOrdered.length" class="text-muted-foreground">
+              {{ placeholder ?? 'Select' }}
+            </div>
+            <div v-else class="pointer-events-auto flex min-w-0 flex-1 flex-wrap gap-1">
+              <Badge
+                v-for="opt in visibleBadgeOptions"
+                :key="opt.id"
+                variant="secondary"
+                class="grid max-w-full grid-cols-[1fr_16px] pr-0.5"
               >
-                <X class="!size-2.5" />
-              </button>
-            </Badge>
-            <Badge v-if="badgeOverflowCount > 0" variant="secondary">
-              <span>+{{ badgeOverflowCount }}</span>
-            </Badge>
-          </div>
-        </template>
-        <template v-else-if="slots.value" #default="scope">
-          <slot name="value" v-bind="scope" />
-        </template>
-      </SelectValue>
-      <ChevronDown class="size-4 shrink-0 self-center text-muted-foreground opacity-50" />
-    </SelectTrigger>
-    <button
-      v-if="clearable && hasValue && !disabled"
-      type="button"
-      class="absolute top-1/2 right-7 z-10 flex size-6 -translate-y-1/2 items-center justify-center rounded bg-background-secondary text-muted-foreground hover:bg-background-tertiary"
-      :aria-label="'Clear selection'"
-      @pointerdown.stop.prevent="clearSelection"
-    >
-      <X class="size-3.5" />
-    </button>
+                <span class="truncate">{{ opt.name }}</span>
+                <button
+                  type="button"
+                  class="flex !size-4 cursor-pointer items-center justify-center rounded bg-transparent hover:bg-neutral-400/15"
+                  :aria-label="`Remove ${opt.name}`"
+                  @click.stop="removeSelectedOption(opt, $event)"
+                  @pointerdown.stop.prevent
+                >
+                  <X class="!size-2.5" />
+                </button>
+              </Badge>
+              <Badge v-if="badgeOverflowCount > 0" variant="secondary">
+                <span>+{{ badgeOverflowCount }}</span>
+              </Badge>
+            </div>
+          </template>
+          <template v-else-if="slots.value" #default="scope">
+            <slot name="value" v-bind="scope" />
+          </template>
+        </SelectValue>
+        <ChevronDown class="size-4 shrink-0 self-center text-muted-foreground opacity-50" />
+      </SelectTrigger>
+      <button
+        v-if="clearable && hasValue && !disabled"
+        type="button"
+        class="absolute top-1/2 right-7 z-10 flex size-6 -translate-y-1/2 items-center justify-center rounded bg-background-secondary text-muted-foreground hover:bg-background-tertiary"
+        :aria-label="'Clear selection'"
+        @pointerdown.stop.prevent="clearSelection"
+      >
+        <X class="size-3.5" />
+      </button>
     </div>
     <SelectPortal>
       <SelectContent

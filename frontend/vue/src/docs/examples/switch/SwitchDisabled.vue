@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Switch } from '@/ui/components/switch-ui'
+import { Switch } from '@/ui/components/switch-ui';
 </script>
 
 <template>

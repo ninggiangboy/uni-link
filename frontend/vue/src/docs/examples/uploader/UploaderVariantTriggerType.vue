@@ -20,9 +20,9 @@ const exampleFileList = [
     type: 'application/msword',
     url: 'https://filesamples.com/samples/document/doc/sample2.doc',
   },
-] as const
-import { Uploader } from '@/ui/components/uploader'
-import { TmpfilesUploaderAction } from '@/docs/examples/uploader/tmpfilesUploaderAction'
+] as const;
+import { Uploader } from '@/ui/components/uploader';
+import { TmpfilesUploaderAction } from '@/docs/examples/uploader/tmpfilesUploaderAction';
 </script>
 <template>
   <Uploader

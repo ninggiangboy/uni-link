@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { RangeCalendar, type DateRange } from '@/ui/components/calendar'
-import { shallowRef } from 'vue'
+import { RangeCalendar, type DateRange } from '@/ui/components/calendar';
+import { shallowRef } from 'vue';
 
 /** shallow: range emits immutable date values; deep ref breaks assignability in vue-tsc */
-const value = shallowRef<DateRange | null>(null)
+const value = shallowRef<DateRange | null>(null);
 </script>
 
 <template>

@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { Spinner } from '@/ui/components/spinner'
-import { cn } from '@/ui/lib/utils'
+import { Spinner } from '@/ui/components/spinner';
+import { cn } from '@/ui/lib/utils';
 
 withDefaults(
   defineProps<{
-    class?: string
+    class?: string;
     /** When true, dims the slotted content and centers a spinner on top */
-    isLoading?: boolean
+    isLoading?: boolean;
   }>(),
   { isLoading: false },
-)
+);
 </script>
 
 <template>

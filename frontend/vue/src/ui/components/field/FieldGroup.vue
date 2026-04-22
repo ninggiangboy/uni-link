@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import type { HTMLAttributes } from 'vue'
-import { computed, useAttrs } from 'vue'
-import { cn } from '@/ui/lib/utils'
-import { fieldGroupVariants, type FieldGroupVariant } from './field-variants'
+import type { HTMLAttributes } from 'vue';
+import { computed, useAttrs } from 'vue';
+import { cn } from '@/ui/lib/utils';
+import { fieldGroupVariants, type FieldGroupVariant } from './field-variants';
 
-defineOptions({ inheritAttrs: false })
+defineOptions({ inheritAttrs: false });
 
 const props = defineProps<{
-  class?: HTMLAttributes['class']
-  variant?: FieldGroupVariant
-}>()
+  class?: HTMLAttributes['class'];
+  variant?: FieldGroupVariant;
+}>();
 
-const attrs = useAttrs()
+const attrs = useAttrs();
 
 const mergedClass = computed(() =>
   cn(
@@ -19,12 +19,12 @@ const mergedClass = computed(() =>
     props.class,
     attrs.class as string,
   ),
-)
+);
 const passthrough = computed(() => {
-  const rest = { ...attrs } as Record<string, unknown>
-  delete rest.class
-  return rest
-})
+  const rest = { ...attrs } as Record<string, unknown>;
+  delete rest.class;
+  return rest;
+});
 </script>
 
 <template>

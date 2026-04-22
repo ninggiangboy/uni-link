@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Button } from '@/ui/components/button'
-import { TextArea } from '@/ui/components/textfield'
+import { Button } from '@/ui/components/button';
+import { TextArea } from '@/ui/components/textfield';
 </script>
 <template>
   <div class="grid w-full max-w-sm gap-2">

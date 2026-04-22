@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Button } from '@/ui/components/button'
-import { toast } from '@/ui/components/sonner'
+import { Button } from '@/ui/components/button';
+import { toast } from '@/ui/components/sonner';
 </script>
 
 <template>

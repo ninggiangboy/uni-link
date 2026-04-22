@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { DateValue } from '@internationalized/date'
-import { parseDate, toCalendarDate } from '@internationalized/date'
-import { computed, ref, watch } from 'vue'
-import { Calendar } from 'lucide-vue-next'
+import type { DateValue } from '@internationalized/date';
+import { parseDate, toCalendarDate } from '@internationalized/date';
+import { computed, ref, watch } from 'vue';
+import { Calendar } from 'lucide-vue-next';
 import {
   DatePickerAnchor,
   DatePickerCalendar,
@@ -12,66 +12,66 @@ import {
   DatePickerRoot,
   type DatePickerRootProps,
   DatePickerTrigger,
-} from 'reka-ui'
-import CalendarPanelGrids from '@/ui/components/calendar/CalendarPanelGrids.vue'
-import { buttonVariants } from '@/ui/components/button/button-variants'
-import { FieldGroup } from '@/ui/components/field'
-import { dateFieldSegmentClassName } from '@/ui/lib/date-field-segment-classes'
-import { UI_DATE_FIELD_LOCALE } from '@/ui/lib/date-field-locale'
-import { datePickerPopoverContentClass } from '@/ui/lib/date-picker-popover-content-class'
-import { omitUndefinedProps } from '@/ui/lib/omit-undefined-props'
-import { cn } from '@/ui/lib/utils'
+} from 'reka-ui';
+import CalendarPanelGrids from '@/ui/components/calendar/CalendarPanelGrids.vue';
+import { buttonVariants } from '@/ui/components/button/button-variants';
+import { FieldGroup } from '@/ui/components/field';
+import { dateFieldSegmentClassName } from '@/ui/lib/date-field-segment-classes';
+import { UI_DATE_FIELD_LOCALE } from '@/ui/lib/date-field-locale';
+import { datePickerPopoverContentClass } from '@/ui/lib/date-picker-popover-content-class';
+import { omitUndefinedProps } from '@/ui/lib/omit-undefined-props';
+import { cn } from '@/ui/lib/utils';
 
-defineOptions({ inheritAttrs: false })
+defineOptions({ inheritAttrs: false });
 
-export type DatePickerProps = Omit<DatePickerRootProps, 'modelValue'> & { class?: string }
+export type DatePickerProps = Omit<DatePickerRootProps, 'modelValue'> & { class?: string };
 
 const props = withDefaults(defineProps<DatePickerProps>(), {
   locale: UI_DATE_FIELD_LOCALE,
-})
+});
 
 /** ISO `YYYY-MM-DD` (Gregorian) for forms / APIs; Reka still uses `DateValue` internally. */
-const model = defineModel<string | undefined>()
-const innerModel = ref<DateValue | undefined>()
+const model = defineModel<string | undefined>();
+const innerModel = ref<DateValue | undefined>();
 
 function stringFromDate(v: DateValue | undefined): string | undefined {
-  return v == null ? undefined : toCalendarDate(v).toString()
+  return v == null ? undefined : toCalendarDate(v).toString();
 }
 
 watch(
   () => model.value,
   (s) => {
-    const innerStr = stringFromDate(innerModel.value)
-    if (s === innerStr) return
+    const innerStr = stringFromDate(innerModel.value);
+    if (s === innerStr) return;
     if (s == null || s === '') {
-      innerModel.value = undefined
-      return
+      innerModel.value = undefined;
+      return;
     }
     try {
-      innerModel.value = parseDate(s)
+      innerModel.value = parseDate(s);
     } catch {
-      innerModel.value = undefined
+      innerModel.value = undefined;
     }
   },
   { immediate: true },
-)
+);
 
 watch(innerModel, (v) => {
-  const next = stringFromDate(v)
-  if (next === model.value) return
-  model.value = next
-})
+  const next = stringFromDate(v);
+  if (next === model.value) return;
+  model.value = next;
+});
 
 const rootProps = computed(() => {
-  const raw = { ...(props as Record<string, unknown>) }
-  delete raw.class
-  delete raw.open
-  delete raw['onUpdate:open']
+  const raw = { ...(props as Record<string, unknown>) };
+  delete raw.class;
+  delete raw.open;
+  delete raw['onUpdate:open'];
   /** `defineModel` puts these on `props`; spreading them would override `v-model="innerModel"` with a string. */
-  delete raw.modelValue
-  delete raw['onUpdate:modelValue']
-  return omitUndefinedProps(raw)
-})
+  delete raw.modelValue;
+  delete raw['onUpdate:modelValue'];
+  return omitUndefinedProps(raw);
+});
 </script>
 
 <template>
@@ -86,10 +86,7 @@ const rootProps = computed(() => {
         <DatePickerAnchor as-child>
           <div class="flex min-w-0 flex-1 flex-wrap items-center gap-0">
             <template v-for="(item, i) in segments" :key="`date-picker-seg-${i}`">
-              <DatePickerInput
-                :part="item.part"
-                :class="dateFieldSegmentClassName()"
-              >
+              <DatePickerInput :part="item.part" :class="dateFieldSegmentClassName()">
                 {{ item.value }}
               </DatePickerInput>
             </template>

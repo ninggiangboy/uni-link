@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { AvatarFallback as RekaAvatarFallback } from 'reka-ui'
-import { cn } from '@/ui/lib/utils'
+import { AvatarFallback as RekaAvatarFallback } from 'reka-ui';
+import { cn } from '@/ui/lib/utils';
 
-defineOptions({ inheritAttrs: false })
+defineOptions({ inheritAttrs: false });
 
 defineProps<{
-  class?: string
-}>()
+  class?: string;
+}>();
 </script>
 
 <template>

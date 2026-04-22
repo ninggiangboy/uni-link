@@ -5,20 +5,20 @@ import {
   ScrollAreaScrollbar,
   ScrollAreaThumb,
   ScrollAreaViewport,
-} from 'reka-ui'
-import { cn } from '@/ui/lib/utils'
+} from 'reka-ui';
+import { cn } from '@/ui/lib/utils';
 
 const props = withDefaults(
   defineProps<{
-    class?: string
-    showHorizontalScrollbar?: boolean
-    showVerticalScrollbar?: boolean
+    class?: string;
+    showHorizontalScrollbar?: boolean;
+    showVerticalScrollbar?: boolean;
   }>(),
   {
     showHorizontalScrollbar: true,
     showVerticalScrollbar: true,
   },
-)
+);
 </script>
 
 <template>

@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { TabsTrigger as RekaTabsTrigger } from 'reka-ui'
-import { cn } from '@/ui/lib/utils'
+import { TabsTrigger as RekaTabsTrigger } from 'reka-ui';
+import { cn } from '@/ui/lib/utils';
 
 defineProps<{
-  class?: string
-  value: string | number
-}>()
+  class?: string;
+  value: string | number;
+}>();
 </script>
 
 <template>

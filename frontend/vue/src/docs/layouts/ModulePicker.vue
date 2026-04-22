@@ -1,27 +1,27 @@
 <script setup lang="ts">
-import { BookOpen, ChevronDown, Layers2 } from 'lucide-vue-next'
-import { computed, onMounted, onUnmounted, ref } from 'vue'
-import { RouterLink, useRoute } from 'vue-router'
-import { cn } from '@/ui/lib/utils'
-import { Button } from '@/ui/components/button'
+import { BookOpen, ChevronDown, Layers2 } from 'lucide-vue-next';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { RouterLink, useRoute } from 'vue-router';
+import { cn } from '@/ui/lib/utils';
+import { Button } from '@/ui/components/button';
 
-export type ModuleValue = 'guide' | 'ui'
+export type ModuleValue = 'guide' | 'ui';
 
-const route = useRoute()
-const open = ref(false)
-const root = ref<HTMLElement | null>(null)
+const route = useRoute();
+const open = ref(false);
+const root = ref<HTMLElement | null>(null);
 
 const selectedModule = computed<ModuleValue>(() =>
   route.path.includes('/docs/ui') ? 'ui' : 'guide',
-)
+);
 
 const modules: {
-  value: ModuleValue
-  label: string
-  description: string
-  icon: typeof BookOpen
-  className: string
-  href: string
+  value: ModuleValue;
+  label: string;
+  description: string;
+  icon: typeof BookOpen;
+  className: string;
+  href: string;
 }[] = [
   {
     value: 'guide',
@@ -39,18 +39,18 @@ const modules: {
     className: 'text-green-500 bg-green-500/10 border-green-500/20',
     href: '/docs/ui/button',
   },
-]
+];
 
-const current = computed(() => modules.find((m) => m.value === selectedModule.value)!)
+const current = computed(() => modules.find((m) => m.value === selectedModule.value)!);
 
 function onDocClick(e: MouseEvent) {
   if (root.value && !root.value.contains(e.target as Node)) {
-    open.value = false
+    open.value = false;
   }
 }
 
-onMounted(() => document.addEventListener('click', onDocClick))
-onUnmounted(() => document.removeEventListener('click', onDocClick))
+onMounted(() => document.addEventListener('click', onDocClick));
+onUnmounted(() => document.removeEventListener('click', onDocClick));
 </script>
 
 <template>

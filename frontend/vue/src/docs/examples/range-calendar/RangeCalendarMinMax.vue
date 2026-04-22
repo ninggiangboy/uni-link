@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { getLocalTimeZone, today } from '@internationalized/date'
-import { RangeCalendar } from '@/ui/components/calendar'
+import { getLocalTimeZone, today } from '@internationalized/date';
+import { RangeCalendar } from '@/ui/components/calendar';
 
-const min = today(getLocalTimeZone())
-const max = min.add({ days: 10 })
+const min = today(getLocalTimeZone());
+const max = min.add({ days: 10 });
 </script>
 
 <template>

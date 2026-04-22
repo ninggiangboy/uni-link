@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { createColumnHelper } from '@tanstack/vue-table'
-import { Button } from '@/ui/components/button'
-import { DataTable } from '@/ui/components/datatable'
+import { computed, ref } from 'vue';
+import { createColumnHelper } from '@tanstack/vue-table';
+import { Button } from '@/ui/components/button';
+import { DataTable } from '@/ui/components/datatable';
 
 interface User {
-  id: string
-  name: string
-  email: string
-  department: string
-  role: string
+  id: string;
+  name: string;
+  email: string;
+  department: string;
+  role: string;
 }
 
 const data: User[] = [
@@ -42,20 +42,20 @@ const data: User[] = [
     role: 'Sales Representative',
   },
   { id: '5', name: 'Eva Brown', email: 'eva@company.com', department: 'HR', role: 'HR Specialist' },
-]
+];
 
-const columnHelper = createColumnHelper<User>()
+const columnHelper = createColumnHelper<User>();
 const columns = [
   columnHelper.accessor('name', { header: 'Name' }),
   columnHelper.accessor('email', { header: 'Email' }),
   columnHelper.accessor('department', { header: 'Department' }),
-]
+];
 
-const rowSelection = ref<Record<string, boolean>>({})
-const selectedCount = computed(() => Object.keys(rowSelection.value).length)
+const rowSelection = ref<Record<string, boolean>>({});
+const selectedCount = computed(() => Object.keys(rowSelection.value).length);
 
 function bulk(action: string) {
-  window.alert(`${action} ${selectedCount.value} selected users`)
+  window.alert(`${action} ${selectedCount.value} selected users`);
 }
 </script>
 
