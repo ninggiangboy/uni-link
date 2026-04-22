@@ -9,8 +9,6 @@ import {
   Code,
   ListChecks,
   Network,
-  Settings,
-  SquareTerminal,
 } from 'lucide-vue-next';
 import { ScrollArea } from '@/ui/components/scroll-area';
 import { cn } from '@/ui/lib/utils';
@@ -64,16 +62,6 @@ function getMenuGroups(module: 'guide' | 'ui'): MenuGroup[] {
             icon: Blocks,
           },
           {
-            title: 'Installation',
-            href: '/docs/guide/installation',
-            icon: Settings,
-          },
-          {
-            title: 'CLI Tool',
-            href: '/docs/guide/cli',
-            icon: SquareTerminal,
-          },
-          {
             title: 'Decisions on DX',
             href: '/docs/guide/decisions-on-dx',
             icon: ListChecks,
@@ -89,13 +77,13 @@ function getMenuGroups(module: 'guide' | 'ui'): MenuGroup[] {
         title: 'Recipes',
         items: [
           {
-            title: 'React Folder Structure',
-            href: '/docs/guide/react-folder-structure',
+            title: 'Vue Folder Structure',
+            href: '/docs/guide/vue-folder-structure',
             icon: Network,
           },
           {
             title: 'Code Conventions',
-            href: '/docs/guide/react-code-convention',
+            href: '/docs/guide/vue-code-convention',
             icon: Code,
             createdAt: '2025-10-20',
           },

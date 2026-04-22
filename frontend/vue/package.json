@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@internationalized/date": "^3.12.0",
+    "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "^4.2.2",
     "@tanstack/vue-query": "^5.96.2",
     "@tanstack/vue-table": "^8.21.3",

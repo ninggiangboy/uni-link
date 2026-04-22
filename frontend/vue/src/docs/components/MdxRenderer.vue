@@ -8,7 +8,7 @@ defineProps<{
 </script>
 
 <template>
-  <div class="docs-prose">
+  <div class="mdx [&>*]:px-5 lg:[&>*]:px-10">
     <template v-for="(seg, i) in segments" :key="i">
       <!-- eslint-disable-next-line vue/no-v-html -->
       <div v-if="seg.type === 'markdown'" class="docs-md" v-html="seg.html" />

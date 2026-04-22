@@ -28,7 +28,7 @@ const needsToggle = ref(false);
 /** Match sample `CodeCollapsible`: show expand when content taller than this (px). */
 const COLLAPSE_AT_PX = 200;
 
-const rootClass = computed(() => cn('w-full mt-4 border-b border-border pb-8'));
+const rootClass = computed(() => cn('p-5! lg:p-10! pt-0! lg:pt-0! w-full mt-4 border-b'));
 
 async function highlightSource(code: string) {
   const highlighter = await getShikiHighlighter();
@@ -83,7 +83,7 @@ async function copy() {
       <div
         v-if="withPreview"
         :class="
-          cn('p-5 min-h-25 docs-not-prose flex items-center justify-center mx-auto', props.class)
+          cn('p-5 min-h-[100px] not-prose flex items-center justify-center mx-auto', props.class)
         "
       >
         <component :is="Preview" v-if="Preview" />

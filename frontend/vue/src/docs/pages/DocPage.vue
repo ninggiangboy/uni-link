@@ -53,27 +53,34 @@ const loadErrorMessage = computed(() => {
       </ScrollArea>
     </template>
 
-    <div class="docs-article px-5 py-8 lg:px-10 lg:py-10 min-h-[60vh]">
+    <article
+      class="prose dark:prose-invert prose-neutral mb-6 max-w-full min-w-0 w-full py-10
+        prose-headings:font-semibold prose-h1:tracking-tight prose-h1:font-bold prose-headings:scroll-mt-20
+        prose-h2:mb-0 prose-h3:mt-7! prose-h3:mb-0 prose-h4:mb-0 prose-h4:mt-3 prose-h5:mb-0 prose-h5:mt-3 prose-h6:mb-0 prose-h6:mt-3
+        prose-blockquote:font-normal prose-blockquote:mx-5 prose-blockquote:px-4! lg:prose-blockquote:mx-10 prose-blockquote:mb-0
+        prose-ul:list-inside prose-ol:list-inside prose-ul:mt-1.5 prose-ul:mb-0 prose-ol:mt-3 prose-ol:mb-0
+        prose-li:mt-1 prose-li:mb-0
+        prose-p:mt-3! prose-p:mb-0!
+        prose-img:my-5
+      "
+    >
       <div v-if="isLoading" class="text-muted-foreground text-sm">Loading…</div>
       <div v-else-if="isError" class="text-destructive text-sm">
         {{ loadErrorMessage }}
       </div>
       <div v-else-if="doc === null" class="text-destructive text-sm">Document not found.</div>
       <template v-else-if="doc">
-        <div class="mb-10 border-b border-border pb-10">
-          <h1 class="mb-0 font-mono text-[40px] text-foreground scroll-mt-24">
+        <div class="mb-10 px-5 lg:px-10 border-b pb-10">
+          <h1 class="mb-0 font-mono text-[40px]">
             {{ doc.frontmatter.title ?? 'Untitled' }}
           </h1>
           <p
             v-if="doc.frontmatter.description"
-            class="text-muted-foreground mt-2 mb-2 text-[15px] leading-relaxed max-w-3xl"
+            class="text-muted-foreground not-prose mt-2 mb-2"
           >
             {{ doc.frontmatter.description }}
           </p>
-          <div
-            v-if="doc.frontmatter.originalDocs || doc.frontmatter.sourceCode"
-            class="flex flex-wrap gap-2"
-          >
+          <div class="flex gap-2">
             <Button
               v-if="doc.frontmatter.originalDocs"
               as="a"
@@ -102,10 +109,8 @@ const loadErrorMessage = computed(() => {
             </Button>
           </div>
         </div>
-        <div class="w-full min-w-0">
-          <MdxRenderer :segments="doc.segments" />
-        </div>
+        <MdxRenderer :segments="doc.segments" />
       </template>
-    </div>
+    </article>
   </DocsLayout>
 </template>
