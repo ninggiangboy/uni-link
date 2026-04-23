@@ -13,6 +13,7 @@ import {
   FormMessage,
   useForm,
 } from '@/ui/components/form';
+import { Select, type SelectOption } from '@/ui/components/select';
 import { Input } from '@/ui/components/textfield';
 import { z } from 'zod';
 
@@ -39,6 +40,11 @@ const { handleSubmit, values } = useForm<CreateUserFormValues>({
 
 const isAdmin = computed(() => values.role === UserRole.Admin);
 
+const roleOptions: SelectOption[] = [
+  { id: UserRole.User, name: 'User' },
+  { id: UserRole.Admin, name: 'Admin' },
+];
+
 const onSubmit = handleSubmit((v) => docFormToast(v));
 </script>
 
@@ -50,13 +56,11 @@ const onSubmit = handleSubmit((v) => docFormToast(v));
       <FormItem>
         <FormLabel>Role</FormLabel>
         <FormControl generic="string" v-slot="vm" :component-field="componentField">
-          <select
+          <Select
             v-bind="vm"
-            class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-          >
-            <option :value="UserRole.User">User</option>
-            <option :value="UserRole.Admin">Admin</option>
-          </select>
+            :options="roleOptions"
+            :class="errors.length ? 'ring-2 ring-destructive' : ''"
+          />
         </FormControl>
         <FormMessage />
       </FormItem>
