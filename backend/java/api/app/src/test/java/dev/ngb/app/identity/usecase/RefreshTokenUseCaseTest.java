@@ -9,11 +9,13 @@ import dev.ngb.domain.identity.error.AccountError;
 import dev.ngb.domain.identity.model.session.AccountSession;
 import dev.ngb.domain.identity.repository.AccountRepository;
 import dev.ngb.domain.identity.repository.AccountSessionRepository;
+import dev.ngb.domain.identity.service.SessionRotationDomainService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
@@ -35,6 +37,8 @@ class RefreshTokenUseCaseTest {
     private AccountSessionRepository accountSessionRepository;
     @Mock
     private TokenProvider tokenProvider;
+    @Spy
+    private SessionRotationDomainService sessionRotationDomainService;
 
     @InjectMocks
     private RefreshTokenUseCase useCase;

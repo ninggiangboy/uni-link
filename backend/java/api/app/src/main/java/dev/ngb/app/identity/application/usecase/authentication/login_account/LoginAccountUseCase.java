@@ -15,6 +15,7 @@ import dev.ngb.domain.identity.model.session.AccountLoginHistory;
 import dev.ngb.domain.identity.repository.AccountDeviceRepository;
 import dev.ngb.domain.identity.repository.AccountLoginHistoryRepository;
 import dev.ngb.domain.identity.repository.AccountRepository;
+import dev.ngb.domain.identity.service.AuthenticationPolicyService;
 import dev.ngb.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,6 +45,7 @@ public class LoginAccountUseCase implements UseCaseService {
     private final TokenProvider tokenProvider;
     private final AccountOtpDeliveryService accountOtpDeliveryService;
     private final AccountSessionTokenService accountSessionTokenService;
+    private final AuthenticationPolicyService authenticationPolicyService;
 
     public LoginAccountResponse execute(LoginAccountRequest request, String ipAddress) {
         log.info("Login attempt for email={}", StringUtils.maskEmail(request.email()));
@@ -73,34 +75,32 @@ public class LoginAccountUseCase implements UseCaseService {
                 .findByAccountIdAndFingerprint(account.getId(), fingerprint)
                 .orElse(null);
 
-        boolean isNewDevice = existingDevice == null;
-        boolean needs2FA = Boolean.TRUE.equals(account.getTwoFactorEnabled());
-        log.debug("accountId={}, isNewDevice={}, needs2FA={}", account.getId(), isNewDevice, needs2FA);
+        AuthenticationPolicyService.LoginDecision decision =
+                authenticationPolicyService.decidePasswordLogin(account, existingDevice);
+        log.debug("accountId={}, loginDecision={}", account.getId(), decision);
 
-        // Unknown hardware / browser: prove inbox access before issuing tokens.
-        if (isNewDevice) {
-            AccountDevice newDevice = AccountDevice.create(
+        boolean requiresVerification = decision == AuthenticationPolicyService.LoginDecision.REQUIRE_VERIFICATION_NEW_DEVICE
+                || decision == AuthenticationPolicyService.LoginDecision.REQUIRE_VERIFICATION_2FA;
+        if (requiresVerification) {
+            AccountDevice verificationDevice = authenticationPolicyService.decideDeviceForLoginVerification(
                     account.getId(),
+                    existingDevice,
                     request.deviceInfo().deviceType(),
                     request.deviceInfo().deviceName(),
                     fingerprint
             );
-            AccountDevice savedDevice = accountDeviceRepository.save(newDevice);
-            log.info("New device login for accountId={}, deviceId={}, OTP required", account.getId(), savedDevice.getId());
-            return sendVerificationAndRespond(account, savedDevice);
-        }
-
-        // Known device still needs a second factor when the account flag is on.
-        if (needs2FA) {
-            existingDevice.touch();
-            AccountDevice savedDevice = accountDeviceRepository.save(existingDevice);
-            log.info("2FA required for accountId={}, deviceId={}", account.getId(), savedDevice.getId());
-            return sendVerificationAndRespond(account, savedDevice);
+            AccountDevice savedDevice = accountDeviceRepository.save(verificationDevice);
+            log.info(
+                    "Password login requires verification accountId={}, deviceId={}, decision={}",
+                    account.getId(),
+                    savedDevice.getId(),
+                    decision
+            );
+            return issueLoginVerificationChallenge(account, savedDevice);
         }
 
         // Trusted path: update activity, record success, then mint session + tokens.
-        existingDevice.touch();
-        account.recordLogin(ipAddress);
+        authenticationPolicyService.applySuccessfulLogin(account, existingDevice, ipAddress, false);
         account = accountRepository.save(account);
         AccountDevice savedDevice = accountDeviceRepository.save(existingDevice);
 
@@ -109,7 +109,7 @@ public class LoginAccountUseCase implements UseCaseService {
                 AccountLoginHistory.createSuccess(account.getId(), savedDevice.getId(), ipAddress, null)
         );
 
-        var tokens = accountSessionTokenService.openSessionAndIssueTokens(account, savedDevice.getId(), ipAddress);
+        var tokens = accountSessionTokenService.createSessionAndIssueTokens(account, savedDevice.getId(), ipAddress);
 
         log.info("Login successful for accountId={}, accountUuid={}", account.getId(), account.getUuid());
         return LoginAccountResponse.authenticated(
@@ -120,7 +120,7 @@ public class LoginAccountUseCase implements UseCaseService {
         );
     }
 
-    private LoginAccountResponse sendVerificationAndRespond(Account account, AccountDevice device) {
+    private LoginAccountResponse issueLoginVerificationChallenge(Account account, AccountDevice device) {
         accountOtpDeliveryService.sendEmailOtp(account.getId(), account.getEmail(), OtpPurpose.LOGIN);
 
         // Binds the email OTP step to this account + device for VerifyLoginUseCase.

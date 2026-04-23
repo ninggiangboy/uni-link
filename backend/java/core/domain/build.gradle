@@ -5,4 +5,12 @@ plugins {
 dependencies {
     implementation project(':libs:common')
     implementation project(':libs:utils')
+
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.assertj:assertj-core'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
 }

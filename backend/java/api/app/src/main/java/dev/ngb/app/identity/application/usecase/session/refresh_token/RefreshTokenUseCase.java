@@ -9,6 +9,7 @@ import dev.ngb.domain.identity.model.auth.Account;
 import dev.ngb.domain.identity.model.session.AccountSession;
 import dev.ngb.domain.identity.repository.AccountRepository;
 import dev.ngb.domain.identity.repository.AccountSessionRepository;
+import dev.ngb.domain.identity.service.SessionRotationDomainService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,11 +30,12 @@ public class RefreshTokenUseCase implements UseCaseService {
     private final AccountRepository accountRepository;
     private final AccountSessionRepository accountSessionRepository;
     private final TokenProvider tokenProvider;
+    private final SessionRotationDomainService sessionRotationDomainService;
 
     public AuthTokenResponse execute(RefreshTokenRequest request) {
         log.debug("Refresh token attempt");
 
-        // Lookup is always by hash so a DB leak never exposes usable refresh tokens.
+        // Lookup is always by hash, so a DB leak never exposes usable refresh tokens.
         String tokenHash = tokenProvider.hashToken(request.refreshToken());
 
         AccountSession session = accountSessionRepository.findByTokenHash(tokenHash)
@@ -60,17 +62,13 @@ public class RefreshTokenUseCase implements UseCaseService {
             throw AccountError.ACCOUNT_NOT_ACTIVE.exception();
         }
 
-        // Rotation: old refresh must fail on the next call even if stolen.
-        session.revoke();
-        accountSessionRepository.save(session);
-
         String newRefreshToken = tokenProvider.generateRefreshToken();
-        // Preserve device binding and last known IP for continuity and audit.
-        AccountSession newSession = AccountSession.create(
-                account.getId(), session.getDeviceId(),
-                tokenProvider.hashToken(newRefreshToken), session.getIpAddress()
+        SessionRotationDomainService.SessionRotation rotation = sessionRotationDomainService.rotate(
+                session,
+                tokenProvider.hashToken(newRefreshToken)
         );
-        accountSessionRepository.save(newSession);
+        accountSessionRepository.save(rotation.revokedSession());
+        accountSessionRepository.save(rotation.newSession());
 
         String accessToken = tokenProvider.generateAccessToken(
                 account.getId(), account.getUuid(), account.getEmail()

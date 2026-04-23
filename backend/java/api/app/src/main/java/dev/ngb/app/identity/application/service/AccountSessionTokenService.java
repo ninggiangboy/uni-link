@@ -22,7 +22,7 @@ public class AccountSessionTokenService implements ApplicationService {
     private final AccountSessionRepository accountSessionRepository;
     private final TokenProvider tokenProvider;
 
-    public AuthTokenResponse openSessionAndIssueTokens(Account account, Long deviceId, String ipAddress) {
+    public AuthTokenResponse createSessionAndIssueTokens(Account account, Long deviceId, String ipAddress) {
         log.debug(
                 "Open session start accountId={}, accountUuid={}, deviceId={}, email={}, ip={}",
                 account.getId(),

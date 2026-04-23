@@ -15,6 +15,7 @@ import dev.ngb.domain.identity.repository.AccountDeviceRepository;
 import dev.ngb.domain.identity.repository.AccountLoginHistoryRepository;
 import dev.ngb.domain.identity.repository.AccountOtpRepository;
 import dev.ngb.domain.identity.repository.AccountRepository;
+import dev.ngb.domain.identity.service.AuthenticationPolicyService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -39,6 +40,7 @@ public class VerifyLoginUseCase implements UseCaseService {
     private final AccountLoginHistoryRepository accountLoginHistoryRepository;
     private final TokenProvider tokenProvider;
     private final AccountSessionTokenService accountSessionTokenService;
+    private final AuthenticationPolicyService authenticationPolicyService;
 
     public AuthTokenResponse execute(VerifyLoginRequest request, String ipAddress) {
         log.info("Verify login attempt");
@@ -63,7 +65,7 @@ public class VerifyLoginUseCase implements UseCaseService {
         account.ensureCanLogin();
 
         Long accountId = account.getId();
-        // Pairs with the LOGIN OTP emailed during sendVerificationAndRespond.
+        // Pairs with the LOGIN OTP emailed during issueLoginVerificationChallenge.
         AccountOtp otp = accountOtpRepository
                 .findLatestActiveByAccountIdAndPurpose(accountId, OtpPurpose.LOGIN)
                 .orElseThrow(() -> {
@@ -87,14 +89,8 @@ public class VerifyLoginUseCase implements UseCaseService {
                     return AccountError.INVALID_VERIFICATION_TOKEN.exception();
                 });
 
-        if (!Boolean.TRUE.equals(device.getIsTrusted())) {
-            // Post-OTP device is allowed to skip future inbox challenges until policy changes.
-            log.debug("Marking device as trusted accountId={}, deviceId={}", accountId, device.getId());
-            device.markTrusted();
-            accountDeviceRepository.save(device);
-        }
-
-        account.recordLogin(ipAddress);
+        authenticationPolicyService.applySuccessfulLogin(account, device, ipAddress, true);
+        accountDeviceRepository.save(device);
         account = accountRepository.save(account);
 
         // Mirror successful direct login: audit success with a concrete device id.
@@ -102,7 +98,7 @@ public class VerifyLoginUseCase implements UseCaseService {
                 AccountLoginHistory.createSuccess(accountId, device.getId(), ipAddress, null)
         );
 
-        AuthTokenResponse tokens = accountSessionTokenService.openSessionAndIssueTokens(account, device.getId(), ipAddress);
+        AuthTokenResponse tokens = accountSessionTokenService.createSessionAndIssueTokens(account, device.getId(), ipAddress);
 
         log.info("Verify login successful accountId={}, accountUuid={}", accountId, account.getUuid());
         return tokens;

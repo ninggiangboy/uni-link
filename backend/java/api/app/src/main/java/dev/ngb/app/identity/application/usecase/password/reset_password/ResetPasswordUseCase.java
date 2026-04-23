@@ -11,6 +11,7 @@ import dev.ngb.domain.identity.model.session.AccountSession;
 import dev.ngb.domain.identity.repository.AccountOtpRepository;
 import dev.ngb.domain.identity.repository.AccountRepository;
 import dev.ngb.domain.identity.repository.AccountSessionRepository;
+import dev.ngb.domain.identity.service.PasswordResetDomainService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,6 +33,7 @@ public class ResetPasswordUseCase implements UseCaseService {
     private final AccountOtpRepository accountOtpRepository;
     private final AccountSessionRepository accountSessionRepository;
     private final PasswordEncoder passwordEncoder;
+    private final PasswordResetDomainService passwordResetDomainService;
 
     public void execute(ResetPasswordRequest request) {
         log.info("Reset password attempt for email={}", request.email() != null ? request.email().replaceAll("(?<=.).(?=.*@)", "*") : "***");
@@ -66,7 +68,7 @@ public class ResetPasswordUseCase implements UseCaseService {
 
         // Invalidate outstanding refresh tokens so old clients cannot keep refreshing.
         List<AccountSession> activeSessions = accountSessionRepository.findActiveByAccountId(account.getId());
-        activeSessions.forEach(AccountSession::revoke);
+        passwordResetDomainService.revokeActiveSessions(activeSessions);
         accountSessionRepository.saveAll(activeSessions);
         log.info("Reset password successful accountId={}, revoked {} session(s)", account.getId(), activeSessions.size());
     }

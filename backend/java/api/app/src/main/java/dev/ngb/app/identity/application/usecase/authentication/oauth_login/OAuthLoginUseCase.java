@@ -13,6 +13,8 @@ import dev.ngb.domain.identity.model.auth.AccountDevice;
 import dev.ngb.domain.identity.repository.AccountCredentialRepository;
 import dev.ngb.domain.identity.repository.AccountDeviceRepository;
 import dev.ngb.domain.identity.repository.AccountRepository;
+import dev.ngb.domain.identity.service.AuthenticationPolicyService;
+import dev.ngb.domain.identity.service.OAuthAccountDomainService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -41,6 +43,8 @@ public class OAuthLoginUseCase implements UseCaseService {
     private final AccountDeviceRepository accountDeviceRepository;
     private final OAuthProviderVerifier oAuthProviderVerifier;
     private final AccountSessionTokenService accountSessionTokenService;
+    private final OAuthAccountDomainService oAuthAccountDomainService;
+    private final AuthenticationPolicyService authenticationPolicyService;
 
     public OAuthLoginResponse execute(OAuthLoginRequest request, String ipAddress) {
         log.info("OAuth login attempt provider={}", request.provider());
@@ -58,35 +62,25 @@ public class OAuthLoginUseCase implements UseCaseService {
 
         // Email is the primary join key between IdP and our Account aggregate.
         Optional<Account> existingAccount = accountRepository.findByEmail(userInfo.email());
-        boolean isNewAccount = existingAccount.isEmpty();
+        Account persistedAccount = existingAccount.orElse(null);
+        boolean providerLinked = persistedAccount != null
+                && accountCredentialRepository.existsByAccountIdAndProvider(persistedAccount.getId(), request.provider());
 
-        Account account;
+        OAuthAccountDomainService.OAuthAccountResolution resolution =
+                oAuthAccountDomainService.decideOAuthAccountLinking(existingAccount, userInfo.email(), providerLinked);
+
+        Account account = resolution.account();
+        boolean isNewAccount = resolution.newAccount();
         if (isNewAccount) {
-            // OAuth-verified email: start as active (no separate email-OTP registration step).
-            log.debug("Creating new account from OAuth for email={}", userInfo.email());
-            account = Account.createFromOAuth(userInfo.email());
             account = accountRepository.save(account);
+        }
+
+        if (resolution.shouldLinkProvider()) {
             AccountCredential credential = AccountCredential.create(
                     account.getId(), request.provider(), userInfo.providerAccountId(),
                     null, null
             );
             accountCredentialRepository.save(credential);
-        } else {
-            account = existingAccount.get();
-            // Local lifecycle still applies; OAuth cannot revive suspended or banned users.
-            if (!account.isActive()) {
-                log.warn("OAuth login rejected: account not active accountId={}", account.getId());
-                throw AccountError.ACCOUNT_NOT_ACTIVE.exception();
-            }
-            // First time this provider is used for an existing password account — link rows.
-            if (!accountCredentialRepository.existsByAccountIdAndProvider(account.getId(), request.provider())) {
-                log.debug("Linking OAuth provider to existing account accountId={}", account.getId());
-                AccountCredential credential = AccountCredential.create(
-                        account.getId(), request.provider(), userInfo.providerAccountId(),
-                        null, null
-                );
-                accountCredentialRepository.save(credential);
-            }
         }
 
         // Same device model as password login, but provider trust skips email OTP for new devices.
@@ -95,28 +89,20 @@ public class OAuthLoginUseCase implements UseCaseService {
                 .findByAccountIdAndFingerprint(account.getId(), fingerprint)
                 .orElse(null);
 
-        // Reuse device row when the client fingerprint was seen before.
-        if (device == null) {
-            log.debug("New device for OAuth login accountId={}", account.getId());
-            AccountDevice newDevice = AccountDevice.create(
-                    account.getId(),
-                    request.deviceInfo().deviceType(),
-                    request.deviceInfo().deviceName(),
-                    fingerprint
-            );
-            // Provider already asserted identity; no extra inbox step here.
-            newDevice.markTrusted();
-            device = accountDeviceRepository.save(newDevice);
-        } else {
-            device.touch();
-            device = accountDeviceRepository.save(device);
-        }
+        AccountDevice updatedDevice = authenticationPolicyService.decideDeviceForOAuthSignIn(
+                account.getId(),
+                device,
+                request.deviceInfo().deviceType(),
+                request.deviceInfo().deviceName(),
+                fingerprint
+        );
+        device = accountDeviceRepository.save(updatedDevice);
 
-        account.recordLogin(ipAddress);
+        authenticationPolicyService.applySuccessfulLogin(account, device, ipAddress, false);
         account = accountRepository.save(account);
 
         // Full session immediately — symmetric with trusted password login.
-        AuthTokenResponse tokens = accountSessionTokenService.openSessionAndIssueTokens(account, device.getId(), ipAddress);
+        AuthTokenResponse tokens = accountSessionTokenService.createSessionAndIssueTokens(account, device.getId(), ipAddress);
 
         log.info("OAuth login successful accountId={}, accountUuid={}, isNewAccount={}", account.getId(), account.getUuid(), isNewAccount);
         return new OAuthLoginResponse(

@@ -14,11 +14,14 @@ import dev.ngb.domain.identity.model.auth.AuthProvider;
 import dev.ngb.domain.identity.repository.AccountCredentialRepository;
 import dev.ngb.domain.identity.repository.AccountDeviceRepository;
 import dev.ngb.domain.identity.repository.AccountRepository;
+import dev.ngb.domain.identity.service.AuthenticationPolicyService;
+import dev.ngb.domain.identity.service.OAuthAccountDomainService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
@@ -44,6 +47,10 @@ class OAuthLoginUseCaseTest {
     private OAuthProviderVerifier oAuthProviderVerifier;
     @Mock
     private AccountSessionTokenService accountSessionTokenService;
+    @Spy
+    private OAuthAccountDomainService oAuthAccountDomainService;
+    @Spy
+    private AuthenticationPolicyService authenticationPolicyService;
 
     @InjectMocks
     private OAuthLoginUseCase useCase;
@@ -113,7 +120,7 @@ class OAuthLoginUseCaseTest {
                     d.getIsTrusted()
             );
         });
-        when(accountSessionTokenService.openSessionAndIssueTokens(any(), eq(60L), eq(IdentityUseCaseTestFixtures.IP)))
+        when(accountSessionTokenService.createSessionAndIssueTokens(any(), eq(60L), eq(IdentityUseCaseTestFixtures.IP)))
                 .thenAnswer(inv -> {
                     Account acc = inv.getArgument(0);
                     return new AuthTokenResponse("oa", "or", 3600, acc.getUuid());
@@ -154,7 +161,7 @@ class OAuthLoginUseCaseTest {
                 .thenReturn(Optional.of(device));
         when(accountDeviceRepository.save(any(AccountDevice.class))).thenAnswer(inv -> inv.getArgument(0));
         when(accountRepository.save(any(Account.class))).thenAnswer(inv -> inv.getArgument(0));
-        when(accountSessionTokenService.openSessionAndIssueTokens(eq(account), eq(70L), eq(IdentityUseCaseTestFixtures.IP)))
+        when(accountSessionTokenService.createSessionAndIssueTokens(eq(account), eq(70L), eq(IdentityUseCaseTestFixtures.IP)))
                 .thenReturn(new AuthTokenResponse("a", "r", 3600, account.getUuid()));
 
         var response = useCase.execute(request(), IdentityUseCaseTestFixtures.IP);

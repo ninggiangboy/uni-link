@@ -14,11 +14,13 @@ import dev.ngb.domain.identity.model.otp.OtpPurpose;
 import dev.ngb.domain.identity.repository.AccountDeviceRepository;
 import dev.ngb.domain.identity.repository.AccountOtpRepository;
 import dev.ngb.domain.identity.repository.AccountRepository;
+import dev.ngb.domain.identity.service.AuthenticationPolicyService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
@@ -42,6 +44,8 @@ class VerifyEmailUseCaseTest {
     private AccountOtpRepository accountOtpRepository;
     @Mock
     private AccountSessionTokenService accountSessionTokenService;
+    @Spy
+    private AuthenticationPolicyService authenticationPolicyService;
 
     @InjectMocks
     private VerifyEmailUseCase useCase;
@@ -111,7 +115,7 @@ class VerifyEmailUseCaseTest {
             );
         });
         var tokenResponse = new AuthTokenResponse("access", "refresh", 3600, pending.getUuid());
-        when(accountSessionTokenService.openSessionAndIssueTokens(any(), eq(77L), eq(IdentityUseCaseTestFixtures.IP)))
+        when(accountSessionTokenService.createSessionAndIssueTokens(any(), eq(77L), eq(IdentityUseCaseTestFixtures.IP)))
                 .thenReturn(tokenResponse);
 
         AuthTokenResponse result = useCase.execute(req, IdentityUseCaseTestFixtures.IP);
@@ -119,6 +123,6 @@ class VerifyEmailUseCaseTest {
         assertThat(result).isSameAs(tokenResponse);
         verify(accountRepository).save(pending);
         verify(accountOtpRepository).save(otp);
-        verify(accountSessionTokenService).openSessionAndIssueTokens(pending, 77L, IdentityUseCaseTestFixtures.IP);
+        verify(accountSessionTokenService).createSessionAndIssueTokens(pending, 77L, IdentityUseCaseTestFixtures.IP);
     }
 }

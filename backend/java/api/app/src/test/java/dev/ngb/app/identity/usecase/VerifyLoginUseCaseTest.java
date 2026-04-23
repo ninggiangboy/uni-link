@@ -16,11 +16,13 @@ import dev.ngb.domain.identity.repository.AccountDeviceRepository;
 import dev.ngb.domain.identity.repository.AccountLoginHistoryRepository;
 import dev.ngb.domain.identity.repository.AccountOtpRepository;
 import dev.ngb.domain.identity.repository.AccountRepository;
+import dev.ngb.domain.identity.service.AuthenticationPolicyService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
@@ -48,6 +50,8 @@ class VerifyLoginUseCaseTest {
     private TokenProvider tokenProvider;
     @Mock
     private AccountSessionTokenService accountSessionTokenService;
+    @Spy
+    private AuthenticationPolicyService authenticationPolicyService;
 
     @InjectMocks
     private VerifyLoginUseCase useCase;
@@ -121,7 +125,7 @@ class VerifyLoginUseCaseTest {
         when(accountOtpRepository.findLatestActiveByAccountIdAndPurpose(1L, OtpPurpose.LOGIN)).thenReturn(Optional.of(otp));
         when(accountDeviceRepository.findById(50L)).thenReturn(Optional.of(device));
         when(accountRepository.save(any(Account.class))).thenAnswer(inv -> inv.getArgument(0));
-        when(accountSessionTokenService.openSessionAndIssueTokens(eq(account), eq(50L), eq(IdentityUseCaseTestFixtures.IP)))
+        when(accountSessionTokenService.createSessionAndIssueTokens(eq(account), eq(50L), eq(IdentityUseCaseTestFixtures.IP)))
                 .thenReturn(tokens);
 
         AuthTokenResponse result = useCase.execute(req, IdentityUseCaseTestFixtures.IP);
@@ -130,6 +134,6 @@ class VerifyLoginUseCaseTest {
         assertThat(device.getIsTrusted()).isTrue();
         verify(accountDeviceRepository).save(device);
         verify(accountOtpRepository).save(otp);
-        verify(accountSessionTokenService).openSessionAndIssueTokens(account, 50L, IdentityUseCaseTestFixtures.IP);
+        verify(accountSessionTokenService).createSessionAndIssueTokens(account, 50L, IdentityUseCaseTestFixtures.IP);
     }
 }
