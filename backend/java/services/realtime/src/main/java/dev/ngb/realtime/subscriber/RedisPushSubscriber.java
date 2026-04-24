@@ -1,6 +1,5 @@
 package dev.ngb.realtime.subscriber;
 
-import dev.ngb.constant.TopicNames;
 import dev.ngb.event.PushEvent;
 import dev.ngb.realtime.dispatch.PushDispatcher;
 import com.fasterxml.jackson.databind.ObjectMapper;

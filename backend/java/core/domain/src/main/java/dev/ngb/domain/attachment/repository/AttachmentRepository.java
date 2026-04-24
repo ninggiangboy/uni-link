@@ -1,7 +1,6 @@
 package dev.ngb.domain.attachment.repository;
 
 import dev.ngb.domain.Repository;
-import dev.ngb.domain.attachment.model.AttachmentUploadStatus;
 import dev.ngb.domain.attachment.model.attachment.Attachment;
 
 import java.time.Instant;

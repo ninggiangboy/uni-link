@@ -1,7 +1,6 @@
 package dev.ngb.realtime.dispatch;
 
 import dev.ngb.event.PushEvent;
-import dev.ngb.realtime.connection.ConnectionManager;
 import dev.ngb.realtime.connection.EmitterRegistry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

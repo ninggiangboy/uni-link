@@ -107,7 +107,7 @@ public class SweepStalePendingAttachmentsUseCase implements UseCaseService, Swee
     @RequiredArgsConstructor
     public static class AttachmentItemReader implements ItemReader<Attachment> {
 
-        private static final int batchSize = 1_000;
+        private static final int BATCH_SIZE = 1_000;
 
         private final AttachmentRepository attachmentRepository;
         private final Instant cutoff;
@@ -143,7 +143,7 @@ public class SweepStalePendingAttachmentsUseCase implements UseCaseService, Swee
         }
 
         private List<Attachment> fetchNextChunk() {
-            List<Attachment> staleChunk = attachmentRepository.findPendingPutStaleAfterId(cutoff, lastId, batchSize);
+            List<Attachment> staleChunk = attachmentRepository.findPendingPutStaleAfterId(cutoff, lastId, BATCH_SIZE);
 
             if (!staleChunk.isEmpty()) {
                 chunksLoaded++;

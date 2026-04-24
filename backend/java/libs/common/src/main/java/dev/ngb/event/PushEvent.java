@@ -15,8 +15,8 @@ public record PushEvent(
         Object data,
         Instant occurredAt
 ) {
-    public enum TargetType {SPECIFIC, TOPIC, ALL}
+    public enum TargetType { SPECIFIC, TOPIC, ALL }
 
-    public enum Protocol {SSE, WS}
+    public enum Protocol { SSE, WS }
 }
 
