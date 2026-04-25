@@ -4,7 +4,11 @@ import org.jspecify.annotations.Nullable;
 
 public record CdcEventPayload<T>(EventPayload<T> payload) {
 
-    public record EventPayload<T>(@Nullable T before, @Nullable T after, String op) {
+    public record EventPayload<T>(@Nullable T before, T after, String op) {
+    }
+
+    public boolean isEvent() {
+        return isCreate() && payload != null && payload.after() != null;
     }
 
     public boolean isCreate() {

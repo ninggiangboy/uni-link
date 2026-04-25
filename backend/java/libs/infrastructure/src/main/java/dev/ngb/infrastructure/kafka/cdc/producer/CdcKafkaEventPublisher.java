@@ -51,14 +51,23 @@ public class CdcKafkaEventPublisher implements EventPublisher {
     @KafkaListener(topics = TopicNames.OUTBOX_EVENTS)
     public void consume(CdcEventPayload<EventPublicationEntity> cdcPayload) throws ClassNotFoundException {
         log.info("Received CDC event: {}", cdcPayload);
-        if (cdcPayload.isCreate() && cdcPayload.payload().after() != null) {
+        if (cdcPayload.isEvent()) {
             EventPublicationEntity event = cdcPayload.payload().after();
             Class<?> eventClass = Class.forName(event.getTypeClazz());
             String topic = EventTopicResolver.resolve(eventClass);
             log.info("Publishing event topic: {}, payload: {}", topic, event.getPayload());
             ProducerRecord<String, String> record = new ProducerRecord<>(topic, event.getUuid(), event.getPayload());
             record.headers().add(new RecordHeader("__TypeId__", eventClass.getName().getBytes(StandardCharsets.UTF_8)));
-            kafkaTemplate.send(record);
+            kafkaTemplate.send(record).whenComplete((result, ex) -> {
+                if (ex != null) {
+                    log.error("Failed to send event to topic {}", topic, ex);
+                } else {
+                    log.debug("Sent event to topic {} partition {} offset {}",
+                            result.getRecordMetadata().topic(),
+                            result.getRecordMetadata().partition(),
+                            result.getRecordMetadata().offset());
+                }
+            });
         }
     }
 }

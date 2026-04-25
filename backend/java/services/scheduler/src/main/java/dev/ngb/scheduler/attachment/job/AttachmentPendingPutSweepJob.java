@@ -1,10 +1,10 @@
 package dev.ngb.scheduler.attachment.job;
 
 import dev.ngb.application.BackgroundJob;
+import dev.ngb.application.port.event.EventPublisher;
 import dev.ngb.constant.ScheduledJobNames;
 import dev.ngb.event.JobTriggeredEvent;
 import dev.ngb.scheduler.config.ScheduleJobConfig;
-import dev.ngb.scheduler.event.EventPublisher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

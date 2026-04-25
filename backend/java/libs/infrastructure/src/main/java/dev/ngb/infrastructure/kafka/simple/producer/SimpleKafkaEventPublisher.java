@@ -1,5 +1,8 @@
-package dev.ngb.scheduler.event;
+package dev.ngb.infrastructure.kafka.simple.producer;
 
+import com.fasterxml.jackson.core.JacksonException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.ngb.application.port.event.EventPublisher;
 import dev.ngb.event.Event;
 import dev.ngb.event.EventTopicResolver;
 import lombok.RequiredArgsConstructor;
@@ -9,15 +12,13 @@ import org.apache.kafka.common.header.internals.RecordHeader;
 import org.jspecify.annotations.NonNull;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
-import com.fasterxml.jackson.core.JacksonException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class KafkaEventPublisher implements EventPublisher {
+public class SimpleKafkaEventPublisher implements EventPublisher {
 
     private final ObjectMapper objectMapper;
     private final KafkaTemplate<@NonNull String, @NonNull String> kafkaTemplate;
@@ -32,9 +33,19 @@ public class KafkaEventPublisher implements EventPublisher {
         } catch (JacksonException ex) {
             throw new IllegalStateException("Failed to serialize event: " + event.getClass().getName(), ex);
         }
-        log.info("Publishing event topic: {} payload: {}", topic, payload);
-        ProducerRecord<String, String> record = new ProducerRecord<>(topic, payload);
+        log.info("Publishing event topic: {} type: {}", topic, eventClass.getSimpleName());
+        ProducerRecord<String, String> record = new ProducerRecord<>(topic, event.uuid(), payload);
         record.headers().add(new RecordHeader("__TypeId__", eventClass.getName().getBytes(StandardCharsets.UTF_8)));
-        kafkaTemplate.send(record);
+        kafkaTemplate.send(record).whenComplete((result, ex) -> {
+            if (ex != null) {
+                log.error("Failed to send event to topic {}", topic, ex);
+            } else {
+                log.debug("Sent event to topic {} partition {} offset {}",
+                        result.getRecordMetadata().topic(),
+                        result.getRecordMetadata().partition(),
+                        result.getRecordMetadata().offset());
+            }
+        });
     }
+
 }

@@ -10,8 +10,9 @@ dependencies {
     api project(':libs:common')
     api project(':libs:utils')
 
-    api platform('software.amazon.awssdk:bom:2.31.77')
-    api 'software.amazon.awssdk:s3'
+    // cloud
+    api 'org.springframework.cloud:spring-cloud-starter-config'
+    api 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
 
     // Web & API
     api 'org.springframework.boot:spring-boot-starter-webmvc'
@@ -19,8 +20,8 @@ dependencies {
     api 'org.springframework.boot:spring-boot-graphql'
 
     // API Documentation
-    api 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5'
-    api 'org.springdoc:springdoc-openapi-starter-webmvc-scalar:2.8.13'
+    api 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.3'
+    api 'org.springdoc:springdoc-openapi-starter-webmvc-scalar:3.0.3'
 
     // Security
     api 'org.springframework.boot:spring-boot-security'
@@ -56,6 +57,10 @@ dependencies {
     api 'io.github.resilience4j:resilience4j-all:2.3.0'
     api "com.github.ben-manes.caffeine:caffeine:3.2.3"
 
+    // AWS
+    api platform('software.amazon.awssdk:bom:2.31.77')
+    api 'software.amazon.awssdk:s3'
+
     // Modulith
     api 'org.springframework.modulith:spring-modulith-core'
     api 'org.springframework.modulith:spring-modulith-events-api'
@@ -65,4 +70,9 @@ dependencies {
 
     // Utilities
     api 'com.github.f4b6a3:uuid-creator:6.1.0'
+
+    // Test
+    api 'org.springframework.boot:spring-boot-starter-test'
+    api 'org.testcontainers:testcontainers-junit-jupiter'
+    api 'org.testcontainers:testcontainers-postgresql'
 }

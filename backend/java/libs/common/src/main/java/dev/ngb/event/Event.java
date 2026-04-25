@@ -10,5 +10,6 @@ import java.time.Instant;
  * the application or external systems about state changes.
  */
 public interface Event {
+    String uuid();
     Instant occurredAt();
 }

@@ -1,12 +1,13 @@
 package dev.ngb.event;
 
+import lombok.experimental.UtilityClass;
+
 import java.util.concurrent.ConcurrentHashMap;
 
+@UtilityClass
 public final class EventTopicResolver {
 
     private static final ConcurrentHashMap<Class<?>, String> CACHE = new ConcurrentHashMap<>();
-
-    private EventTopicResolver() {}
 
     public static String resolve(Class<?> eventClass) {
         return CACHE.computeIfAbsent(eventClass, EventTopicResolver::resolveUncached);
