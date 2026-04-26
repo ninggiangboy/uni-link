@@ -7,10 +7,8 @@ import { BsTimeField } from '@/ui/components/datefield';
 import {
   Form,
   FormField,
-  FormItem,
   FormLabel,
   FormMessage,
-  FormControl,
   useForm,
 } from '@/ui/components/form';
 
@@ -21,24 +19,16 @@ const onSubmit = handleSubmit((v) => docFormToast(v));
   <Form class="flex w-full max-w-lg flex-col gap-4" @submit="onSubmit">
     <div class="flex gap-2">
       <div class="min-w-0 flex-1">
-        <FormField v-slot="{ componentField }" name="appointmentDate" :rules="z.any().ruleFn()">
-          <FormItem>
-            <FormLabel>Appointment date</FormLabel>
-            <FormControl generic="string | undefined" v-slot="vm" :component-field="componentField">
-              <DatePicker v-bind="vm" />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
+        <FormField v-slot="{ vmBinds }" name="appointmentDate" :rules="z.any().ruleFn()" class="space-y-2">
+          <FormLabel>Appointment date</FormLabel>
+          <DatePicker v-bind="vmBinds" />
+          <FormMessage />
         </FormField>
       </div>
-      <FormField v-slot="{ componentField }" name="appointmentTime" :rules="z.any().ruleFn()">
-        <FormItem>
-          <FormLabel class="opacity-0">Time</FormLabel>
-          <FormControl generic="string | undefined" v-slot="vm" :component-field="componentField">
-            <BsTimeField class="w-18 min-w-0 shrink-0" v-bind="vm" />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
+      <FormField v-slot="{ vmBinds }" name="appointmentTime" :rules="z.any().ruleFn()" class="space-y-2">
+        <FormLabel class="opacity-0">Time</FormLabel>
+        <BsTimeField class="w-18 min-w-0 shrink-0" v-bind="vmBinds" />
+        <FormMessage />
       </FormField>
     </div>
     <Button type="submit">Submit</Button>

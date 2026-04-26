@@ -7,10 +7,8 @@ import {
   Form,
   FormDescription,
   FormField,
-  FormItem,
   FormLabel,
   FormMessage,
-  FormControl,
   useForm,
 } from '@/ui/components/form';
 import { TextArea } from '@/ui/components/textfield';
@@ -29,44 +27,38 @@ const onSubmit = handleSubmit((v) => docFormToast(v));
 <template>
   <Form class="space-y-5" @submit="onSubmit">
     <FormField
-      v-slot="{ componentField }"
+      v-slot="{ vmBinds }"
       name="interest"
       :rules="z.array(z.string()).min(1, 'Pick at least one').ruleFn()"
+      class="space-y-2"
     >
-      <FormItem>
-        <FormLabel>Select your interests</FormLabel>
-        <FormDescription>Pick one or more.</FormDescription>
-        <FormControl generic="string[]" v-slot="vm" :component-field="componentField">
-          <CheckboxGroup v-bind="vm" class="grid grid-cols-3 gap-4">
-            <Checkbox value="reading"> Reading </Checkbox>
-            <Checkbox value="writing"> Writing </Checkbox>
-            <Checkbox value="coding"> Coding </Checkbox>
-          </CheckboxGroup>
-        </FormControl>
-        <FormMessage />
-      </FormItem>
+      <FormLabel>Select your interests</FormLabel>
+      <FormDescription>Pick one or more.</FormDescription>
+      <CheckboxGroup v-bind="vmBinds" class="grid grid-cols-3 gap-4">
+        <Checkbox value="reading"> Reading </Checkbox>
+        <Checkbox value="writing"> Writing </Checkbox>
+        <Checkbox value="coding"> Coding </Checkbox>
+      </CheckboxGroup>
+      <FormMessage />
     </FormField>
 
     <FormField
-      v-slot="{ componentField }"
+      v-slot="{ vmBinds }"
       name="bio"
       :rules="z.string().min(1, 'Required').ruleFn()"
+      class="space-y-2"
     >
-      <FormItem>
-        <FormLabel>Bio</FormLabel>
-        <FormControl v-slot="controlProps">
-          <TextArea
-            v-bind="{ ...componentField, ...controlProps }"
-            placeholder="Type your bio here..."
-            class="min-h-24"
-          />
-        </FormControl>
-        <FormMessage />
-      </FormItem>
+      <FormLabel>Bio</FormLabel>
+      <TextArea
+        v-bind="vmBinds"
+        placeholder="Type your bio here..."
+        class="min-h-24"
+      />
+      <FormMessage />
     </FormField>
 
     <FormField
-      v-slot="{ componentField }"
+      v-slot="{ vmBinds }"
       name="acceptTerm"
       type="checkbox"
       :rules="
@@ -75,17 +67,10 @@ const onSubmit = handleSubmit((v) => docFormToast(v));
           .refine((v) => v, { message: 'Please accept the terms and conditions' })
           .ruleFn()
       "
+      class="space-y-2"
     >
-      <FormItem>
-        <FormControl
-          generic="boolean | 'indeterminate'"
-          v-slot="vm"
-          :component-field="componentField"
-        >
-          <Checkbox v-bind="vm"> I accept the terms and conditions </Checkbox>
-        </FormControl>
-        <FormMessage />
-      </FormItem>
+      <Checkbox v-bind="vmBinds"> I accept the terms and conditions </Checkbox>
+      <FormMessage />
     </FormField>
 
     <Button type="submit"> Submit </Button>

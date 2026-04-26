@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { docFormToast } from '@/docs/examples/_internal/docFormSubmit';
 import { Button } from '@/ui/components/button';
-import { Form, FormControl, FormField, FormItem, FormLabel, useForm } from '@/ui/components/form';
+import { Form, FormField, FormLabel, useForm } from '@/ui/components/form';
 import { Switch } from '@/ui/components/switch-ui';
 import { z } from 'zod';
 
@@ -11,19 +11,16 @@ const onSubmit = handleSubmit((v) => docFormToast(v));
 <template>
   <Form class="space-y-4" @submit="onSubmit">
     <FormField
-      v-slot="{ componentField }"
+      v-slot="{ vmBinds }"
       name="notify"
       type="checkbox"
       :rules="z.boolean().ruleFn()"
+      class="space-y-2"
     >
-      <FormItem>
-        <div class="flex items-center gap-2">
-          <FormControl generic="boolean" v-slot="vm" :component-field="componentField">
-            <Switch v-bind="vm" />
-          </FormControl>
-          <FormLabel class="!mt-0 cursor-pointer font-normal">Notifications</FormLabel>
-        </div>
-      </FormItem>
+      <div class="flex items-center gap-2">
+        <Switch v-bind="vmBinds" />
+        <FormLabel class="!mt-0 cursor-pointer font-normal">Notifications</FormLabel>
+      </div>
     </FormField>
     <Button type="submit">Submit</Button>
   </Form>

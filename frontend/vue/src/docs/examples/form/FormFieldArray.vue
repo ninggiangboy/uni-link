@@ -4,9 +4,7 @@ import { toTypedSchema } from '@vee-validate/zod';
 import { Button } from '@/ui/components/button';
 import {
   Form,
-  FormControl,
   FormField,
-  FormItem,
   FormLabel,
   FormMessage,
   useFieldArray,
@@ -47,26 +45,22 @@ const onSubmit = handleSubmit((v) => docFormToast(v));
     <div
       v-for="(field, index) in fields"
       :key="field.key"
-      class="grid grid-cols-[1fr_1fr_auto] gap-3"
+      class="grid grid-cols-[1fr_1fr_auto] gap-3 mb-8"
     >
-      <FormField v-slot="{ componentField }" :name="`users[${index}].email`">
-        <FormItem>
-          <FormLabel>Email</FormLabel>
-          <FormControl v-slot="controlProps">
-            <Input v-bind="{ ...componentField, ...controlProps }" placeholder="Email" />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
+      <FormField v-slot="{ vmBinds }" :name="`users[${index}].email`" class="space-y-2">
+        <FormLabel>Email</FormLabel>
+        <div class="relative">
+          <Input v-bind="vmBinds" placeholder="Email" />
+          <FormMessage class="absolute top-full left-0 z-10 mt-1" />
+        </div>
       </FormField>
 
-      <FormField v-slot="{ componentField }" :name="`users[${index}].name`">
-        <FormItem>
-          <FormLabel>Name</FormLabel>
-          <FormControl v-slot="controlProps">
-            <Input v-bind="{ ...componentField, ...controlProps }" placeholder="Name" />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
+      <FormField v-slot="{ vmBinds }" :name="`users[${index}].name`" class="space-y-2">
+        <FormLabel>Name</FormLabel>
+        <div class="relative">
+          <Input v-bind="vmBinds" placeholder="Name" />
+          <FormMessage class="absolute top-full left-0 z-10 mt-1" />
+        </div>
       </FormField>
 
       <div class="flex items-end">

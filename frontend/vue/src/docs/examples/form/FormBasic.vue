@@ -3,9 +3,7 @@ import { docFormToast } from '@/docs/examples/_internal/docFormSubmit';
 import { Button } from '@/ui/components/button';
 import {
   Form,
-  FormControl,
   FormField,
-  FormItem,
   FormLabel,
   FormMessage,
   useForm,
@@ -25,31 +23,25 @@ const onSubmit = handleSubmit((v) => docFormToast(v));
     <h2 class="text-xl font-semibold">Sign up</h2>
 
     <FormField
-      v-slot="{ componentField }"
+      v-slot="{ vmBinds }"
       name="email"
       :rules="z.string().email('Invalid email').ruleFn()"
+      class="space-y-2"
     >
-      <FormItem>
-        <FormLabel>Email</FormLabel>
-        <FormControl v-slot="controlProps">
-          <Input v-bind="{ ...componentField, ...controlProps }" placeholder="Enter your email" />
-        </FormControl>
-        <FormMessage />
-      </FormItem>
+      <FormLabel>Email</FormLabel>
+      <Input v-bind="vmBinds" placeholder="Enter your email" />
+      <FormMessage />
     </FormField>
 
     <FormField
-      v-slot="{ componentField }"
+      v-slot="{ vmBinds }"
       name="name"
       :rules="z.string().min(2, 'At least 2 characters').ruleFn()"
+      class="space-y-2"
     >
-      <FormItem>
-        <FormLabel>Name</FormLabel>
-        <FormControl v-slot="controlProps">
-          <Input v-bind="{ ...componentField, ...controlProps }" placeholder="Enter your name" />
-        </FormControl>
-        <FormMessage />
-      </FormItem>
+      <FormLabel>Name</FormLabel>
+      <Input v-bind="vmBinds" placeholder="Enter your name" />
+      <FormMessage />
     </FormField>
 
     <Button type="submit" class="w-full">Sign up</Button>

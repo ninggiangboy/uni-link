@@ -4,9 +4,7 @@ import { toTypedSchema } from '@vee-validate/zod';
 import { Button } from '@/ui/components/button';
 import {
   Form,
-  FormControl,
   FormField,
-  FormItem,
   FormLabel,
   FormMessage,
   useForm,
@@ -41,41 +39,31 @@ const onSubmit = handleSubmit((v) => docFormToast(v));
     <h2 class="text-xl font-semibold">Register</h2>
 
     <FormField
-      v-slot="{ componentField }"
+      v-slot="{ vmBinds }"
       name="email"
       :rules="z.string().email('Enter a valid email').ruleFn()"
+      class="space-y-2"
     >
-      <FormItem>
-        <FormLabel>Email</FormLabel>
-        <FormControl v-slot="controlProps">
-          <Input v-bind="{ ...componentField, ...controlProps }" type="email" placeholder="Enter your email" />
-        </FormControl>
-        <FormMessage />
-      </FormItem>
+      <FormLabel>Email</FormLabel>
+      <Input v-bind="vmBinds" type="email" placeholder="Enter your email" />
+      <FormMessage />
     </FormField>
 
     <FormField
-      v-slot="{ componentField }"
+      v-slot="{ vmBinds }"
       name="password"
       :rules="z.string().min(8, 'At least 8 characters').ruleFn()"
+      class="space-y-2"
     >
-      <FormItem>
-        <FormLabel>Password</FormLabel>
-        <FormControl v-slot="controlProps">
-          <Input v-bind="{ ...componentField, ...controlProps }" type="password" placeholder="Enter your password" />
-        </FormControl>
-        <FormMessage />
-      </FormItem>
+      <FormLabel>Password</FormLabel>
+      <Input v-bind="vmBinds" type="password" placeholder="Enter your password" />
+      <FormMessage />
     </FormField>
 
-    <FormField v-slot="{ componentField }" name="confirmPassword">
-      <FormItem>
-        <FormLabel>Confirm password</FormLabel>
-        <FormControl v-slot="controlProps">
-          <Input v-bind="{ ...componentField, ...controlProps }" type="password" placeholder="Confirm your password" />
-        </FormControl>
-        <FormMessage />
-      </FormItem>
+    <FormField v-slot="{ vmBinds }" name="confirmPassword" class="space-y-2">
+      <FormLabel>Confirm password</FormLabel>
+      <Input v-bind="vmBinds" type="password" placeholder="Confirm your password" />
+      <FormMessage />
     </FormField>
 
     <Button type="submit" class="w-full">Register</Button>

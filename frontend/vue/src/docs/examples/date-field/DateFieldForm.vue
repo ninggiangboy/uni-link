@@ -6,10 +6,8 @@ import { DateField } from '@/ui/components/datefield';
 import {
   Form,
   FormField,
-  FormItem,
   FormLabel,
   FormMessage,
-  FormControl,
   useForm,
 } from '@/ui/components/form';
 
@@ -18,14 +16,10 @@ const onSubmit = handleSubmit((v) => docFormToast(v));
 </script>
 <template>
   <Form class="w-full max-w-xs space-y-4" @submit="onSubmit">
-    <FormField v-slot="{ componentField }" name="dob" :rules="z.any().ruleFn()">
-      <FormItem>
-        <FormLabel>Date of birth</FormLabel>
-        <FormControl generic="DateValue | undefined" v-slot="vm" :component-field="componentField">
-          <DateField v-bind="vm" />
-        </FormControl>
-        <FormMessage />
-      </FormItem>
+    <FormField v-slot="{ vmBinds }" name="dob" :rules="z.any().ruleFn()" class="space-y-2">
+      <FormLabel>Date of birth</FormLabel>
+      <DateField v-bind="vmBinds" />
+      <FormMessage />
     </FormField>
     <Button type="submit">Submit</Button>
   </Form>

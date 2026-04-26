@@ -4,10 +4,8 @@ import { Button } from '@/ui/components/button';
 import {
   Form,
   FormField,
-  FormItem,
   FormLabel,
   FormMessage,
-  FormControl,
   useForm,
 } from '@/ui/components/form';
 import { Select, type SelectOption } from '@/ui/components/select';
@@ -40,32 +38,25 @@ const onSubmit = handleSubmit((values) => {
 
 <template>
   <Form class="w-full space-y-3" @submit="onSubmit">
-    <FormField v-slot="{ componentField, errors }" name="role" :rules="z.string().min(1).ruleFn()">
-      <FormItem>
-        <FormLabel>Role</FormLabel>
-        <FormControl generic="string | undefined" v-slot="vm" :component-field="componentField">
-          <Select
-            v-bind="vm"
-            clearable
-            :options="roleOptions"
-            :class="errors.length ? 'ring-2 ring-destructive' : ''"
-          />
-        </FormControl>
-        <FormMessage />
-      </FormItem>
+    <FormField v-slot="{ vmBinds, errors }" name="role" :rules="z.string().min(1).ruleFn()" class="space-y-2">
+      <FormLabel>Role</FormLabel>
+      <Select
+        v-bind="vmBinds"
+        clearable
+        :options="roleOptions"
+        :class="errors.length ? 'ring-2 ring-destructive' : ''"
+      />
+      <FormMessage />
     </FormField>
     <FormField
-      v-slot="{ componentField }"
+      v-slot="{ vmBinds }"
       name="languages"
       :rules="z.array(z.string()).optional().ruleFn()"
+      class="space-y-2"
     >
-      <FormItem>
-        <FormLabel>Language</FormLabel>
-        <FormControl generic="string[]" v-slot="vm" :component-field="componentField">
-          <Select v-bind="vm" multiple :options="languageOptions" />
-        </FormControl>
-        <FormMessage />
-      </FormItem>
+      <FormLabel>Language</FormLabel>
+      <Select v-bind="vmBinds" multiple :options="languageOptions" />
+      <FormMessage />
     </FormField>
     <div class="grid grid-cols-2 gap-2 py-2">
       <Button type="button" variant="outline"> Cancel </Button>

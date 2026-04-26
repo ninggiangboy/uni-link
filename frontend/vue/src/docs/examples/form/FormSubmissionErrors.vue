@@ -4,9 +4,7 @@ import { useMutation } from '@tanstack/vue-query';
 import { Button } from '@/ui/components/button';
 import {
   Form,
-  FormControl,
   FormField,
-  FormItem,
   FormLabel,
   FormMessage,
   setSubmitErrors,
@@ -75,24 +73,16 @@ const onSubmit = handleSubmit((values) => {
 
     <LoadingOverlay :is-loading="signUpMutation.isPending.value">
       <div class="grid gap-4">
-        <FormField v-slot="{ componentField }" name="email">
-          <FormItem>
-            <FormLabel>Email</FormLabel>
-            <FormControl v-slot="controlProps">
-              <Input v-bind="{ ...componentField, ...controlProps }" placeholder="Enter your email" />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
+        <FormField v-slot="{ vmBinds }" name="email" class="space-y-2">
+          <FormLabel>Email</FormLabel>
+          <Input v-bind="vmBinds" placeholder="Enter your email" />
+          <FormMessage />
         </FormField>
 
-        <FormField v-slot="{ componentField }" name="name">
-          <FormItem>
-            <FormLabel>Name</FormLabel>
-            <FormControl v-slot="controlProps">
-              <Input v-bind="{ ...componentField, ...controlProps }" placeholder="Enter your name" />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
+        <FormField v-slot="{ vmBinds }" name="name" class="space-y-2">
+          <FormLabel>Name</FormLabel>
+          <Input v-bind="vmBinds" placeholder="Enter your name" />
+          <FormMessage />
         </FormField>
 
         <Button type="submit" :disabled="signUpMutation.isPending.value" class="w-full">

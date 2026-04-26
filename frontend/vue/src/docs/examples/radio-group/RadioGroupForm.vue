@@ -6,10 +6,8 @@ import { Label } from '@/ui/components/field';
 import {
   Form,
   FormField,
-  FormItem,
   FormLabel,
   FormMessage,
-  FormControl,
   useForm,
 } from '@/ui/components/form';
 import { RadioGroup, RadioGroupItem } from '@/ui/components/radio-group';
@@ -20,27 +18,24 @@ const onSubmit = handleSubmit((v) => docFormToast(v));
 <template>
   <Form class="space-y-4" @submit="onSubmit">
     <FormField
-      v-slot="{ componentField }"
+      v-slot="{ vmBinds }"
       name="plan"
       type="radio"
       :rules="z.string().min(1).ruleFn()"
+      class="space-y-2"
     >
-      <FormItem>
-        <FormLabel>Plan</FormLabel>
-        <FormControl generic="string | undefined" v-slot="vm" :component-field="componentField">
-          <RadioGroup v-bind="vm" class="max-w-xs">
-            <Label class="flex items-center gap-2 font-normal">
-              <RadioGroupItem value="free" />
-              Free
-            </Label>
-            <Label class="flex items-center gap-2 font-normal">
-              <RadioGroupItem value="pro" />
-              Pro
-            </Label>
-          </RadioGroup>
-        </FormControl>
-        <FormMessage />
-      </FormItem>
+      <FormLabel>Plan</FormLabel>
+      <RadioGroup v-bind="vmBinds" class="max-w-xs">
+        <Label class="flex items-center gap-2 font-normal">
+          <RadioGroupItem value="free" />
+          Free
+        </Label>
+        <Label class="flex items-center gap-2 font-normal">
+          <RadioGroupItem value="pro" />
+          Pro
+        </Label>
+      </RadioGroup>
+      <FormMessage />
     </FormField>
     <Button type="submit">Submit</Button>
   </Form>

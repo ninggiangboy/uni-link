@@ -6,9 +6,7 @@ import { Button } from '@/ui/components/button';
 import { Checkbox, CheckboxGroup } from '@/ui/components/checkbox';
 import {
   Form,
-  FormControl,
   FormField,
-  FormItem,
   FormLabel,
   FormMessage,
   useForm,
@@ -52,47 +50,36 @@ const onSubmit = handleSubmit((v) => docFormToast(v));
   <Form class="w-full space-y-4" @submit="onSubmit">
     <h2 class="text-xl font-semibold">Create User</h2>
 
-    <FormField v-slot="{ componentField, errors }" name="role">
-      <FormItem>
-        <FormLabel>Role</FormLabel>
-        <FormControl generic="string" v-slot="vm" :component-field="componentField">
-          <Select
-            v-bind="vm"
-            :options="roleOptions"
-            :class="errors.length ? 'ring-2 ring-destructive' : ''"
-          />
-        </FormControl>
-        <FormMessage />
-      </FormItem>
+    <FormField v-slot="{ vmBinds, errors }" name="role" class="space-y-2">
+      <FormLabel>Role</FormLabel>
+      <Select
+        v-bind="vmBinds"
+        :options="roleOptions"
+        :class="errors.length ? 'ring-2 ring-destructive' : ''"
+      />
+      <FormMessage />
     </FormField>
 
     <FormField
-      v-slot="{ componentField }"
+      v-slot="{ vmBinds }"
       name="name"
       :rules="z.string().min(4, 'At least 4 characters').ruleFn()"
+      class="space-y-2"
     >
-      <FormItem>
-        <FormLabel>Name</FormLabel>
-        <FormControl v-slot="controlProps">
-          <Input v-bind="{ ...componentField, ...controlProps }" placeholder="Enter name" />
-        </FormControl>
-        <FormMessage />
-      </FormItem>
+      <FormLabel>Name</FormLabel>
+      <Input v-bind="vmBinds" placeholder="Enter name" />
+      <FormMessage />
     </FormField>
 
     <div v-if="isAdmin">
-      <FormField v-slot="{ componentField }" name="permissions">
-        <FormItem>
-          <FormLabel>Permissions</FormLabel>
-          <FormControl generic="string[]" v-slot="vm" :component-field="componentField">
-            <CheckboxGroup v-bind="vm" class="flex flex-col gap-2">
-              <Checkbox value="read">Read</Checkbox>
-              <Checkbox value="write">Write</Checkbox>
-              <Checkbox value="delete">Delete</Checkbox>
-            </CheckboxGroup>
-          </FormControl>
-          <FormMessage />
-        </FormItem>
+      <FormField v-slot="{ vmBinds }" name="permissions" class="space-y-2">
+        <FormLabel>Permissions</FormLabel>
+        <CheckboxGroup v-bind="vmBinds" class="flex flex-col gap-2">
+          <Checkbox value="read">Read</Checkbox>
+          <Checkbox value="write">Write</Checkbox>
+          <Checkbox value="delete">Delete</Checkbox>
+        </CheckboxGroup>
+        <FormMessage />
       </FormField>
     </div>
 

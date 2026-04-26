@@ -6,10 +6,8 @@ import { DatePicker } from '@/ui/components/date-picker';
 import {
   Form,
   FormField,
-  FormItem,
   FormLabel,
   FormMessage,
-  FormControl,
   useForm,
 } from '@/ui/components/form';
 
@@ -18,14 +16,10 @@ const onSubmit = handleSubmit((v) => docFormToast(v));
 </script>
 <template>
   <Form class="w-full max-w-[280px] space-y-4" @submit="onSubmit">
-    <FormField v-slot="{ componentField }" name="date" :rules="z.any().ruleFn()">
-      <FormItem>
-        <FormLabel>Date</FormLabel>
-        <FormControl generic="string | undefined" v-slot="vm" :component-field="componentField">
-          <DatePicker v-bind="vm" />
-        </FormControl>
-        <FormMessage />
-      </FormItem>
+    <FormField v-slot="{ vmBinds }" name="date" :rules="z.any().ruleFn()" class="space-y-2">
+      <FormLabel>Date</FormLabel>
+      <DatePicker v-bind="vmBinds" />
+      <FormMessage />
     </FormField>
     <Button type="submit">Submit</Button>
   </Form>
