@@ -2,14 +2,14 @@
 
 ## Overview
 
-**UniLink** is a full-featured social networking platform built on Clean Architecture principles using Spring Data JDBC and PostgreSQL. The system provides a complete set of modern social network capabilities: threaded posts, real-time messaging with end-to-end encryption, community groups, multi-channel notifications, hashtag analytics, and fine-grained access control.
+**UniLink** is a full-featured social networking platform built on Clean Architecture principles with a polyglot persistence model: Spring Data JDBC + PostgreSQL for relational aggregates, and Spring Data Neo4j + Neo4j for relationship-heavy graph traversals. The system provides a complete set of modern social network capabilities: threaded posts, real-time messaging with end-to-end encryption, community groups, multi-channel notifications, hashtag analytics, and fine-grained access control.
 
 ### High-Level Architecture
 
 ```
-backend/core/
+backend/java/core/
 ├── domain/     # Pure domain layer — models, repository interfaces, enums, domain errors
-└── database/   # Infrastructure layer — JDBC entities, mappers, repository implementations
+└── database/   # Infrastructure layer — JDBC + Neo4j repository implementations
 ```
 
 ---
@@ -69,10 +69,10 @@ backend/core/
 | `prf_profile_medias` | Avatar and banner media gallery |
 | `prf_profile_metadata` | Custom key-value metadata |
 | `prf_profile_usernames` | Full history of username changes |
-| `prf_profile_follows` | Directed follow relationships |
-| `prf_profile_blocks` | Block relationships (bidirectional enforcement) |
-| `prf_profile_mutes` | Mute relationships |
-| `prf_profile_follow_hashtags` | Hashtag subscription records |
+| *(Neo4j graph)* `(:Profile)-[:FOLLOWS]->(:Profile)` | Directed follow relationships |
+| *(Neo4j graph)* `(:Profile)-[:BLOCKS]->(:Profile)` | Block relationships (also removes existing follow edges in both directions) |
+| *(Neo4j graph)* `(:Profile)-[:MUTES]->(:Profile)` | Mute relationships |
+| *(Neo4j graph)* `(:Profile)-[:FOLLOWS_TAG]->(:Hashtag)` | Hashtag subscription relationships |
 
 **Domain Models:**
 
@@ -86,10 +86,12 @@ backend/core/
 | `ProfileLink` | Personal / social external links |
 | `ProfileMetadata` | Flexible key-value extension point |
 | `ProfileUsername` | Append-only history of username changes |
-| `ProfileFollow` | Directed edge in the social graph |
-| `ProfileBlock` | Block record suppressing all interactions |
-| `ProfileMute` | Mute record hiding content without blocking |
-| `ProfileFollowHashtag` | User subscription to a hashtag feed |
+| `ProfileRelationshipRepository` | Graph-oriented relationship contract (`follow`, `block`, `mute`, `follow hashtag`, traversal queries) backed by Neo4j (`ProfileRelationshipNeo4jRepository`) |
+
+**Profile Relationship Storage Split:**
+- Profile master data (`prf_profiles`, settings, metadata, media, username history) remains in PostgreSQL.
+- Relationship edges (follow, block, mute, follow hashtag) are modeled as Neo4j relationships for traversal performance.
+- A shared query executor (`Neo4jQueryExecutor`) runs parameterized Cypher and maps scalar/list results.
 
 **Key Enums:**
 - `ProfileVisibility` — `PUBLIC`, `PRIVATE`, `HIDDEN`
@@ -356,11 +358,16 @@ OWNER > ADMIN > MODERATOR > MEMBER
 │                                                           │
 │   ┌─────────────┐   ┌───────────────┐   ┌────────────┐  │
 │   │    JDBC     │   │    Mapper     │   │ Repository │  │
-│   │  Entities   │   │  toDomain()  │   │    Impl    │  │
-│   │             │   │  toJdbc()    │   │            │  │
+│   │  Entities   │   │  toDomain()   │   │    Impl    │  │
+│   │             │   │  toJdbc()     │   │            │  │
+│   └─────────────┘   └───────────────┘   └────────────┘  │
+│            +                                              │
+│   ┌─────────────┐   ┌───────────────┐   ┌────────────┐  │
+│   │   Cypher    │   │ QueryExecutor │   │ Repository │  │
+│   │   Queries   │   │  (Neo4jClient)│   │   (Graph)  │  │
 │   └─────────────┘   └───────────────┘   └────────────┘  │
 │                                                           │
-│              Spring Data JDBC + PostgreSQL                │
+│         Spring Data JDBC + PostgreSQL + Neo4j            │
 └──────────────────────────────────────────────────────────┘
 ```
 
@@ -371,6 +378,8 @@ OWNER > ADMIN > MODERATOR > MEMBER
 | **Aggregate Root** | Each domain has a single entry-point entity (`Account`, `Profile`, `Thread`, `Conversation`, `Notification`, `Hashtag`, `Group`) |
 | **Repository Pattern** | Interfaces defined in `domain/`, implemented in `database/` — domain has no knowledge of JDBC |
 | **Mapper Pattern** | `JdbcMapper<Domain, Entity>` provides explicit bidirectional `toDomain()` and `toJdbc()` conversions |
+| **Graph Repository Pattern** | Traversal-heavy contracts (e.g. profile relationships) use Cypher + Neo4j repositories instead of relational join tables |
+| **Polyglot Persistence** | Relational aggregates stay in PostgreSQL; social graph edges are stored in Neo4j for efficient relationship queries |
 | **Soft Delete** | `SoftDeletableJdbcEntity` records `deleted_at` instead of physically removing rows |
 | **Audit Trail** | Every entity carries `created_by`, `created_at`, `updated_by`, `updated_at` |
 | **Bitmask Permissions** | `GroupAdminPermission` encodes 12 permission flags into a single `BIGINT` column |
@@ -401,15 +410,20 @@ OWNER > ADMIN > MODERATOR > MEMBER
 ## Database Schema Summary
 
 ```
+PostgreSQL (relational):
 iam_*    Identity          6 tables
-prf_*    Profile          12 tables
+prf_*    Profile           8 tables
 thr_*    Thread           12 tables
 chat_*   Chat             10 tables
 ntf_*    Notification      6 tables
 ht_*     Hashtag           6 tables
 grp_*    Group             8 tables
                           ─────────
-Total                    60 tables
+Subtotal                 56 tables
+
+Neo4j (graph):
+Profile-Profile edges    FOLLOWS, BLOCKS, MUTES
+Profile-Hashtag edges    FOLLOWS_TAG
 ```
 
 Migrations are managed by **Liquibase** (`db.changelog-master.yaml`) with full rollback support.
@@ -751,6 +765,8 @@ database/
   ├── libs:common
   ├── libs:utils
   ├── spring-boot-data-jdbc
+  ├── spring-boot-data-neo4j
   ├── postgresql
+  ├── neo4j-java-driver
   └── liquibase
 ```

@@ -10,6 +10,7 @@ dependencies {
 
     implementation 'org.springframework.boot:spring-boot-jdbc'
     implementation 'org.springframework.boot:spring-boot-data-jdbc'
+    implementation 'org.springframework.boot:spring-boot-starter-data-neo4j'
     implementation 'org.springframework.boot:spring-boot-starter'
     runtimeOnly 'org.postgresql:postgresql'
 }
