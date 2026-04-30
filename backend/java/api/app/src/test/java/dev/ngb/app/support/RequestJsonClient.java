@@ -34,12 +34,17 @@ public final class RequestJsonClient {
 
     public ResponseEntity<String> postJson(String path, Object body, HttpHeaders headers) {
         var h = headers != null ? headers : defaultJsonHeaders();
-        return restTemplate.exchange(
-                baseUrl + path,
-                HttpMethod.POST,
-                new HttpEntity<>(body, h),
-                String.class
-        );
+        return exchangeJson(path, HttpMethod.POST, body, h);
+    }
+
+    public ResponseEntity<String> patchJson(String path, Object body, HttpHeaders headers) {
+        var h = headers != null ? headers : defaultJsonHeaders();
+        return exchangeJson(path, HttpMethod.PATCH, body, h);
+    }
+
+    public ResponseEntity<String> deleteJson(String path, Object body, HttpHeaders headers) {
+        var h = headers != null ? headers : defaultJsonHeaders();
+        return exchangeJson(path, HttpMethod.DELETE, body, h);
     }
 
     public <R> Either<ErrorResponse, R> post(
@@ -67,6 +72,33 @@ public final class RequestJsonClient {
             Predicate<HttpStatusCode> isSuccess
     ) {
         var raw = postJson(path, body, headers);
+        return deserialize(path, raw, type, isSuccess);
+    }
+
+    public <R> Either<ErrorResponse, R> patch(
+            String path,
+            Object body,
+            Class<R> type
+    ) {
+        var raw = patchJson(path, body, null);
+        return deserialize(path, raw, type, HttpStatusCode::is2xxSuccessful);
+    }
+
+    public <R> Either<ErrorResponse, R> delete(
+            String path,
+            Object body,
+            Class<R> type
+    ) {
+        var raw = deleteJson(path, body, null);
+        return deserialize(path, raw, type, HttpStatusCode::is2xxSuccessful);
+    }
+
+    private <R> Either<ErrorResponse, R> deserialize(
+            String path,
+            ResponseEntity<String> raw,
+            Class<R> type,
+            Predicate<HttpStatusCode> isSuccess
+    ) {
         var status = raw.getStatusCode();
         var responseBody = raw.getBody();
         if (isSuccess.test(status)) {
@@ -91,6 +123,15 @@ public final class RequestJsonClient {
         } catch (JsonProcessingException e) {
             throw new IllegalStateException("Failed to deserialize error body for " + path, e);
         }
+    }
+
+    private ResponseEntity<String> exchangeJson(String path, HttpMethod method, Object body, HttpHeaders headers) {
+        return restTemplate.exchange(
+                baseUrl + path,
+                method,
+                new HttpEntity<>(body, headers),
+                String.class
+        );
     }
 
     private static HttpHeaders defaultJsonHeaders() {

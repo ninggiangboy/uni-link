@@ -23,7 +23,7 @@ public class AccountOtpDeliveryService implements ApplicationService {
     private final OtpCodeGenerator otpCodeGenerator;
     private final OtpSender otpSender;
 
-    public void sendEmailOtp(Long accountId, String email, OtpPurpose purpose) {
+    public AccountOtp sendEmailOtp(Long accountId, String email, OtpPurpose purpose) {
         log.debug(
                 "Email OTP pipeline start accountId={}, purpose={}, channel={}, email={}",
                 accountId,
@@ -50,5 +50,6 @@ public class AccountOtpDeliveryService implements ApplicationService {
                 purpose,
                 StringUtils.maskEmail(email)
         );
+        return saved;
     }
 }

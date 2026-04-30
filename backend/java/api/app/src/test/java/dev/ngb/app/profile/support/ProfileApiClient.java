@@ -14,7 +14,7 @@ import org.springframework.web.client.RestTemplate;
  */
 public final class ProfileApiClient {
 
-    private static final String PROFILES_ENDPOINT = "/api/profiles";
+    private static final String PROFILES_ENDPOINT = "/profiles";
 
     private final RequestJsonClient json;
 

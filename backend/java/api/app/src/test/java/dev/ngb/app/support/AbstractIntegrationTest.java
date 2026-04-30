@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.ngb.app.identity.support.IdentityIntegrationTestConfig;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
@@ -41,6 +42,9 @@ public abstract class AbstractIntegrationTest {
     @LocalServerPort
     private int port;
 
+    @Value("${server.servlet.context-path}")
+    private String contextPath;
+
     protected final RestTemplate restTemplate = createRestTemplate();
 
     @DynamicPropertySource
@@ -51,7 +55,7 @@ public abstract class AbstractIntegrationTest {
     }
 
     protected String baseUrl() {
-        return "http://localhost:" + port;
+        return "http://localhost:" + port + contextPath;
     }
 
     public static RestTemplate createRestTemplate() {

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-public class ProfileResource implements ProfileApi {
+public class ProfileResource implements ProfileEndpoint {
 
     private final CreateProfileUseCase createProfileUseCase;
 

@@ -7,7 +7,6 @@ import dev.ngb.application.port.config.SecurityJwtConfig;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -32,23 +31,6 @@ public class SecurityConfig {
 
     private final SecurityJwtConfig appConfig;
 
-    /**
-     * Public auth endpoints stay outside the OAuth2 resource-server filter chain so domain errors
-     * (401/403/409, etc.) are handled by {@code GlobalExceptionHandler} with JSON error bodies.
-     * A single chain with {@code oauth2ResourceServer} still installs bearer-token handling that can
-     * produce empty 401 responses on those paths.
-     */
-    @Bean
-    @Order(0)
-    public SecurityFilterChain authPublicSecurityFilterChain(HttpSecurity http) throws Exception {
-        return http
-                .securityMatcher("/api/auth/**")
-                .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
-                .build();
-    }
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
@@ -57,6 +39,18 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers(
+                                "/identity/accounts",
+                                "/identity/sessions",
+                                "/identity/sessions/verification",
+                                "/identity/sessions/oauth",
+                                "/identity/sessions/current",
+                                "/identity/tokens",
+                                "/identity/email-verifications",
+                                "/identity/email-verifications/**",
+                                "/identity/password-resets",
+                                "/identity/password-resets/**"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.decoder(jwtDecoder())))

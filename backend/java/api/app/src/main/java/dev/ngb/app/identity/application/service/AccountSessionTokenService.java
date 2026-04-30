@@ -13,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 /*
  * Opens a new session and returns access + refresh tokens. Shared by every path that completes
  * authentication with a known account and device (verify email, trusted password login, OTP login
- * completion, OAuth). RefreshTokenUseCase intentionally stays separate — it rotates instead.
+ * completion, OAuth). CreateTokenUseCase intentionally stays separate — it rotates instead.
  */
 @Slf4j
 @RequiredArgsConstructor

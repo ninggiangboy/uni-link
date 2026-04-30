@@ -2,19 +2,21 @@ package dev.ngb.app.identity.support;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.ngb.app.identity.application.dto.AuthTokenResponse;
-import dev.ngb.app.identity.application.usecase.authentication.login_account.dto.LoginAccountRequest;
-import dev.ngb.app.identity.application.usecase.authentication.login_account.dto.LoginAccountResponse;
-import dev.ngb.app.identity.application.usecase.authentication.oauth_login.dto.OAuthLoginRequest;
-import dev.ngb.app.identity.application.usecase.authentication.oauth_login.dto.OAuthLoginResponse;
-import dev.ngb.app.identity.application.usecase.authentication.verify_login.dto.VerifyLoginRequest;
-import dev.ngb.app.identity.application.usecase.password.forgot_password.dto.ForgotPasswordRequest;
-import dev.ngb.app.identity.application.usecase.password.reset_password.dto.ResetPasswordRequest;
-import dev.ngb.app.identity.application.usecase.registration.register_account.dto.RegisterAccountRequest;
-import dev.ngb.app.identity.application.usecase.registration.register_account.dto.RegisterAccountResponse;
-import dev.ngb.app.identity.application.usecase.registration.resend_verification.dto.ResendVerificationRequest;
-import dev.ngb.app.identity.application.usecase.registration.verify_email.dto.VerifyEmailRequest;
-import dev.ngb.app.identity.application.usecase.session.logout_account.dto.LogoutAccountRequest;
-import dev.ngb.app.identity.application.usecase.session.refresh_token.dto.RefreshTokenRequest;
+import dev.ngb.app.identity.application.usecase.authentication.login_account.dto.CreateSessionRequest;
+import dev.ngb.app.identity.application.usecase.authentication.login_account.dto.CreateSessionResponse;
+import dev.ngb.app.identity.application.usecase.authentication.oauth_login.dto.CreateOAuthSessionRequest;
+import dev.ngb.app.identity.application.usecase.authentication.oauth_login.dto.CreateOAuthSessionResponse;
+import dev.ngb.app.identity.application.usecase.authentication.verify_login.dto.CompleteSessionVerificationRequest;
+import dev.ngb.app.identity.application.usecase.password.forgot_password.dto.CreatePasswordResetRequest;
+import dev.ngb.app.identity.application.usecase.password.forgot_password.dto.CreatePasswordResetResponse;
+import dev.ngb.app.identity.application.usecase.password.reset_password.dto.CompletePasswordResetRequest;
+import dev.ngb.app.identity.application.usecase.registration.register_account.dto.CreateAccountRequest;
+import dev.ngb.app.identity.application.usecase.registration.register_account.dto.CreateAccountResponse;
+import dev.ngb.app.identity.application.usecase.registration.resend_verification.dto.CreateEmailVerificationRequest;
+import dev.ngb.app.identity.application.usecase.registration.resend_verification.dto.CreateEmailVerificationResponse;
+import dev.ngb.app.identity.application.usecase.registration.verify_email.dto.CompleteEmailVerificationRequest;
+import dev.ngb.app.identity.application.usecase.session.logout_account.dto.DeleteCurrentSessionRequest;
+import dev.ngb.app.identity.application.usecase.session.refresh_token.dto.CreateTokenRequest;
 import dev.ngb.app.support.NoContent;
 import dev.ngb.app.support.RequestJsonClient;
 import dev.ngb.web.ErrorResponse;
@@ -22,22 +24,20 @@ import io.vavr.control.Either;
 import org.springframework.web.client.RestTemplate;
 
 /**
- * Composable HTTP client for {@code /api/auth/*}. {@code Left} = {@link ErrorResponse};
+ * Composable HTTP client for identity REST endpoints. {@code Left} = {@link ErrorResponse};
  * {@code Right} = success DTO or {@link NoContent} for empty bodies.
  */
 public final class IdentityAuthApiClient {
 
-    private static final String AUTH_ENDPOINT = "/api/auth";
-    private static final String REGISTER_ENDPOINT = AUTH_ENDPOINT + "/register";
-    private static final String VERIFY_EMAIL_ENDPOINT = AUTH_ENDPOINT + "/verify-email";
-    private static final String VERIFY_EMAIL_RESEND_ENDPOINT = AUTH_ENDPOINT + "/verify-email/resend";
-    private static final String LOGIN_ENDPOINT = AUTH_ENDPOINT + "/login";
-    private static final String LOGIN_VERIFY_ENDPOINT = AUTH_ENDPOINT + "/login/verify";
-    private static final String TOKEN_REFRESH_ENDPOINT = AUTH_ENDPOINT + "/token/refresh";
-    private static final String LOGOUT_ENDPOINT = AUTH_ENDPOINT + "/logout";
-    private static final String OAUTH_ENDPOINT = AUTH_ENDPOINT + "/oauth";
-    private static final String FORGOT_PASSWORD_ENDPOINT = AUTH_ENDPOINT + "/forgot-password";
-    private static final String RESET_PASSWORD_ENDPOINT = AUTH_ENDPOINT + "/reset-password";
+    private static final String IDENTITY_ENDPOINT = "/identity";
+    private static final String ACCOUNTS_ENDPOINT = IDENTITY_ENDPOINT + "/accounts";
+    private static final String EMAIL_VERIFICATIONS_ENDPOINT = IDENTITY_ENDPOINT + "/email-verifications";
+    private static final String SESSIONS_ENDPOINT = IDENTITY_ENDPOINT + "/sessions";
+    private static final String SESSION_VERIFICATION_ENDPOINT = IDENTITY_ENDPOINT + "/sessions/verification";
+    private static final String TOKENS_ENDPOINT = IDENTITY_ENDPOINT + "/tokens";
+    private static final String CURRENT_SESSION_ENDPOINT = IDENTITY_ENDPOINT + "/sessions/current";
+    private static final String OAUTH_SESSIONS_ENDPOINT = IDENTITY_ENDPOINT + "/sessions/oauth";
+    private static final String PASSWORD_RESETS_ENDPOINT = IDENTITY_ENDPOINT + "/password-resets";
 
     private final RequestJsonClient json;
 
@@ -45,43 +45,43 @@ public final class IdentityAuthApiClient {
         this.json = new RequestJsonClient(objectMapper, baseUrl, restTemplate);
     }
 
-    public Either<ErrorResponse, RegisterAccountResponse> registerAccount(RegisterAccountRequest request) {
-        return json.post(REGISTER_ENDPOINT, request, RegisterAccountResponse.class);
+    public Either<ErrorResponse, CreateAccountResponse> createAccount(CreateAccountRequest request) {
+        return json.post(ACCOUNTS_ENDPOINT, request, CreateAccountResponse.class);
     }
 
-    public Either<ErrorResponse, AuthTokenResponse> verifyEmail(VerifyEmailRequest request) {
-        return json.post(VERIFY_EMAIL_ENDPOINT, request, AuthTokenResponse.class);
+    public Either<ErrorResponse, AuthTokenResponse> completeEmailVerification(String verificationId, CompleteEmailVerificationRequest request) {
+        return json.patch(EMAIL_VERIFICATIONS_ENDPOINT + "/" + verificationId, request, AuthTokenResponse.class);
     }
 
-    public Either<ErrorResponse, LoginAccountResponse> login(LoginAccountRequest request) {
-        return json.post(LOGIN_ENDPOINT, request, LoginAccountResponse.class);
+    public Either<ErrorResponse, CreateSessionResponse> createSession(CreateSessionRequest request) {
+        return json.post(SESSIONS_ENDPOINT, request, CreateSessionResponse.class);
     }
 
-    public Either<ErrorResponse, AuthTokenResponse> verifyLogin(VerifyLoginRequest request) {
-        return json.post(LOGIN_VERIFY_ENDPOINT, request, AuthTokenResponse.class);
+    public Either<ErrorResponse, AuthTokenResponse> completeSessionVerification(CompleteSessionVerificationRequest request) {
+        return json.post(SESSION_VERIFICATION_ENDPOINT, request, AuthTokenResponse.class);
     }
 
-    public Either<ErrorResponse, AuthTokenResponse> refreshToken(RefreshTokenRequest request) {
-        return json.post(TOKEN_REFRESH_ENDPOINT, request, AuthTokenResponse.class);
+    public Either<ErrorResponse, AuthTokenResponse> createToken(CreateTokenRequest request) {
+        return json.post(TOKENS_ENDPOINT, request, AuthTokenResponse.class);
     }
 
-    public Either<ErrorResponse, NoContent> resendVerification(ResendVerificationRequest request) {
-        return json.post(VERIFY_EMAIL_RESEND_ENDPOINT, request, NoContent.class);
+    public Either<ErrorResponse, CreateEmailVerificationResponse> createEmailVerification(CreateEmailVerificationRequest request) {
+        return json.post(EMAIL_VERIFICATIONS_ENDPOINT, request, CreateEmailVerificationResponse.class);
     }
 
-    public Either<ErrorResponse, NoContent> logout(LogoutAccountRequest request) {
-        return json.post(LOGOUT_ENDPOINT, request, NoContent.class);
+    public Either<ErrorResponse, NoContent> deleteCurrentSession(DeleteCurrentSessionRequest request) {
+        return json.delete(CURRENT_SESSION_ENDPOINT, request, NoContent.class);
     }
 
-    public Either<ErrorResponse, NoContent> forgotPassword(ForgotPasswordRequest request) {
-        return json.post(FORGOT_PASSWORD_ENDPOINT, request, NoContent.class);
+    public Either<ErrorResponse, CreatePasswordResetResponse> createPasswordReset(CreatePasswordResetRequest request) {
+        return json.post(PASSWORD_RESETS_ENDPOINT, request, CreatePasswordResetResponse.class);
     }
 
-    public Either<ErrorResponse, NoContent> resetPassword(ResetPasswordRequest request) {
-        return json.post(RESET_PASSWORD_ENDPOINT, request, NoContent.class);
+    public Either<ErrorResponse, NoContent> completePasswordReset(String resetId, CompletePasswordResetRequest request) {
+        return json.patch(PASSWORD_RESETS_ENDPOINT + "/" + resetId, request, NoContent.class);
     }
 
-    public Either<ErrorResponse, OAuthLoginResponse> oauthLogin(OAuthLoginRequest request) {
-        return json.post(OAUTH_ENDPOINT, request, OAuthLoginResponse.class);
+    public Either<ErrorResponse, CreateOAuthSessionResponse> createOAuthSession(CreateOAuthSessionRequest request) {
+        return json.post(OAUTH_SESSIONS_ENDPOINT, request, CreateOAuthSessionResponse.class);
     }
 }

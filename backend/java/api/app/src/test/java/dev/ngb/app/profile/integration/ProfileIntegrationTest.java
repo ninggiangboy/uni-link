@@ -1,8 +1,8 @@
 package dev.ngb.app.profile.integration;
 
 import dev.ngb.app.identity.application.dto.DeviceInfo;
-import dev.ngb.app.identity.application.usecase.registration.register_account.dto.RegisterAccountRequest;
-import dev.ngb.app.identity.application.usecase.registration.verify_email.dto.VerifyEmailRequest;
+import dev.ngb.app.identity.application.usecase.registration.register_account.dto.CreateAccountRequest;
+import dev.ngb.app.identity.application.usecase.registration.verify_email.dto.CompleteEmailVerificationRequest;
 import dev.ngb.app.identity.support.IdentityAuthApiClient;
 import dev.ngb.app.identity.support.TestOtpSender;
 import dev.ngb.app.profile.application.usecase.create_profile.dto.CreateProfileRequest;
@@ -87,10 +87,12 @@ class ProfileIntegrationTest extends AbstractIntegrationTest {
         var password = "Password1!";
         var device = new DeviceInfo(DeviceType.WEB, "profile-test-browser", "profile-fp-" + System.nanoTime());
 
-        assertThat(identityAuth.registerAccount(new RegisterAccountRequest(email, password)).isRight()).isTrue();
+        var register = identityAuth.createAccount(new CreateAccountRequest(email, password));
+        assertThat(register.isRight()).isTrue();
+        var verificationId = register.get().verificationId();
 
         var otp = testOtpSender.getLastOtpCode().orElseThrow();
-        var verify = identityAuth.verifyEmail(new VerifyEmailRequest(email, otp, device));
+        var verify = identityAuth.completeEmailVerification(verificationId, new CompleteEmailVerificationRequest(otp, device));
         assertThat(verify.isRight()).isTrue();
         return verify.get().accessToken();
     }
