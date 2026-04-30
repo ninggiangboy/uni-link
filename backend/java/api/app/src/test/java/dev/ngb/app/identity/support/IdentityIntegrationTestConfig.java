@@ -1,15 +1,10 @@
 package dev.ngb.app.identity.support;
 
 import dev.ngb.app.identity.application.port.OAuthProviderVerifier;
-import dev.ngb.app.identity.infrastructure.LoggingOtpSender;
 import dev.ngb.domain.identity.model.auth.AuthProvider;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
-import org.springframework.core.Ordered;
 
 @TestConfiguration
 public class IdentityIntegrationTestConfig {
@@ -33,32 +28,5 @@ public class IdentityIntegrationTestConfig {
             }
             throw new IllegalArgumentException("invalid provider token for integration test");
         };
-    }
-
-    /** Remove LoggingOtpSender so the application uses TestOtpSender and OTP is captured. */
-    @Bean
-    public static BeanDefinitionRegistryPostProcessor removeLoggingOtpSender() {
-        return new LoggingOtpSenderRemovingPostProcessor();
-    }
-
-    private static final class LoggingOtpSenderRemovingPostProcessor
-            implements BeanDefinitionRegistryPostProcessor, Ordered {
-
-        @Override
-        public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
-            var names = registry.getBeanDefinitionNames();
-            for (var name : names) {
-                var def = registry.getBeanDefinition(name);
-                if (LoggingOtpSender.class.getName().equals(def.getBeanClassName())) {
-                    registry.removeBeanDefinition(name);
-                    break;
-                }
-            }
-        }
-
-        @Override
-        public int getOrder() {
-            return Ordered.LOWEST_PRECEDENCE;
-        }
     }
 }
