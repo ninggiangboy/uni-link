@@ -8,7 +8,5 @@ import dev.ngb.domain.profile.model.profile.Profile;
  */
 public interface ProfileRepository extends Repository<Profile, Long> {
 
-    boolean existsByAccountId(Long accountId);
-
     boolean existsByUsername(String username);
 }

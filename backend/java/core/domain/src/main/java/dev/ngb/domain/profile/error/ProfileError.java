@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum ProfileError implements DomainError {
 
-    PROFILE_ALREADY_EXISTS("Profile already exists for this account", DomainErrorType.CONFLICT),
+    ACCOUNT_NOT_ACTIVE("Account is not active", DomainErrorType.FORBIDDEN),
     USERNAME_ALREADY_EXISTS("Username is already taken", DomainErrorType.CONFLICT);
 
     private final String message;

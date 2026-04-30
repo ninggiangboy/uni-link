@@ -27,3 +27,5 @@ databaseChangeLog:
       file: db/changelog/migrations/013-create-message-processed-events.sql
   - include:
       file: db/changelog/migrations/014-create-message-event-publications.sql
+  - include:
+      file: db/changelog/migrations/015-add-profile-indexes.sql

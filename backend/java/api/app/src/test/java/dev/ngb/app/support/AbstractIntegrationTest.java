@@ -1,11 +1,17 @@
 package dev.ngb.app.support;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.ngb.app.identity.support.IdentityIntegrationTestConfig;
 import org.jspecify.annotations.NonNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.test.context.ActiveProfiles;
@@ -26,6 +32,9 @@ import java.util.List;
 @Import(IdentityIntegrationTestConfig.class)
 public abstract class AbstractIntegrationTest {
 
+    @Autowired
+    protected ObjectMapper objectMapper;
+
     @Container
     static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>(DockerImageName.parse("postgres:16-alpine"))
             .withDatabaseName("uni-link_test")
@@ -35,7 +44,7 @@ public abstract class AbstractIntegrationTest {
     @LocalServerPort
     private int port;
 
-    private final RestTemplate restTemplate = createRestTemplate();
+    protected final RestTemplate restTemplate = createRestTemplate();
 
     @DynamicPropertySource
     static void configureDatasource(DynamicPropertyRegistry registry) {
@@ -66,16 +75,9 @@ public abstract class AbstractIntegrationTest {
         return headers;
     }
 
-    public <T> ResponseEntity<T> postJson(
-            String path,
-            Object body,
-            Class<T> responseType
-    ) {
-        return restTemplate.exchange(
-                baseUrl() + path,
-                HttpMethod.POST,
-                new HttpEntity<>(body, jsonRequestHeaders()),
-                responseType
-        );
+    public static HttpHeaders bearerHeaders(String accessToken) {
+        HttpHeaders headers = jsonRequestHeaders();
+        headers.setBearerAuth(accessToken);
+        return headers;
     }
 }

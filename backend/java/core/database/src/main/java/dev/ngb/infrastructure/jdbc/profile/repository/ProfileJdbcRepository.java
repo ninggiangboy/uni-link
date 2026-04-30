@@ -22,11 +22,6 @@ public class ProfileJdbcRepository extends JdbcRepository<Profile, ProfileJdbcEn
     }
 
     @Override
-    public boolean existsByAccountId(Long accountId) {
-        return existsByFieldEqual("account_id", accountId);
-    }
-
-    @Override
     public boolean existsByUsername(String username) {
         return existsByFieldEqual("username", username);
     }
