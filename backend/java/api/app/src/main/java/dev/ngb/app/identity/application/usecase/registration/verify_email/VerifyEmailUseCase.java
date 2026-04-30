@@ -13,6 +13,7 @@ import dev.ngb.domain.identity.repository.AccountDeviceRepository;
 import dev.ngb.domain.identity.repository.AccountOtpRepository;
 import dev.ngb.domain.identity.repository.AccountRepository;
 import dev.ngb.domain.identity.service.AuthenticationPolicyService;
+import dev.ngb.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -39,7 +40,7 @@ public class VerifyEmailUseCase implements UseCaseService {
     private final AuthenticationPolicyService authenticationPolicyService;
 
     public AuthTokenResponse execute(VerifyEmailRequest request, String ipAddress) {
-        log.info("Verify email attempt for email={}", request.email() != null ? request.email().replaceAll("(?<=.).(?=.*@)", "*") : "***");
+        log.info("Verify email attempt for email={}", StringUtils.maskEmail(request.email()));
 
         // Unknown email cannot complete this flow.
         Account account = accountRepository.findByEmail(request.email())

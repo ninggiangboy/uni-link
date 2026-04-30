@@ -12,6 +12,7 @@ import dev.ngb.domain.identity.repository.AccountOtpRepository;
 import dev.ngb.domain.identity.repository.AccountRepository;
 import dev.ngb.domain.identity.repository.AccountSessionRepository;
 import dev.ngb.domain.identity.service.PasswordResetDomainService;
+import dev.ngb.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,7 +37,7 @@ public class ResetPasswordUseCase implements UseCaseService {
     private final PasswordResetDomainService passwordResetDomainService;
 
     public void execute(ResetPasswordRequest request) {
-        log.info("Reset password attempt for email={}", request.email() != null ? request.email().replaceAll("(?<=.).(?=.*@)", "*") : "***");
+        log.info("Reset password attempt for email={}", StringUtils.maskEmail(request.email()));
 
         // Unlike forgot-password, invalid email is an error: user is past the enumeration-safe entrypoint.
         Account account = accountRepository.findByEmail(request.email())

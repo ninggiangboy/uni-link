@@ -45,47 +45,49 @@ public final class RequestJsonClient {
     public <R> Either<ErrorResponse, R> post(
             String path,
             Object body,
-            Class<R> rightType
+            Class<R> type
     ) {
-        return post(path, body, null, ErrorResponse.class, rightType, HttpStatusCode::is2xxSuccessful);
+        return post(path, body, null, type, HttpStatusCode::is2xxSuccessful);
     }
 
     public <R> Either<ErrorResponse, R> post(
             String path,
             Object body,
             HttpHeaders headers,
-            Class<R> rightType
+            Class<R> type
     ) {
-        return post(path, body, headers, ErrorResponse.class, rightType, HttpStatusCode::is2xxSuccessful);
+        return post(path, body, headers, type, HttpStatusCode::is2xxSuccessful);
     }
 
-    public <L, R> Either<L, R> post(
+    public <R> Either<ErrorResponse, R> post(
             String path,
             Object body,
             HttpHeaders headers,
-            Class<L> leftType,
-            Class<R> rightType,
+            Class<R> type,
             Predicate<HttpStatusCode> isSuccess
     ) {
         ResponseEntity<String> raw = postJson(path, body, headers);
         HttpStatusCode status = raw.getStatusCode();
         String responseBody = raw.getBody();
         if (isSuccess.test(status)) {
-            if (rightType == NoContent.class) {
+            if (type == NoContent.class) {
                 @SuppressWarnings("unchecked")
                 R empty = (R) NoContent.INSTANCE;
                 return Either.right(empty);
             }
             requireNonBlankBody(path, status, responseBody);
             try {
-                return Either.right(objectMapper.readValue(responseBody, rightType));
+                return Either.right(objectMapper.readValue(responseBody, type));
             } catch (JsonProcessingException e) {
                 throw new IllegalStateException("Failed to deserialize success body for " + path, e);
             }
         }
-        requireNonBlankBody(path, status, responseBody);
+        if (responseBody == null || responseBody.isBlank()) {
+            ErrorResponse fallback = ErrorResponse.of("HTTP_" + status.value(), "Request failed with status " + status.value());
+            return Either.left(fallback);
+        }
         try {
-            return Either.left(objectMapper.readValue(responseBody, leftType));
+            return Either.left(objectMapper.readValue(responseBody, ErrorResponse.class));
         } catch (JsonProcessingException e) {
             throw new IllegalStateException("Failed to deserialize error body for " + path, e);
         }

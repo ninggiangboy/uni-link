@@ -3,7 +3,6 @@ package dev.ngb.app.profile.support;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.ngb.app.profile.application.usecase.create_profile.dto.CreateProfileRequest;
 import dev.ngb.app.profile.application.usecase.create_profile.dto.CreateProfileResponse;
-import dev.ngb.app.support.AbstractIntegrationTest;
 import dev.ngb.app.support.RequestJsonClient;
 import dev.ngb.web.ErrorResponse;
 import io.vavr.control.Either;

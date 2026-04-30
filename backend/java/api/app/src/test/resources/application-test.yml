@@ -26,6 +26,8 @@ spring:
   kafka:
     consumer:
       group-id: test-group
+    listener:
+      auto-startup: false
 
 management:
   otlp:

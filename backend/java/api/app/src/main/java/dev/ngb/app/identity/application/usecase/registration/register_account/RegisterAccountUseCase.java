@@ -9,6 +9,7 @@ import dev.ngb.domain.identity.error.AccountError;
 import dev.ngb.domain.identity.model.auth.Account;
 import dev.ngb.domain.identity.model.otp.OtpPurpose;
 import dev.ngb.domain.identity.repository.AccountRepository;
+import dev.ngb.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,7 +31,7 @@ public class RegisterAccountUseCase implements UseCaseService {
     private final AccountOtpDeliveryService accountOtpDeliveryService;
 
     public RegisterAccountResponse execute(RegisterAccountRequest request) {
-        log.info("Register account attempt for email={}", request.email() != null ? request.email().replaceAll("(?<=.).(?=.*@)", "*") : "***");
+        log.info("Register account attempt for email={}", StringUtils.maskEmail(request.email()));
 
         // Fast path for common duplicates; save-time catch still handles race conditions.
         if (accountRepository.existsByEmail(request.email())) {

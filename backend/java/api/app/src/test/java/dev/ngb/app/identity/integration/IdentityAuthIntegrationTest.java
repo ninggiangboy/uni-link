@@ -16,6 +16,7 @@ import dev.ngb.app.identity.application.usecase.registration.verify_email.dto.Ve
 import dev.ngb.app.identity.application.usecase.session.logout_account.dto.LogoutAccountRequest;
 import dev.ngb.app.identity.application.usecase.session.refresh_token.dto.RefreshTokenRequest;
 import dev.ngb.app.identity.support.IdentityAuthTestClient;
+import dev.ngb.app.identity.support.IdentityIntegrationTestConfig;
 import dev.ngb.app.identity.support.TestOtpSender;
 import dev.ngb.app.support.AbstractIntegrationTest;
 import dev.ngb.app.support.TestUtils;
@@ -28,6 +29,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Import;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

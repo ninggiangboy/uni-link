@@ -7,6 +7,7 @@ import dev.ngb.domain.identity.error.AccountError;
 import dev.ngb.domain.identity.model.auth.Account;
 import dev.ngb.domain.identity.model.otp.OtpPurpose;
 import dev.ngb.domain.identity.repository.AccountRepository;
+import dev.ngb.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,7 +27,7 @@ public class ResendVerificationUseCase implements UseCaseService {
     private final AccountOtpDeliveryService accountOtpDeliveryService;
 
     public void execute(ResendVerificationRequest request) {
-        log.info("Resend verification attempt for email={}", request.email() != null ? request.email().replaceAll("(?<=.).(?=.*@)", "*") : "***");
+        log.info("Resend verification attempt for email={}", StringUtils.maskEmail(request.email()));
 
         // Same contract as verify: unknown mailbox is an error, not a silent success.
         Account account = accountRepository.findByEmail(request.email())
