@@ -25,7 +25,7 @@ import org.springframework.web.client.RestTemplate;
  * Composable HTTP client for {@code /api/auth/*}. {@code Left} = {@link ErrorResponse};
  * {@code Right} = success DTO or {@link NoContent} for empty bodies.
  */
-public final class IdentityAuthTestClient {
+public final class IdentityAuthApiClient {
 
     private static final String AUTH_ENDPOINT = "/api/auth";
     private static final String REGISTER_ENDPOINT = AUTH_ENDPOINT + "/register";
@@ -41,7 +41,7 @@ public final class IdentityAuthTestClient {
 
     private final RequestJsonClient json;
 
-    public IdentityAuthTestClient(ObjectMapper objectMapper, RestTemplate restTemplate, String baseUrl) {
+    public IdentityAuthApiClient(ObjectMapper objectMapper, RestTemplate restTemplate, String baseUrl) {
         this.json = new RequestJsonClient(objectMapper, baseUrl, restTemplate);
     }
 

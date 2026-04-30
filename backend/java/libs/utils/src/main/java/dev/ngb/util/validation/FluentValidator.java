@@ -124,6 +124,11 @@ public final class FluentValidator<T> {
                     "format is invalid");
         }
 
+        public RuleBuilder<T, V> matches(Pattern pattern) {
+            return must(value -> value instanceof CharSequence sequence && pattern.matcher(sequence).matches(),
+                    "format is invalid");
+        }
+
         public RuleBuilder<T, V> email() {
             var emailPattern = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$");
             return must(value -> value instanceof CharSequence sequence

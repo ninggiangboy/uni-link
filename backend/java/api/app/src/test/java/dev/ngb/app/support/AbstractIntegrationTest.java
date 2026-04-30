@@ -55,7 +55,7 @@ public abstract class AbstractIntegrationTest {
     }
 
     public static RestTemplate createRestTemplate() {
-        RestTemplate template = new RestTemplate(new JdkClientHttpRequestFactory());
+        var template = new RestTemplate(new JdkClientHttpRequestFactory());
         template.setErrorHandler(new DefaultResponseErrorHandler() {
             @Override
             public boolean hasError(@NonNull ClientHttpResponse response) {
@@ -66,14 +66,14 @@ public abstract class AbstractIntegrationTest {
     }
 
     public static HttpHeaders jsonRequestHeaders() {
-        HttpHeaders headers = new HttpHeaders();
+        var headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
         return headers;
     }
 
     public static HttpHeaders bearerHeaders(String accessToken) {
-        HttpHeaders headers = jsonRequestHeaders();
+        var headers = jsonRequestHeaders();
         headers.setBearerAuth(accessToken);
         return headers;
     }

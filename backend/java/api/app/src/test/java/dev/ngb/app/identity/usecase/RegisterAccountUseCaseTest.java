@@ -51,7 +51,7 @@ class RegisterAccountUseCaseTest {
     void executeWhenEmailAlreadyExistsThrowsConflict() {
         when(accountRepository.existsByEmail(IdentityUseCaseTestFixtures.EMAIL)).thenReturn(true);
 
-        DomainException ex = assertThrows(DomainException.class, () -> useCase.execute(request));
+        var ex = assertThrows(DomainException.class, () -> useCase.execute(request));
 
         assertThat(ex.getError()).isEqualTo(AccountError.EMAIL_ALREADY_EXISTS);
         verifyNoInteractions(passwordEncoder, accountOtpDeliveryService);
@@ -64,7 +64,7 @@ class RegisterAccountUseCaseTest {
         when(passwordEncoder.encode("plain-secret")).thenReturn("hashed-secret");
         when(accountRepository.save(any(Account.class))).thenThrow(AccountError.EMAIL_ALREADY_EXISTS.exception());
 
-        DomainException ex = assertThrows(DomainException.class, () -> useCase.execute(request));
+        var ex = assertThrows(DomainException.class, () -> useCase.execute(request));
 
         assertThat(ex.getError()).isEqualTo(AccountError.EMAIL_ALREADY_EXISTS);
         verifyNoInteractions(accountOtpDeliveryService);
@@ -99,7 +99,7 @@ class RegisterAccountUseCaseTest {
         var response = useCase.execute(request);
 
         assertThat(response.accountUuid()).isNotBlank();
-        ArgumentCaptor<Account> saved = ArgumentCaptor.forClass(Account.class);
+        var saved = ArgumentCaptor.forClass(Account.class);
         verify(accountRepository).save(saved.capture());
         assertThat(saved.getValue().getEmail()).isEqualTo(IdentityUseCaseTestFixtures.EMAIL);
         assertThat(saved.getValue().getPasswordHash()).isEqualTo("hashed-secret");

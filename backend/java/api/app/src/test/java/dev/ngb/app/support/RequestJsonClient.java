@@ -33,7 +33,7 @@ public final class RequestJsonClient {
     }
 
     public ResponseEntity<String> postJson(String path, Object body, HttpHeaders headers) {
-        HttpHeaders h = headers != null ? headers : defaultJsonHeaders();
+        var h = headers != null ? headers : defaultJsonHeaders();
         return restTemplate.exchange(
                 baseUrl + path,
                 HttpMethod.POST,
@@ -66,9 +66,9 @@ public final class RequestJsonClient {
             Class<R> type,
             Predicate<HttpStatusCode> isSuccess
     ) {
-        ResponseEntity<String> raw = postJson(path, body, headers);
-        HttpStatusCode status = raw.getStatusCode();
-        String responseBody = raw.getBody();
+        var raw = postJson(path, body, headers);
+        var status = raw.getStatusCode();
+        var responseBody = raw.getBody();
         if (isSuccess.test(status)) {
             if (type == NoContent.class) {
                 @SuppressWarnings("unchecked")
@@ -83,7 +83,7 @@ public final class RequestJsonClient {
             }
         }
         if (responseBody == null || responseBody.isBlank()) {
-            ErrorResponse fallback = ErrorResponse.of("HTTP_" + status.value(), "Request failed with status " + status.value());
+            var fallback = ErrorResponse.of("HTTP_" + status.value(), "Request failed with status " + status.value());
             return Either.left(fallback);
         }
         try {
@@ -94,7 +94,7 @@ public final class RequestJsonClient {
     }
 
     private static HttpHeaders defaultJsonHeaders() {
-        HttpHeaders headers = new HttpHeaders();
+        var headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
         return headers;

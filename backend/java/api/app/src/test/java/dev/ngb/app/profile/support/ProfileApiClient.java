@@ -12,13 +12,13 @@ import org.springframework.web.client.RestTemplate;
 /**
  * Composable HTTP client for {@code /api/profiles}. {@code Left} = {@link ErrorResponse}.
  */
-public final class ProfileTestClient {
+public final class ProfileApiClient {
 
     private static final String PROFILES_ENDPOINT = "/api/profiles";
 
     private final RequestJsonClient json;
 
-    public ProfileTestClient(ObjectMapper objectMapper, RestTemplate restTemplate, String baseUrl) {
+    public ProfileApiClient(ObjectMapper objectMapper, RestTemplate restTemplate, String baseUrl) {
         this.json = new RequestJsonClient(objectMapper, baseUrl, restTemplate);
     }
 

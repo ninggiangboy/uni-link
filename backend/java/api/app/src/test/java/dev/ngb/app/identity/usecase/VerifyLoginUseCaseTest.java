@@ -62,7 +62,7 @@ class VerifyLoginUseCaseTest {
         var req = new VerifyLoginRequest("bad", "123456");
         when(tokenProvider.parseVerificationToken("bad")).thenThrow(new IllegalArgumentException("bad sig"));
 
-        DomainException ex = assertThrows(DomainException.class, () -> useCase.execute(req, IdentityUseCaseTestFixtures.IP));
+        var ex = assertThrows(DomainException.class, () -> useCase.execute(req, IdentityUseCaseTestFixtures.IP));
 
         assertThat(ex.getError()).isEqualTo(AccountError.INVALID_VERIFICATION_TOKEN);
     }
@@ -74,7 +74,7 @@ class VerifyLoginUseCaseTest {
         when(tokenProvider.parseVerificationToken("tok")).thenReturn(new TokenProvider.VerificationClaims(1L, 50L));
         when(accountRepository.findById(1L)).thenReturn(Optional.empty());
 
-        DomainException ex = assertThrows(DomainException.class, () -> useCase.execute(req, IdentityUseCaseTestFixtures.IP));
+        var ex = assertThrows(DomainException.class, () -> useCase.execute(req, IdentityUseCaseTestFixtures.IP));
 
         assertThat(ex.getError()).isEqualTo(AccountError.ACCOUNT_NOT_FOUND);
     }
@@ -88,7 +88,7 @@ class VerifyLoginUseCaseTest {
         when(accountRepository.findById(1L)).thenReturn(Optional.of(account));
         when(accountOtpRepository.findLatestActiveByAccountIdAndPurpose(1L, OtpPurpose.LOGIN)).thenReturn(Optional.empty());
 
-        DomainException ex = assertThrows(DomainException.class, () -> useCase.execute(req, IdentityUseCaseTestFixtures.IP));
+        var ex = assertThrows(DomainException.class, () -> useCase.execute(req, IdentityUseCaseTestFixtures.IP));
 
         assertThat(ex.getError()).isEqualTo(AccountError.INVALID_OTP);
     }
@@ -97,7 +97,7 @@ class VerifyLoginUseCaseTest {
     @DisplayName("Device row not for account → INVALID_VERIFICATION_TOKEN")
     void executeWhenDeviceWrongAccountThrowsInvalidVerificationToken() {
         var account = IdentityUseCaseTestFixtures.activeAccount(1L);
-        AccountOtp otp = AccountOtp.create(1L, "123456", OtpPurpose.LOGIN, OtpChannel.EMAIL);
+        var otp = AccountOtp.create(1L, "123456", OtpPurpose.LOGIN, OtpChannel.EMAIL);
         var device = IdentityUseCaseTestFixtures.deviceRow(50L, 999L, "fp", false);
         var req = new VerifyLoginRequest("tok", "123456");
 
@@ -106,7 +106,7 @@ class VerifyLoginUseCaseTest {
         when(accountOtpRepository.findLatestActiveByAccountIdAndPurpose(1L, OtpPurpose.LOGIN)).thenReturn(Optional.of(otp));
         when(accountDeviceRepository.findById(50L)).thenReturn(Optional.of(device));
 
-        DomainException ex = assertThrows(DomainException.class, () -> useCase.execute(req, IdentityUseCaseTestFixtures.IP));
+        var ex = assertThrows(DomainException.class, () -> useCase.execute(req, IdentityUseCaseTestFixtures.IP));
 
         assertThat(ex.getError()).isEqualTo(AccountError.INVALID_VERIFICATION_TOKEN);
     }
@@ -115,7 +115,7 @@ class VerifyLoginUseCaseTest {
     @DisplayName("Valid OTP → tokens + device marked trusted")
     void executeWhenValidReturnsTokensAndMarksTrustedDevice() {
         var account = IdentityUseCaseTestFixtures.activeAccount(1L);
-        AccountOtp otp = AccountOtp.create(1L, "123456", OtpPurpose.LOGIN, OtpChannel.EMAIL);
+        var otp = AccountOtp.create(1L, "123456", OtpPurpose.LOGIN, OtpChannel.EMAIL);
         var device = IdentityUseCaseTestFixtures.deviceRow(50L, 1L, "fp", false);
         var req = new VerifyLoginRequest("tok", "123456");
         var tokens = new AuthTokenResponse("a", "r", 3600, account.getUuid());
@@ -128,7 +128,7 @@ class VerifyLoginUseCaseTest {
         when(accountSessionTokenService.createSessionAndIssueTokens(eq(account), eq(50L), eq(IdentityUseCaseTestFixtures.IP)))
                 .thenReturn(tokens);
 
-        AuthTokenResponse result = useCase.execute(req, IdentityUseCaseTestFixtures.IP);
+        var result = useCase.execute(req, IdentityUseCaseTestFixtures.IP);
 
         assertThat(result).isSameAs(tokens);
         assertThat(device.getIsTrusted()).isTrue();

@@ -9,7 +9,6 @@ import dev.ngb.domain.identity.error.AccountError;
 import dev.ngb.domain.identity.model.otp.AccountOtp;
 import dev.ngb.domain.identity.model.otp.OtpChannel;
 import dev.ngb.domain.identity.model.otp.OtpPurpose;
-import dev.ngb.domain.identity.model.session.AccountSession;
 import dev.ngb.domain.identity.repository.AccountOtpRepository;
 import dev.ngb.domain.identity.repository.AccountRepository;
 import dev.ngb.domain.identity.repository.AccountSessionRepository;
@@ -57,7 +56,7 @@ class ResetPasswordUseCaseTest {
     void executeWhenAccountMissingThrows() {
         when(accountRepository.findByEmail(IdentityUseCaseTestFixtures.EMAIL)).thenReturn(Optional.empty());
 
-        DomainException ex = assertThrows(DomainException.class, () -> useCase.execute(request));
+        var ex = assertThrows(DomainException.class, () -> useCase.execute(request));
 
         assertThat(ex.getError()).isEqualTo(AccountError.INVALID_OTP);
     }
@@ -69,7 +68,7 @@ class ResetPasswordUseCaseTest {
         when(accountRepository.findByEmail(IdentityUseCaseTestFixtures.EMAIL)).thenReturn(Optional.of(account));
         when(accountOtpRepository.findLatestActiveByAccountIdAndPurpose(3L, OtpPurpose.PASSWORD_RESET)).thenReturn(Optional.empty());
 
-        DomainException ex = assertThrows(DomainException.class, () -> useCase.execute(request));
+        var ex = assertThrows(DomainException.class, () -> useCase.execute(request));
 
         assertThat(ex.getError()).isEqualTo(AccountError.INVALID_OTP);
     }
@@ -78,9 +77,9 @@ class ResetPasswordUseCaseTest {
     @DisplayName("Valid OTP → new password + revoke sessions")
     void executeWhenOtpValidUpdatesPasswordAndRevokesSessions() {
         var account = IdentityUseCaseTestFixtures.activeAccount(3L);
-        AccountOtp otp = AccountOtp.create(3L, "123456", OtpPurpose.PASSWORD_RESET, OtpChannel.EMAIL);
-        AccountSession s1 = IdentityUseCaseTestFixtures.validSession(1L, 3L, 10L, "h1");
-        AccountSession s2 = IdentityUseCaseTestFixtures.validSession(2L, 3L, 11L, "h2");
+        var otp = AccountOtp.create(3L, "123456", OtpPurpose.PASSWORD_RESET, OtpChannel.EMAIL);
+        var s1 = IdentityUseCaseTestFixtures.validSession(1L, 3L, 10L, "h1");
+        var s2 = IdentityUseCaseTestFixtures.validSession(2L, 3L, 11L, "h2");
 
         when(accountRepository.findByEmail(IdentityUseCaseTestFixtures.EMAIL)).thenReturn(Optional.of(account));
         when(accountOtpRepository.findLatestActiveByAccountIdAndPurpose(3L, OtpPurpose.PASSWORD_RESET)).thenReturn(Optional.of(otp));

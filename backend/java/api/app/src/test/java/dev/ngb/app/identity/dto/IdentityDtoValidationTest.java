@@ -42,7 +42,7 @@ class IdentityDtoValidationTest {
     }
 
     private void assertFieldError(Executable executable, String expectedField, String expectedMessage) {
-        ValidationException ex = assertThrows(ValidationException.class, executable);
+        var ex = assertThrows(ValidationException.class, executable);
         assertThat(ex.errors()).anySatisfy(e -> {
             assertThat(e.field()).isEqualTo(expectedField);
             assertThat(e.message()).isEqualTo(expectedMessage);

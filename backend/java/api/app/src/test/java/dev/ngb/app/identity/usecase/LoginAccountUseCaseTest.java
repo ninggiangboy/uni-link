@@ -68,7 +68,7 @@ class LoginAccountUseCaseTest {
     void executeWhenAccountMissingThrowsInvalidCredentials() {
         when(accountRepository.findByEmail(IdentityUseCaseTestFixtures.EMAIL)).thenReturn(Optional.empty());
 
-        DomainException ex = assertThrows(DomainException.class, () -> useCase.execute(request(), IdentityUseCaseTestFixtures.IP));
+        var ex = assertThrows(DomainException.class, () -> useCase.execute(request(), IdentityUseCaseTestFixtures.IP));
 
         assertThat(ex.getError()).isEqualTo(AccountError.INVALID_CREDENTIALS);
     }
@@ -80,7 +80,7 @@ class LoginAccountUseCaseTest {
         when(accountRepository.findByEmail(IdentityUseCaseTestFixtures.EMAIL)).thenReturn(Optional.of(account));
         when(passwordEncoder.matches("password", "stored-hash")).thenReturn(false);
 
-        DomainException ex = assertThrows(DomainException.class, () -> useCase.execute(request(), IdentityUseCaseTestFixtures.IP));
+        var ex = assertThrows(DomainException.class, () -> useCase.execute(request(), IdentityUseCaseTestFixtures.IP));
 
         assertThat(ex.getError()).isEqualTo(AccountError.INVALID_CREDENTIALS);
         verify(accountLoginHistoryRepository).save(any(AccountLoginHistory.class));
@@ -93,7 +93,7 @@ class LoginAccountUseCaseTest {
         when(accountRepository.findByEmail(IdentityUseCaseTestFixtures.EMAIL)).thenReturn(Optional.of(account));
         when(passwordEncoder.matches("password", "hash")).thenReturn(true);
 
-        DomainException ex = assertThrows(DomainException.class, () -> useCase.execute(request(), IdentityUseCaseTestFixtures.IP));
+        var ex = assertThrows(DomainException.class, () -> useCase.execute(request(), IdentityUseCaseTestFixtures.IP));
 
         assertThat(ex.getError()).isEqualTo(AccountError.ACCOUNT_PENDING);
     }
@@ -105,7 +105,7 @@ class LoginAccountUseCaseTest {
         when(accountRepository.findByEmail(IdentityUseCaseTestFixtures.EMAIL)).thenReturn(Optional.of(account));
         when(passwordEncoder.matches("password", "stored-hash")).thenReturn(true);
 
-        DomainException ex = assertThrows(DomainException.class, () -> useCase.execute(request(), IdentityUseCaseTestFixtures.IP));
+        var ex = assertThrows(DomainException.class, () -> useCase.execute(request(), IdentityUseCaseTestFixtures.IP));
 
         assertThat(ex.getError()).isEqualTo(AccountError.ACCOUNT_SUSPENDED);
     }

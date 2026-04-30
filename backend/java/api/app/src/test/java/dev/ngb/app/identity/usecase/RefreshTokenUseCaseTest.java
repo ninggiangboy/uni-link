@@ -51,7 +51,7 @@ class RefreshTokenUseCaseTest {
         when(tokenProvider.hashToken("raw-refresh")).thenReturn("h1");
         when(accountSessionRepository.findByTokenHash("h1")).thenReturn(Optional.empty());
 
-        DomainException ex = assertThrows(DomainException.class, () -> useCase.execute(request));
+        var ex = assertThrows(DomainException.class, () -> useCase.execute(request));
 
         assertThat(ex.getError()).isEqualTo(AccountError.INVALID_REFRESH_TOKEN);
     }
@@ -76,7 +76,7 @@ class RefreshTokenUseCaseTest {
         when(tokenProvider.hashToken("raw-refresh")).thenReturn("h1");
         when(accountSessionRepository.findByTokenHash("h1")).thenReturn(Optional.of(session));
 
-        DomainException ex = assertThrows(DomainException.class, () -> useCase.execute(request));
+        var ex = assertThrows(DomainException.class, () -> useCase.execute(request));
 
         assertThat(ex.getError()).isEqualTo(AccountError.INVALID_REFRESH_TOKEN);
     }
@@ -89,7 +89,7 @@ class RefreshTokenUseCaseTest {
         when(accountSessionRepository.findByTokenHash("h1")).thenReturn(Optional.of(session));
         when(accountRepository.findById(10L)).thenReturn(Optional.empty());
 
-        DomainException ex = assertThrows(DomainException.class, () -> useCase.execute(request));
+        var ex = assertThrows(DomainException.class, () -> useCase.execute(request));
 
         assertThat(ex.getError()).isEqualTo(AccountError.ACCOUNT_NOT_FOUND);
     }
@@ -103,7 +103,7 @@ class RefreshTokenUseCaseTest {
         when(accountSessionRepository.findByTokenHash("h1")).thenReturn(Optional.of(session));
         when(accountRepository.findById(10L)).thenReturn(Optional.of(pending));
 
-        DomainException ex = assertThrows(DomainException.class, () -> useCase.execute(request));
+        var ex = assertThrows(DomainException.class, () -> useCase.execute(request));
 
         assertThat(ex.getError()).isEqualTo(AccountError.ACCOUNT_NOT_ACTIVE);
     }

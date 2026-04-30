@@ -41,7 +41,7 @@ class ResendVerificationUseCaseTest {
     void executeWhenAccountMissingThrowsNotFound() {
         when(accountRepository.findByEmail(IdentityUseCaseTestFixtures.EMAIL)).thenReturn(Optional.empty());
 
-        DomainException ex = assertThrows(DomainException.class, () -> useCase.execute(request));
+        var ex = assertThrows(DomainException.class, () -> useCase.execute(request));
 
         assertThat(ex.getError()).isEqualTo(AccountError.ACCOUNT_NOT_FOUND);
         verifyNoInteractions(accountOtpDeliveryService);
@@ -53,7 +53,7 @@ class ResendVerificationUseCaseTest {
         var active = IdentityUseCaseTestFixtures.activeAccount(1L);
         when(accountRepository.findByEmail(IdentityUseCaseTestFixtures.EMAIL)).thenReturn(Optional.of(active));
 
-        DomainException ex = assertThrows(DomainException.class, () -> useCase.execute(request));
+        var ex = assertThrows(DomainException.class, () -> useCase.execute(request));
 
         assertThat(ex.getError()).isEqualTo(AccountError.EMAIL_ALREADY_VERIFIED);
         verifyNoInteractions(accountOtpDeliveryService);

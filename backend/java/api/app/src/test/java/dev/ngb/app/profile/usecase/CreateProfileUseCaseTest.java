@@ -2,7 +2,6 @@ package dev.ngb.app.profile.usecase;
 
 import dev.ngb.app.profile.application.usecase.create_profile.CreateProfileUseCase;
 import dev.ngb.app.profile.application.usecase.create_profile.dto.CreateProfileRequest;
-import dev.ngb.app.profile.application.usecase.create_profile.dto.CreateProfileResponse;
 import dev.ngb.app.shared.public_api.IdentityPublicApi;
 import dev.ngb.domain.DomainException;
 import dev.ngb.domain.profile.error.ProfileError;
@@ -40,11 +39,11 @@ class CreateProfileUseCaseTest {
     @Test
     @DisplayName("Inactive account -> ACCOUNT_NOT_ACTIVE")
     void executeWhenAccountNotActiveThrowsForbidden() {
-        Long accountId = 10L;
-        CreateProfileRequest request = new CreateProfileRequest("user.one", "User One", "bio", ProfileVisibility.PUBLIC);
+        var accountId = 10L;
+        var request = new CreateProfileRequest("user.one", "User One", "bio", ProfileVisibility.PUBLIC);
         when(identityPublicApi.isAccountActive(accountId)).thenReturn(false);
 
-        DomainException ex = assertThrows(DomainException.class, () -> useCase.execute(accountId, request));
+        var ex = assertThrows(DomainException.class, () -> useCase.execute(accountId, request));
 
         assertThat(ex.getError()).isEqualTo(ProfileError.ACCOUNT_NOT_ACTIVE);
         verifyNoInteractions(profileRepository);
@@ -53,12 +52,12 @@ class CreateProfileUseCaseTest {
     @Test
     @DisplayName("Duplicate username -> USERNAME_ALREADY_EXISTS")
     void executeWhenUsernameExistsThrowsConflict() {
-        Long accountId = 11L;
-        CreateProfileRequest request = new CreateProfileRequest("user.one", "User One", "bio", ProfileVisibility.PUBLIC);
+        var accountId = 11L;
+        var request = new CreateProfileRequest("user.one", "User One", "bio", ProfileVisibility.PUBLIC);
         when(identityPublicApi.isAccountActive(accountId)).thenReturn(true);
         when(profileRepository.existsByUsername("user.one")).thenReturn(true);
 
-        DomainException ex = assertThrows(DomainException.class, () -> useCase.execute(accountId, request));
+        var ex = assertThrows(DomainException.class, () -> useCase.execute(accountId, request));
 
         assertThat(ex.getError()).isEqualTo(ProfileError.USERNAME_ALREADY_EXISTS);
         verify(profileRepository, never()).save(any(Profile.class));
@@ -67,8 +66,8 @@ class CreateProfileUseCaseTest {
     @Test
     @DisplayName("Active account + available username -> profile created")
     void executeWhenValidCreatesProfile() {
-        Long accountId = 12L;
-        CreateProfileRequest request = new CreateProfileRequest("user.one", "User One", "bio", ProfileVisibility.PRIVATE);
+        var accountId = 12L;
+        var request = new CreateProfileRequest("user.one", "User One", "bio", ProfileVisibility.PRIVATE);
         when(identityPublicApi.isAccountActive(accountId)).thenReturn(true);
         when(profileRepository.existsByUsername("user.one")).thenReturn(false);
         when(profileRepository.save(any(Profile.class))).thenAnswer(invocation -> {
@@ -94,14 +93,14 @@ class CreateProfileUseCaseTest {
             );
         });
 
-        CreateProfileResponse response = useCase.execute(accountId, request);
+        var response = useCase.execute(accountId, request);
 
         assertThat(response.profileUuid()).isEqualTo("profile-uuid-200");
         assertThat(response.username()).isEqualTo("user.one");
         assertThat(response.displayName()).isEqualTo("User One");
         assertThat(response.visibility()).isEqualTo(ProfileVisibility.PRIVATE);
 
-        ArgumentCaptor<Profile> savedCaptor = ArgumentCaptor.forClass(Profile.class);
+        var savedCaptor = ArgumentCaptor.forClass(Profile.class);
         verify(profileRepository).save(savedCaptor.capture());
         assertThat(savedCaptor.getValue().getAccountId()).isEqualTo(accountId);
     }
@@ -109,16 +108,16 @@ class CreateProfileUseCaseTest {
     @Test
     @DisplayName("Same active account can create multiple profiles with different usernames")
     void executeWhenSameAccountCreatesDifferentUsernamesSucceeds() {
-        Long accountId = 13L;
-        CreateProfileRequest requestOne = new CreateProfileRequest("user.one", "User One", null, ProfileVisibility.PUBLIC);
-        CreateProfileRequest requestTwo = new CreateProfileRequest("user.two", "User Two", null, ProfileVisibility.PUBLIC);
+        var accountId = 13L;
+        var requestOne = new CreateProfileRequest("user.one", "User One", null, ProfileVisibility.PUBLIC);
+        var requestTwo = new CreateProfileRequest("user.two", "User Two", null, ProfileVisibility.PUBLIC);
         when(identityPublicApi.isAccountActive(accountId)).thenReturn(true);
         when(profileRepository.existsByUsername("user.one")).thenReturn(false);
         when(profileRepository.existsByUsername("user.two")).thenReturn(false);
         when(profileRepository.save(any(Profile.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        CreateProfileResponse first = useCase.execute(accountId, requestOne);
-        CreateProfileResponse second = useCase.execute(accountId, requestTwo);
+        var first = useCase.execute(accountId, requestOne);
+        var second = useCase.execute(accountId, requestTwo);
 
         assertThat(first.username()).isEqualTo("user.one");
         assertThat(second.username()).isEqualTo("user.two");

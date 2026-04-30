@@ -3,16 +3,13 @@ package dev.ngb.app.profile.integration;
 import dev.ngb.app.identity.application.dto.DeviceInfo;
 import dev.ngb.app.identity.application.usecase.registration.register_account.dto.RegisterAccountRequest;
 import dev.ngb.app.identity.application.usecase.registration.verify_email.dto.VerifyEmailRequest;
-import dev.ngb.app.identity.support.IdentityAuthTestClient;
+import dev.ngb.app.identity.support.IdentityAuthApiClient;
 import dev.ngb.app.identity.support.TestOtpSender;
 import dev.ngb.app.profile.application.usecase.create_profile.dto.CreateProfileRequest;
-import dev.ngb.app.profile.application.usecase.create_profile.dto.CreateProfileResponse;
-import dev.ngb.app.profile.support.ProfileTestClient;
+import dev.ngb.app.profile.support.ProfileApiClient;
 import dev.ngb.app.support.AbstractIntegrationTest;
 import dev.ngb.app.support.TestUtils;
 import dev.ngb.domain.identity.model.auth.DeviceType;
-import dev.ngb.web.ErrorResponse;
-import io.vavr.control.Either;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,20 +23,20 @@ class ProfileIntegrationTest extends AbstractIntegrationTest {
     @Autowired
     private TestOtpSender testOtpSender;
 
-    private IdentityAuthTestClient identityAuth;
-    private ProfileTestClient profiles;
+    private IdentityAuthApiClient identityAuth;
+    private ProfileApiClient profiles;
 
     @BeforeEach
     void setUp() {
         testOtpSender.clear();
-        identityAuth = new IdentityAuthTestClient(objectMapper, restTemplate, baseUrl());
-        profiles = new ProfileTestClient(objectMapper, restTemplate, baseUrl());
+        identityAuth = new IdentityAuthApiClient(objectMapper, restTemplate, baseUrl());
+        profiles = new ProfileApiClient(objectMapper, restTemplate, baseUrl());
     }
 
     @Test
     @DisplayName("POST /api/profiles without token -> 401")
     void createProfileWithoutAuthReturnsUnauthorized() {
-        Either<ErrorResponse, CreateProfileResponse> result = profiles.createProfile(
+        var result = profiles.createProfile(
                 new CreateProfileRequest("guest.user", "Guest User", null, null)
         );
         assertThat(result.isLeft()).isTrue();
@@ -48,17 +45,17 @@ class ProfileIntegrationTest extends AbstractIntegrationTest {
     @Test
     @DisplayName("Active account can create multiple profiles")
     void createProfileWithActiveAccountAllowsMultipleProfiles() {
-        String accessToken = registerAndVerifyToGetAccessToken();
+        var accessToken = registerAndVerifyToGetAccessToken();
         var headers = bearerHeaders(accessToken);
 
-        Either<ErrorResponse, CreateProfileResponse> first = profiles.createProfile(
+        var first = profiles.createProfile(
                 new CreateProfileRequest("multi.user.one", "Multi User One", "bio one", null),
                 headers
         );
         assertThat(first.isRight()).isTrue();
         assertThat(first.get().username()).isEqualTo("multi.user.one");
 
-        Either<ErrorResponse, CreateProfileResponse> second = profiles.createProfile(
+        var second = profiles.createProfile(
                 new CreateProfileRequest("multi.user.two", "Multi User Two", "bio two", null),
                 headers
         );
@@ -69,7 +66,7 @@ class ProfileIntegrationTest extends AbstractIntegrationTest {
     @Test
     @DisplayName("Duplicate username -> 409 USERNAME_ALREADY_EXISTS")
     void createProfileDuplicateUsernameReturnsConflict() {
-        String accessToken = registerAndVerifyToGetAccessToken();
+        var accessToken = registerAndVerifyToGetAccessToken();
         var headers = bearerHeaders(accessToken);
 
         assertThat(profiles.createProfile(
@@ -77,7 +74,7 @@ class ProfileIntegrationTest extends AbstractIntegrationTest {
                 headers
         ).isRight()).isTrue();
 
-        Either<ErrorResponse, CreateProfileResponse> duplicate = profiles.createProfile(
+        var duplicate = profiles.createProfile(
                 new CreateProfileRequest("taken.profile", "Another Display Name", null, null),
                 headers
         );
@@ -86,13 +83,13 @@ class ProfileIntegrationTest extends AbstractIntegrationTest {
     }
 
     private String registerAndVerifyToGetAccessToken() {
-        String email = TestUtils.getUniqueEmail();
-        String password = "Password1!";
-        DeviceInfo device = new DeviceInfo(DeviceType.WEB, "profile-test-browser", "profile-fp-" + System.nanoTime());
+        var email = TestUtils.getUniqueEmail();
+        var password = "Password1!";
+        var device = new DeviceInfo(DeviceType.WEB, "profile-test-browser", "profile-fp-" + System.nanoTime());
 
         assertThat(identityAuth.registerAccount(new RegisterAccountRequest(email, password)).isRight()).isTrue();
 
-        String otp = testOtpSender.getLastOtpCode().orElseThrow();
+        var otp = testOtpSender.getLastOtpCode().orElseThrow();
         var verify = identityAuth.verifyEmail(new VerifyEmailRequest(email, otp, device));
         assertThat(verify.isRight()).isTrue();
         return verify.get().accessToken();

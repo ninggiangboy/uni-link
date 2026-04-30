@@ -56,7 +56,7 @@ class VerifyEmailUseCaseTest {
         var req = new VerifyEmailRequest(IdentityUseCaseTestFixtures.EMAIL, "123456", IdentityUseCaseTestFixtures.device());
         when(accountRepository.findByEmail(IdentityUseCaseTestFixtures.EMAIL)).thenReturn(Optional.empty());
 
-        DomainException ex = assertThrows(DomainException.class, () -> useCase.execute(req, IdentityUseCaseTestFixtures.IP));
+        var ex = assertThrows(DomainException.class, () -> useCase.execute(req, IdentityUseCaseTestFixtures.IP));
 
         assertThat(ex.getError()).isEqualTo(AccountError.ACCOUNT_NOT_FOUND);
     }
@@ -68,7 +68,7 @@ class VerifyEmailUseCaseTest {
         when(accountRepository.findByEmail(IdentityUseCaseTestFixtures.EMAIL))
                 .thenReturn(Optional.of(IdentityUseCaseTestFixtures.activeAccount(1L)));
 
-        DomainException ex = assertThrows(DomainException.class, () -> useCase.execute(req, IdentityUseCaseTestFixtures.IP));
+        var ex = assertThrows(DomainException.class, () -> useCase.execute(req, IdentityUseCaseTestFixtures.IP));
 
         assertThat(ex.getError()).isEqualTo(AccountError.EMAIL_ALREADY_VERIFIED);
     }
@@ -81,7 +81,7 @@ class VerifyEmailUseCaseTest {
         when(accountRepository.findByEmail(IdentityUseCaseTestFixtures.EMAIL)).thenReturn(Optional.of(pending));
         when(accountOtpRepository.findLatestActiveByAccountIdAndPurpose(10L, OtpPurpose.REGISTRATION)).thenReturn(Optional.empty());
 
-        DomainException ex = assertThrows(DomainException.class, () -> useCase.execute(req, IdentityUseCaseTestFixtures.IP));
+        var ex = assertThrows(DomainException.class, () -> useCase.execute(req, IdentityUseCaseTestFixtures.IP));
 
         assertThat(ex.getError()).isEqualTo(AccountError.INVALID_OTP);
     }
@@ -91,7 +91,7 @@ class VerifyEmailUseCaseTest {
     void executeWhenOtpValidOpensSessionAndReturnsTokens() {
         var req = new VerifyEmailRequest(IdentityUseCaseTestFixtures.EMAIL, "123456", IdentityUseCaseTestFixtures.device());
         var pending = IdentityUseCaseTestFixtures.pendingAccount(10L);
-        AccountOtp otp = AccountOtp.create(10L, "123456", OtpPurpose.REGISTRATION, OtpChannel.EMAIL);
+        var otp = AccountOtp.create(10L, "123456", OtpPurpose.REGISTRATION, OtpChannel.EMAIL);
 
         when(accountRepository.findByEmail(IdentityUseCaseTestFixtures.EMAIL)).thenReturn(Optional.of(pending));
         when(accountOtpRepository.findLatestActiveByAccountIdAndPurpose(10L, OtpPurpose.REGISTRATION)).thenReturn(Optional.of(otp));
@@ -118,7 +118,7 @@ class VerifyEmailUseCaseTest {
         when(accountSessionTokenService.createSessionAndIssueTokens(any(), eq(77L), eq(IdentityUseCaseTestFixtures.IP)))
                 .thenReturn(tokenResponse);
 
-        AuthTokenResponse result = useCase.execute(req, IdentityUseCaseTestFixtures.IP);
+        var result = useCase.execute(req, IdentityUseCaseTestFixtures.IP);
 
         assertThat(result).isSameAs(tokenResponse);
         verify(accountRepository).save(pending);

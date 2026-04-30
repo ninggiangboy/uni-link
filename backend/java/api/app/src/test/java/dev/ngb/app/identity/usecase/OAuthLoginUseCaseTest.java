@@ -65,7 +65,7 @@ class OAuthLoginUseCaseTest {
         when(oAuthProviderVerifier.verify(AuthProvider.GOOGLE, "provider-jwt"))
                 .thenThrow(new RuntimeException("invalid"));
 
-        DomainException ex = assertThrows(DomainException.class, () -> useCase.execute(request(), IdentityUseCaseTestFixtures.IP));
+        var ex = assertThrows(DomainException.class, () -> useCase.execute(request(), IdentityUseCaseTestFixtures.IP));
 
         assertThat(ex.getError()).isEqualTo(AccountError.INVALID_OAUTH_TOKEN);
     }
@@ -142,7 +142,7 @@ class OAuthLoginUseCaseTest {
         when(oAuthProviderVerifier.verify(AuthProvider.GOOGLE, "provider-jwt")).thenReturn(userInfo);
         when(accountRepository.findByEmail(IdentityUseCaseTestFixtures.EMAIL)).thenReturn(Optional.of(pending));
 
-        DomainException ex = assertThrows(DomainException.class, () -> useCase.execute(request(), IdentityUseCaseTestFixtures.IP));
+        var ex = assertThrows(DomainException.class, () -> useCase.execute(request(), IdentityUseCaseTestFixtures.IP));
 
         assertThat(ex.getError()).isEqualTo(AccountError.ACCOUNT_NOT_ACTIVE);
     }

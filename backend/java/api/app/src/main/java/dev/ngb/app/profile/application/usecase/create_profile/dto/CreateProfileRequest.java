@@ -3,12 +3,16 @@ package dev.ngb.app.profile.application.usecase.create_profile.dto;
 import dev.ngb.domain.profile.model.profile.ProfileVisibility;
 import dev.ngb.util.validation.FluentValidator;
 
+import java.util.regex.Pattern;
+
 public record CreateProfileRequest(
         String username,
         String displayName,
         String bio,
         ProfileVisibility visibility
 ) {
+    private static final Pattern VALID_USERNAME_PATTERN = Pattern.compile("^[A-Za-z0-9_.]+$");
+
     public CreateProfileRequest {
         String normalizedUsername = username == null ? null : username.trim();
         String normalizedDisplayName = displayName == null ? null : displayName.trim();
@@ -25,7 +29,7 @@ public record CreateProfileRequest(
                 .notNullOrBlank()
                 .minLength(3)
                 .maxLength(50)
-                .matches("^[A-Za-z0-9_.]+$")
+                .matches(VALID_USERNAME_PATTERN)
                 .ruleFor("displayName", ignored -> normalizedDisplayName)
                 .notNullOrBlank()
                 .maxLength(100)
