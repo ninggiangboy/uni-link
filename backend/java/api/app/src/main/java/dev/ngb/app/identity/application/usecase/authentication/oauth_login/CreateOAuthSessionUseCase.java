@@ -10,11 +10,10 @@ import dev.ngb.domain.identity.error.AccountError;
 import dev.ngb.domain.identity.model.auth.Account;
 import dev.ngb.domain.identity.model.auth.AccountCredential;
 import dev.ngb.domain.identity.model.auth.AccountDevice;
+import dev.ngb.domain.identity.model.auth.DeviceType;
 import dev.ngb.domain.identity.repository.AccountCredentialRepository;
 import dev.ngb.domain.identity.repository.AccountDeviceRepository;
 import dev.ngb.domain.identity.repository.AccountRepository;
-import dev.ngb.domain.identity.service.AuthenticationPolicyService;
-import dev.ngb.domain.identity.service.OAuthAccountDomainService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -43,8 +42,6 @@ public class CreateOAuthSessionUseCase implements UseCaseService {
     private final AccountDeviceRepository accountDeviceRepository;
     private final OAuthProviderVerifier oAuthProviderVerifier;
     private final AccountSessionTokenService accountSessionTokenService;
-    private final OAuthAccountDomainService oAuthAccountDomainService;
-    private final AuthenticationPolicyService authenticationPolicyService;
 
     public CreateOAuthSessionResponse execute(CreateOAuthSessionRequest request, String ipAddress) {
         log.info("OAuth login attempt provider={}", request.provider());
@@ -60,14 +57,38 @@ public class CreateOAuthSessionUseCase implements UseCaseService {
 
         log.debug("OAuth user verified email={}", userInfo.email());
 
-        // Email is the primary join key between IdP and our Account aggregate.
-        Optional<Account> existingAccount = accountRepository.findByEmail(userInfo.email());
-        Account persistedAccount = existingAccount.orElse(null);
-        boolean providerLinked = persistedAccount != null
-                && accountCredentialRepository.existsByAccountIdAndProvider(persistedAccount.getId(), request.provider());
+        Optional<AccountCredential> credentialByProviderAccount = accountCredentialRepository
+                .findByProviderAndProviderAccountId(request.provider(), userInfo.providerAccountId());
 
-        OAuthAccountDomainService.OAuthAccountResolution resolution =
-                oAuthAccountDomainService.decideOAuthAccountLinking(existingAccount, userInfo.email(), providerLinked);
+        Optional<Account> accountByEmail = accountRepository.findByEmail(userInfo.email());
+        Optional<Account> accountLinkedByProviderSubject = Optional.empty();
+
+        if (credentialByProviderAccount.isPresent()) {
+            Long linkedAccountId = credentialByProviderAccount.get().getAccountId();
+            Account linkedAccount = accountRepository.findById(linkedAccountId)
+                    .orElseThrow(() -> {
+                        log.warn("OAuth verification failed: linked account not found accountId={}", linkedAccountId);
+                        return AccountError.INVALID_OAUTH_TOKEN.exception();
+                    });
+            accountLinkedByProviderSubject = Optional.of(linkedAccount);
+        }
+
+        Optional<AccountCredential> providerCredentialForEmailAccount = accountByEmail
+                .flatMap(account -> accountCredentialRepository.findByAccountIdAndProvider(account.getId(), request.provider()));
+
+        OAuthLoginContext loginContext = resolveOAuthLoginContext(
+                accountByEmail.orElse(null),
+                accountLinkedByProviderSubject.orElse(null),
+                providerCredentialForEmailAccount.orElse(null),
+                userInfo.providerAccountId()
+        );
+
+        OAuthAccountResolution resolution =
+                decideOAuthAccountLinking(
+                        loginContext.account(),
+                        userInfo.email(),
+                        loginContext.providerLinked()
+                );
 
         Account account = resolution.account();
         boolean isNewAccount = resolution.newAccount();
@@ -76,10 +97,7 @@ public class CreateOAuthSessionUseCase implements UseCaseService {
         }
 
         if (resolution.shouldLinkProvider()) {
-            AccountCredential credential = AccountCredential.create(
-                    account.getId(), request.provider(), userInfo.providerAccountId(),
-                    null, null
-            );
+            AccountCredential credential = AccountCredential.create(account.getId(), request.provider(), userInfo.providerAccountId());
             accountCredentialRepository.save(credential);
         }
 
@@ -89,7 +107,7 @@ public class CreateOAuthSessionUseCase implements UseCaseService {
                 .findByAccountIdAndFingerprint(account.getId(), fingerprint)
                 .orElse(null);
 
-        AccountDevice updatedDevice = authenticationPolicyService.decideDeviceForOAuthSignIn(
+        AccountDevice updatedDevice = decideDeviceForOAuthSignIn(
                 account.getId(),
                 device,
                 request.deviceInfo().deviceType(),
@@ -98,7 +116,8 @@ public class CreateOAuthSessionUseCase implements UseCaseService {
         );
         device = accountDeviceRepository.save(updatedDevice);
 
-        authenticationPolicyService.applySuccessfulLogin(account, device, ipAddress, false);
+        device.touch();
+        account.recordLogin(ipAddress);
         account = accountRepository.save(account);
 
         // Full session immediately — symmetric with trusted password login.
@@ -112,5 +131,59 @@ public class CreateOAuthSessionUseCase implements UseCaseService {
                 tokens.accountUuid(),
                 isNewAccount
         );
+    }
+
+    private AccountDevice decideDeviceForOAuthSignIn(
+            Long accountId,
+            AccountDevice existingDevice,
+            DeviceType deviceType,
+            String deviceName,
+            String fingerprint
+    ) {
+        if (existingDevice == null) {
+            AccountDevice created = AccountDevice.create(accountId, deviceType, deviceName, fingerprint);
+            created.markTrusted();
+            return created;
+        }
+        existingDevice.touch();
+        return existingDevice;
+    }
+
+    private OAuthLoginContext resolveOAuthLoginContext(
+            Account accountByEmail,
+            Account accountLinkedByProviderSubject,
+            AccountCredential providerCredentialForEmailAccount,
+            String providerAccountId
+    ) {
+        if (accountLinkedByProviderSubject != null) {
+            if (accountByEmail != null && !accountByEmail.getId().equals(accountLinkedByProviderSubject.getId())) {
+                throw AccountError.OAUTH_EMAIL_CONFLICT.exception();
+            }
+            return new OAuthLoginContext(accountLinkedByProviderSubject, true);
+        }
+        if (accountByEmail == null) {
+            return new OAuthLoginContext(null, false);
+        }
+        if (providerCredentialForEmailAccount != null
+                && !providerAccountId.equals(providerCredentialForEmailAccount.getProviderAccountId())) {
+            throw AccountError.INVALID_OAUTH_TOKEN.exception();
+        }
+        return new OAuthLoginContext(accountByEmail, providerCredentialForEmailAccount != null);
+    }
+
+    private OAuthAccountResolution decideOAuthAccountLinking(Account existingAccount, String email, boolean providerLinked) {
+        if (existingAccount == null) {
+            return new OAuthAccountResolution(Account.createFromOAuth(email), true, true);
+        }
+        if (!existingAccount.isActive()) {
+            throw AccountError.ACCOUNT_NOT_ACTIVE.exception();
+        }
+        return new OAuthAccountResolution(existingAccount, false, !providerLinked);
+    }
+
+    private record OAuthAccountResolution(Account account, boolean newAccount, boolean shouldLinkProvider) {
+    }
+
+    private record OAuthLoginContext(Account account, boolean providerLinked) {
     }
 }

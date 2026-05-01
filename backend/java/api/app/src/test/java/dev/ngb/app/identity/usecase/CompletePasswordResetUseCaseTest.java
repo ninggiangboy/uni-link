@@ -12,13 +12,11 @@ import dev.ngb.domain.identity.model.otp.OtpPurpose;
 import dev.ngb.domain.identity.repository.AccountOtpRepository;
 import dev.ngb.domain.identity.repository.AccountRepository;
 import dev.ngb.domain.identity.repository.AccountSessionRepository;
-import dev.ngb.domain.identity.service.PasswordResetDomainService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
@@ -43,8 +41,6 @@ class CompletePasswordResetUseCaseTest {
     private AccountSessionRepository accountSessionRepository;
     @Mock
     private PasswordEncoder passwordEncoder;
-    @Spy
-    private PasswordResetDomainService passwordResetDomainService;
 
     @InjectMocks
     private CompletePasswordResetUseCase useCase;

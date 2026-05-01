@@ -13,18 +13,19 @@ import dev.ngb.domain.identity.error.AccountError;
 import dev.ngb.domain.identity.model.auth.Account;
 import dev.ngb.domain.identity.model.auth.AccountDevice;
 import dev.ngb.domain.identity.model.auth.AccountStatus;
+import dev.ngb.domain.identity.model.otp.AccountOtp;
+import dev.ngb.domain.identity.model.otp.OtpChannel;
 import dev.ngb.domain.identity.model.otp.OtpPurpose;
 import dev.ngb.domain.identity.model.session.AccountLoginHistory;
+import dev.ngb.domain.identity.model.session.LoginResult;
 import dev.ngb.domain.identity.repository.AccountDeviceRepository;
 import dev.ngb.domain.identity.repository.AccountLoginHistoryRepository;
 import dev.ngb.domain.identity.repository.AccountRepository;
-import dev.ngb.domain.identity.service.AuthenticationPolicyService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
@@ -53,8 +54,6 @@ class CreateSessionUseCaseTest {
     private AccountOtpDeliveryService accountOtpDeliveryService;
     @Mock
     private AccountSessionTokenService accountSessionTokenService;
-    @Spy
-    private AuthenticationPolicyService authenticationPolicyService;
 
     @InjectMocks
     private CreateSessionUseCase useCase;
@@ -108,6 +107,9 @@ class CreateSessionUseCaseTest {
         var ex = assertThrows(DomainException.class, () -> useCase.execute(request(), IdentityUseCaseTestFixtures.IP));
 
         assertThat(ex.getError()).isEqualTo(AccountError.ACCOUNT_SUSPENDED);
+        var historyCaptor = org.mockito.ArgumentCaptor.forClass(AccountLoginHistory.class);
+        verify(accountLoginHistoryRepository).save(historyCaptor.capture());
+        assertThat(historyCaptor.getValue().getResult()).isEqualTo(LoginResult.BLOCKED);
     }
 
     @Test
@@ -137,7 +139,9 @@ class CreateSessionUseCaseTest {
                     d.getIsTrusted()
             );
         });
-        when(tokenProvider.generateVerificationToken(1L, 50L)).thenReturn("verif-token");
+        var otp = AccountOtp.create(1L, "123456", OtpPurpose.LOGIN, OtpChannel.EMAIL);
+        when(accountOtpDeliveryService.sendEmailOtp(1L, IdentityUseCaseTestFixtures.EMAIL, OtpPurpose.LOGIN)).thenReturn(otp);
+        when(tokenProvider.generateVerificationToken(1L, 50L, otp.getUuid())).thenReturn("verif-token");
 
         var response = useCase.execute(request(), IdentityUseCaseTestFixtures.IP);
 
@@ -157,7 +161,9 @@ class CreateSessionUseCaseTest {
         when(accountDeviceRepository.findByAccountIdAndFingerprint(1L, IdentityUseCaseTestFixtures.FINGERPRINT))
                 .thenReturn(Optional.of(device));
         when(accountDeviceRepository.save(any(AccountDevice.class))).thenAnswer(inv -> inv.getArgument(0));
-        when(tokenProvider.generateVerificationToken(1L, 50L)).thenReturn("v2");
+        var otp = AccountOtp.create(1L, "123456", OtpPurpose.LOGIN, OtpChannel.EMAIL);
+        when(accountOtpDeliveryService.sendEmailOtp(1L, IdentityUseCaseTestFixtures.EMAIL, OtpPurpose.LOGIN)).thenReturn(otp);
+        when(tokenProvider.generateVerificationToken(1L, 50L, otp.getUuid())).thenReturn("v2");
 
         var response = useCase.execute(request(), IdentityUseCaseTestFixtures.IP);
 

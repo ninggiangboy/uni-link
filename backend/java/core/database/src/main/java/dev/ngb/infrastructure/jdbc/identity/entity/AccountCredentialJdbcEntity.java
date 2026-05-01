@@ -18,6 +18,4 @@ public class AccountCredentialJdbcEntity extends SoftDeletableJdbcEntity<Long> {
     private Long accountId;
     private AuthProvider provider;
     private String providerAccountId;
-    private String accessToken;
-    private String refreshToken;
 }

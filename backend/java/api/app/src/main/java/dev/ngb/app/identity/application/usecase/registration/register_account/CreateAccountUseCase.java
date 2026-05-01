@@ -13,6 +13,7 @@ import dev.ngb.domain.identity.repository.AccountRepository;
 import dev.ngb.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 
 /*
  * Registers a new account with email and password. The account stays pending until the user
@@ -43,7 +44,12 @@ public class CreateAccountUseCase implements UseCaseService {
         // Hash before persistence; domain factory builds a pending account until email is verified.
         String passwordHash = passwordEncoder.encode(request.password());
         Account account = Account.create(request.email(), passwordHash);
-        account = accountRepository.save(account);
+        try {
+            account = accountRepository.save(account);
+        } catch (DataIntegrityViolationException e) {
+            log.warn("Register failed: duplicate email race detected");
+            throw AccountError.EMAIL_ALREADY_EXISTS.exception();
+        }
         log.debug("Account created accountId={}", account.getId());
 
         AccountOtp otp = accountOtpDeliveryService.sendEmailOtp(account.getId(), request.email(), OtpPurpose.REGISTRATION);

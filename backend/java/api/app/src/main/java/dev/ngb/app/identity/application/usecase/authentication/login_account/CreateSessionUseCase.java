@@ -7,15 +7,17 @@ import dev.ngb.app.identity.application.service.AccountSessionTokenService;
 import dev.ngb.app.identity.application.usecase.authentication.login_account.dto.CreateSessionRequest;
 import dev.ngb.app.identity.application.usecase.authentication.login_account.dto.CreateSessionResponse;
 import dev.ngb.application.UseCaseService;
+import dev.ngb.domain.DomainException;
 import dev.ngb.domain.identity.error.AccountError;
 import dev.ngb.domain.identity.model.auth.Account;
 import dev.ngb.domain.identity.model.auth.AccountDevice;
+import dev.ngb.domain.identity.model.auth.DeviceType;
+import dev.ngb.domain.identity.model.otp.AccountOtp;
 import dev.ngb.domain.identity.model.otp.OtpPurpose;
 import dev.ngb.domain.identity.model.session.AccountLoginHistory;
 import dev.ngb.domain.identity.repository.AccountDeviceRepository;
 import dev.ngb.domain.identity.repository.AccountLoginHistoryRepository;
 import dev.ngb.domain.identity.repository.AccountRepository;
-import dev.ngb.domain.identity.service.AuthenticationPolicyService;
 import dev.ngb.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +47,6 @@ public class CreateSessionUseCase implements UseCaseService {
     private final TokenProvider tokenProvider;
     private final AccountOtpDeliveryService accountOtpDeliveryService;
     private final AccountSessionTokenService accountSessionTokenService;
-    private final AuthenticationPolicyService authenticationPolicyService;
 
     public CreateSessionResponse execute(CreateSessionRequest request, String ipAddress) {
         log.info("Login attempt for email={}", StringUtils.maskEmail(request.email()));
@@ -67,7 +68,14 @@ public class CreateSessionUseCase implements UseCaseService {
         }
 
         log.debug("Password verified for accountId={}", account.getId());
-        account.ensureCanLogin();
+        try {
+            account.ensureCanLogin();
+        } catch (DomainException e) {
+            accountLoginHistoryRepository.save(
+                    AccountLoginHistory.createBlocked(account.getId(), null, ipAddress, null, e.getError().getMessage())
+            );
+            throw e;
+        }
 
         // Stable client fingerprint ties sessions and OTP verification to one device row.
         String fingerprint = request.deviceInfo().fingerprint();
@@ -75,14 +83,13 @@ public class CreateSessionUseCase implements UseCaseService {
                 .findByAccountIdAndFingerprint(account.getId(), fingerprint)
                 .orElse(null);
 
-        AuthenticationPolicyService.LoginDecision decision =
-                authenticationPolicyService.decidePasswordLogin(account, existingDevice);
+        LoginDecision decision = decidePasswordLogin(account, existingDevice);
         log.debug("accountId={}, loginDecision={}", account.getId(), decision);
 
-        boolean requiresVerification = decision == AuthenticationPolicyService.LoginDecision.REQUIRE_VERIFICATION_NEW_DEVICE
-                || decision == AuthenticationPolicyService.LoginDecision.REQUIRE_VERIFICATION_2FA;
+        boolean requiresVerification = decision == LoginDecision.REQUIRE_VERIFICATION_NEW_DEVICE
+                || decision == LoginDecision.REQUIRE_VERIFICATION_2FA;
         if (requiresVerification) {
-            AccountDevice verificationDevice = authenticationPolicyService.decideDeviceForLoginVerification(
+            AccountDevice verificationDevice = decideDeviceForLoginVerification(
                     account.getId(),
                     existingDevice,
                     request.deviceInfo().deviceType(),
@@ -100,7 +107,8 @@ public class CreateSessionUseCase implements UseCaseService {
         }
 
         // Trusted path: update activity, record success, then mint session + tokens.
-        authenticationPolicyService.applySuccessfulLogin(account, existingDevice, ipAddress, false);
+        existingDevice.touch();
+        account.recordLogin(ipAddress);
         account = accountRepository.save(account);
         AccountDevice savedDevice = accountDeviceRepository.save(existingDevice);
 
@@ -121,10 +129,40 @@ public class CreateSessionUseCase implements UseCaseService {
     }
 
     private CreateSessionResponse issueLoginVerificationChallenge(Account account, AccountDevice device) {
-        accountOtpDeliveryService.sendEmailOtp(account.getId(), account.getEmail(), OtpPurpose.LOGIN);
+        AccountOtp otp = accountOtpDeliveryService.sendEmailOtp(account.getId(), account.getEmail(), OtpPurpose.LOGIN);
 
         // Binds the email OTP step to this account + device for CompleteSessionVerificationUseCase.
-        String verificationToken = tokenProvider.generateVerificationToken(account.getId(), device.getId());
+        String verificationToken = tokenProvider.generateVerificationToken(account.getId(), device.getId(), otp.getUuid());
         return CreateSessionResponse.verificationRequired(verificationToken);
+    }
+
+    private LoginDecision decidePasswordLogin(Account account, AccountDevice existingDevice) {
+        if (existingDevice == null) {
+            return LoginDecision.REQUIRE_VERIFICATION_NEW_DEVICE;
+        }
+        if (Boolean.TRUE.equals(account.getTwoFactorEnabled())) {
+            return LoginDecision.REQUIRE_VERIFICATION_2FA;
+        }
+        return LoginDecision.TRUSTED_DEVICE_DIRECT_AUTH;
+    }
+
+    private AccountDevice decideDeviceForLoginVerification(
+            Long accountId,
+            AccountDevice existingDevice,
+            DeviceType deviceType,
+            String deviceName,
+            String fingerprint
+    ) {
+        if (existingDevice == null) {
+            return AccountDevice.create(accountId, deviceType, deviceName, fingerprint);
+        }
+        existingDevice.touch();
+        return existingDevice;
+    }
+
+    private enum LoginDecision {
+        REQUIRE_VERIFICATION_NEW_DEVICE,
+        REQUIRE_VERIFICATION_2FA,
+        TRUSTED_DEVICE_DIRECT_AUTH
     }
 }

@@ -11,6 +11,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,5 +37,23 @@ public class AccountSessionJdbcRepository extends JdbcRepository<AccountSession,
         Criteria criteria = Criteria.where("account_id").is(accountId)
                 .and("is_revoked").is(false);
         return findAll(criteria);
+    }
+
+    @Override
+    public boolean revokeIfActiveByTokenHash(String tokenHash, Instant now) {
+        Timestamp nowTimestamp = Timestamp.from(now);
+        int affected = jdbcTemplate.update(
+                """
+                UPDATE iam_account_sessions
+                SET is_revoked = TRUE, updated_at = ?
+                WHERE token_hash = ?
+                  AND is_revoked = FALSE
+                  AND expires_at > ?
+                """,
+                nowTimestamp,
+                tokenHash,
+                nowTimestamp
+        );
+        return affected > 0;
     }
 }

@@ -16,13 +16,11 @@ import dev.ngb.domain.identity.repository.AccountDeviceRepository;
 import dev.ngb.domain.identity.repository.AccountLoginHistoryRepository;
 import dev.ngb.domain.identity.repository.AccountOtpRepository;
 import dev.ngb.domain.identity.repository.AccountRepository;
-import dev.ngb.domain.identity.service.AuthenticationPolicyService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
@@ -50,8 +48,6 @@ class CompleteSessionVerificationUseCaseTest {
     private TokenProvider tokenProvider;
     @Mock
     private AccountSessionTokenService accountSessionTokenService;
-    @Spy
-    private AuthenticationPolicyService authenticationPolicyService;
 
     @InjectMocks
     private CompleteSessionVerificationUseCase useCase;
@@ -71,7 +67,7 @@ class CompleteSessionVerificationUseCaseTest {
     @DisplayName("Account missing → ACCOUNT_NOT_FOUND")
     void executeWhenAccountMissingThrowsNotFound() {
         var req = new CompleteSessionVerificationRequest("tok", "123456");
-        when(tokenProvider.parseVerificationToken("tok")).thenReturn(new TokenProvider.VerificationClaims(1L, 50L));
+        when(tokenProvider.parseVerificationToken("tok")).thenReturn(new TokenProvider.VerificationClaims(1L, 50L, "otp-1"));
         when(accountRepository.findById(1L)).thenReturn(Optional.empty());
 
         var ex = assertThrows(DomainException.class, () -> useCase.execute(req, IdentityUseCaseTestFixtures.IP));
@@ -84,9 +80,9 @@ class CompleteSessionVerificationUseCaseTest {
     void executeWhenNoLoginOtpThrowsInvalidOtp() {
         var account = IdentityUseCaseTestFixtures.activeAccount(1L);
         var req = new CompleteSessionVerificationRequest("tok", "123456");
-        when(tokenProvider.parseVerificationToken("tok")).thenReturn(new TokenProvider.VerificationClaims(1L, 50L));
+        when(tokenProvider.parseVerificationToken("tok")).thenReturn(new TokenProvider.VerificationClaims(1L, 50L, "otp-1"));
         when(accountRepository.findById(1L)).thenReturn(Optional.of(account));
-        when(accountOtpRepository.findLatestActiveByAccountIdAndPurpose(1L, OtpPurpose.LOGIN)).thenReturn(Optional.empty());
+        when(accountOtpRepository.findByUuid("otp-1")).thenReturn(Optional.empty());
 
         var ex = assertThrows(DomainException.class, () -> useCase.execute(req, IdentityUseCaseTestFixtures.IP));
 
@@ -101,9 +97,9 @@ class CompleteSessionVerificationUseCaseTest {
         var device = IdentityUseCaseTestFixtures.deviceRow(50L, 999L, "fp", false);
         var req = new CompleteSessionVerificationRequest("tok", "123456");
 
-        when(tokenProvider.parseVerificationToken("tok")).thenReturn(new TokenProvider.VerificationClaims(1L, 50L));
+        when(tokenProvider.parseVerificationToken("tok")).thenReturn(new TokenProvider.VerificationClaims(1L, 50L, otp.getUuid()));
         when(accountRepository.findById(1L)).thenReturn(Optional.of(account));
-        when(accountOtpRepository.findLatestActiveByAccountIdAndPurpose(1L, OtpPurpose.LOGIN)).thenReturn(Optional.of(otp));
+        when(accountOtpRepository.findByUuid(otp.getUuid())).thenReturn(Optional.of(otp));
         when(accountDeviceRepository.findById(50L)).thenReturn(Optional.of(device));
 
         var ex = assertThrows(DomainException.class, () -> useCase.execute(req, IdentityUseCaseTestFixtures.IP));
@@ -120,9 +116,9 @@ class CompleteSessionVerificationUseCaseTest {
         var req = new CompleteSessionVerificationRequest("tok", "123456");
         var tokens = new AuthTokenResponse("a", "r", 3600, account.getUuid());
 
-        when(tokenProvider.parseVerificationToken("tok")).thenReturn(new TokenProvider.VerificationClaims(1L, 50L));
+        when(tokenProvider.parseVerificationToken("tok")).thenReturn(new TokenProvider.VerificationClaims(1L, 50L, otp.getUuid()));
         when(accountRepository.findById(1L)).thenReturn(Optional.of(account));
-        when(accountOtpRepository.findLatestActiveByAccountIdAndPurpose(1L, OtpPurpose.LOGIN)).thenReturn(Optional.of(otp));
+        when(accountOtpRepository.findByUuid(otp.getUuid())).thenReturn(Optional.of(otp));
         when(accountDeviceRepository.findById(50L)).thenReturn(Optional.of(device));
         when(accountRepository.save(any(Account.class))).thenAnswer(inv -> inv.getArgument(0));
         when(accountSessionTokenService.createSessionAndIssueTokens(eq(account), eq(50L), eq(IdentityUseCaseTestFixtures.IP)))

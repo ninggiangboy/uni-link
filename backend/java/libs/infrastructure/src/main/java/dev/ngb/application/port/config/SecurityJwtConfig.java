@@ -5,6 +5,8 @@ public interface SecurityJwtConfig {
 
     long securityJwtRefreshTokenExpiry();
 
+    long securityJwtVerificationTokenExpiry();
+
     String securityJwtPublicKeyBase64();
 
     String securityJwtPrivateKeyBase64();

@@ -9,13 +9,11 @@ import dev.ngb.domain.identity.error.AccountError;
 import dev.ngb.domain.identity.model.session.AccountSession;
 import dev.ngb.domain.identity.repository.AccountRepository;
 import dev.ngb.domain.identity.repository.AccountSessionRepository;
-import dev.ngb.domain.identity.service.SessionRotationDomainService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
@@ -37,8 +35,6 @@ class CreateTokenUseCaseTest {
     private AccountSessionRepository accountSessionRepository;
     @Mock
     private TokenProvider tokenProvider;
-    @Spy
-    private SessionRotationDomainService sessionRotationDomainService;
 
     @InjectMocks
     private CreateTokenUseCase useCase;
@@ -75,6 +71,7 @@ class CreateTokenUseCaseTest {
         );
         when(tokenProvider.hashToken("raw-refresh")).thenReturn("h1");
         when(accountSessionRepository.findByTokenHash("h1")).thenReturn(Optional.of(session));
+        when(accountSessionRepository.revokeIfActiveByTokenHash(eq("h1"), any(Instant.class))).thenReturn(false);
 
         var ex = assertThrows(DomainException.class, () -> useCase.execute(request));
 
@@ -87,6 +84,7 @@ class CreateTokenUseCaseTest {
         var session = IdentityUseCaseTestFixtures.validSession(1L, 10L, 20L, "h1");
         when(tokenProvider.hashToken("raw-refresh")).thenReturn("h1");
         when(accountSessionRepository.findByTokenHash("h1")).thenReturn(Optional.of(session));
+        when(accountSessionRepository.revokeIfActiveByTokenHash(eq("h1"), any(Instant.class))).thenReturn(true);
         when(accountRepository.findById(10L)).thenReturn(Optional.empty());
 
         var ex = assertThrows(DomainException.class, () -> useCase.execute(request));
@@ -95,17 +93,18 @@ class CreateTokenUseCaseTest {
     }
 
     @Test
-    @DisplayName("Account not active → ACCOUNT_NOT_ACTIVE")
+    @DisplayName("Pending account → ACCOUNT_PENDING")
     void executeWhenAccountNotActiveThrows() {
         var session = IdentityUseCaseTestFixtures.validSession(1L, 10L, 20L, "h1");
         var pending = IdentityUseCaseTestFixtures.pendingAccount(10L);
         when(tokenProvider.hashToken("raw-refresh")).thenReturn("h1");
         when(accountSessionRepository.findByTokenHash("h1")).thenReturn(Optional.of(session));
+        when(accountSessionRepository.revokeIfActiveByTokenHash(eq("h1"), any(Instant.class))).thenReturn(true);
         when(accountRepository.findById(10L)).thenReturn(Optional.of(pending));
 
         var ex = assertThrows(DomainException.class, () -> useCase.execute(request));
 
-        assertThat(ex.getError()).isEqualTo(AccountError.ACCOUNT_NOT_ACTIVE);
+        assertThat(ex.getError()).isEqualTo(AccountError.ACCOUNT_PENDING);
     }
 
     @Test
@@ -115,6 +114,7 @@ class CreateTokenUseCaseTest {
         var account = IdentityUseCaseTestFixtures.activeAccount(10L);
         when(tokenProvider.hashToken("raw-refresh")).thenReturn("h1");
         when(accountSessionRepository.findByTokenHash("h1")).thenReturn(Optional.of(session));
+        when(accountSessionRepository.revokeIfActiveByTokenHash(eq("h1"), any(Instant.class))).thenReturn(true);
         when(accountRepository.findById(10L)).thenReturn(Optional.of(account));
         when(tokenProvider.generateRefreshToken()).thenReturn("new-raw");
         when(tokenProvider.hashToken("new-raw")).thenReturn("h2");
@@ -125,6 +125,6 @@ class CreateTokenUseCaseTest {
 
         assertThat(response.accessToken()).isEqualTo("new-access");
         assertThat(response.refreshToken()).isEqualTo("new-raw");
-        verify(accountSessionRepository, times(2)).save(any(AccountSession.class));
+        verify(accountSessionRepository, times(1)).save(any(AccountSession.class));
     }
 }

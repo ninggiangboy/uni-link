@@ -6,7 +6,7 @@ public interface TokenProvider {
 
     String generateRefreshToken();
 
-    String generateVerificationToken(Long accountId, Long deviceId);
+    String generateVerificationToken(Long accountId, Long deviceId, String otpUuid);
 
     VerificationClaims parseVerificationToken(String token);
 
@@ -14,5 +14,5 @@ public interface TokenProvider {
 
     long getAccessTokenExpiresInSeconds();
 
-    record VerificationClaims(Long accountId, Long deviceId) {}
+    record VerificationClaims(Long accountId, Long deviceId, String otpUuid) {}
 }

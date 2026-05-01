@@ -1,4 +1,4 @@
-package dev.ngb.app.identity.infrastructure.security;
+package dev.ngb.app.identity.infrastructure;
 
 import dev.ngb.app.identity.application.port.TokenProvider;
 import dev.ngb.application.port.config.SecurityJwtConfig;
@@ -22,6 +22,8 @@ import java.util.Base64;
 @Component
 public class JwtTokenProvider implements TokenProvider {
 
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+
     private final TimeProvider timeProvider;
     private final JwtEncoder jwtEncoder;
     private final JwtDecoder jwtDecoder;
@@ -38,7 +40,7 @@ public class JwtTokenProvider implements TokenProvider {
         this.jwtEncoder = jwtEncoder;
         this.jwtDecoder = jwtDecoder;
         this.accessTokenExpiresInSeconds = appConfig.securityJwtAccessTokenExpiry();
-        this.verificationTokenExpiresInSeconds = appConfig.securityJwtRefreshTokenExpiry();
+        this.verificationTokenExpiresInSeconds = appConfig.securityJwtVerificationTokenExpiry();
     }
 
     @Override
@@ -59,12 +61,12 @@ public class JwtTokenProvider implements TokenProvider {
     @Override
     public String generateRefreshToken() {
         byte[] randomBytes = new byte[32];
-        new SecureRandom().nextBytes(randomBytes);
+        SECURE_RANDOM.nextBytes(randomBytes);
         return Base64.getUrlEncoder().withoutPadding().encodeToString(randomBytes);
     }
 
     @Override
-    public String generateVerificationToken(Long accountId, Long deviceId) {
+    public String generateVerificationToken(Long accountId, Long deviceId, String otpUuid) {
         Instant now = timeProvider.now();
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .subject("verification")
@@ -72,6 +74,7 @@ public class JwtTokenProvider implements TokenProvider {
                 .expiresAt(now.plusSeconds(verificationTokenExpiresInSeconds))
                 .claim("account_id", accountId)
                 .claim("device_id", deviceId)
+                .claim("otp_uuid", otpUuid)
                 .build();
 
         JwsHeader header = JwsHeader.with(SignatureAlgorithm.RS256).build();
@@ -83,7 +86,8 @@ public class JwtTokenProvider implements TokenProvider {
         Jwt jwt = jwtDecoder.decode(token);
         Long accountId = jwt.getClaim("account_id");
         Long deviceId = jwt.getClaim("device_id");
-        return new VerificationClaims(accountId, deviceId);
+        String otpUuid = jwt.getClaim("otp_uuid");
+        return new VerificationClaims(accountId, deviceId, otpUuid);
     }
 
     @Override

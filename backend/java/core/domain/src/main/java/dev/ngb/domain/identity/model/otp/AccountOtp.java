@@ -2,6 +2,7 @@ package dev.ngb.domain.identity.model.otp;
 
 import dev.ngb.domain.DomainEntity;
 import dev.ngb.domain.identity.error.AccountError;
+import dev.ngb.util.HashUtils;
 import lombok.Getter;
 
 import java.time.Duration;
@@ -13,7 +14,7 @@ import java.time.Instant;
 @Getter
 public class AccountOtp extends DomainEntity<Long> {
 
-    private static final int MAX_ATTEMPTS = 5;
+    private static final int MAX_ALLOWED_ATTEMPTS = 5;
     private static final Duration DEFAULT_TTL = Duration.ofMinutes(10);
 
     private AccountOtp() {}
@@ -30,7 +31,7 @@ public class AccountOtp extends DomainEntity<Long> {
         AccountOtp obj = new AccountOtp();
         obj.createdAt = Instant.now(obj.clock);
         obj.accountId = accountId;
-        obj.code = code;
+        obj.code = HashUtils.sha256Hex(code);
         obj.purpose = purpose;
         obj.channel = channel;
         obj.expiresAt = Instant.now(obj.clock).plus(DEFAULT_TTL);
@@ -47,10 +48,11 @@ public class AccountOtp extends DomainEntity<Long> {
             throw AccountError.INVALID_OTP.exception();
         }
         this.attempts++;
-        if (this.attempts > MAX_ATTEMPTS) {
+        if (this.attempts >= MAX_ALLOWED_ATTEMPTS) {
             throw AccountError.OTP_MAX_ATTEMPTS.exception();
         }
-        if (!this.code.equals(inputCode)) {
+        String inputCodeHash = HashUtils.sha256Hex(inputCode);
+        if (!this.code.equals(inputCodeHash)) {
             throw AccountError.INVALID_OTP.exception();
         }
         this.isUsed = true;

@@ -4,6 +4,7 @@ plugins {
 
 dependencies {
     testImplementation 'io.vavr:vavr:0.10.6'
+    testImplementation 'org.springframework.modulith:spring-modulith-starter-test'
 
     implementation project(':core:domain')
     implementation project(':core:database')

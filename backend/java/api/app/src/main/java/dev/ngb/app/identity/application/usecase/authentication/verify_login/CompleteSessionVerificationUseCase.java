@@ -15,7 +15,6 @@ import dev.ngb.domain.identity.repository.AccountDeviceRepository;
 import dev.ngb.domain.identity.repository.AccountLoginHistoryRepository;
 import dev.ngb.domain.identity.repository.AccountOtpRepository;
 import dev.ngb.domain.identity.repository.AccountRepository;
-import dev.ngb.domain.identity.service.AuthenticationPolicyService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,7 +39,6 @@ public class CompleteSessionVerificationUseCase implements UseCaseService {
     private final AccountLoginHistoryRepository accountLoginHistoryRepository;
     private final TokenProvider tokenProvider;
     private final AccountSessionTokenService accountSessionTokenService;
-    private final AuthenticationPolicyService authenticationPolicyService;
 
     public AuthTokenResponse execute(CompleteSessionVerificationRequest request, String ipAddress) {
         log.info("Verify login attempt");
@@ -55,6 +53,10 @@ public class CompleteSessionVerificationUseCase implements UseCaseService {
         }
 
         log.debug("Verification token parsed accountId={}, deviceId={}", claims.accountId(), claims.deviceId());
+        if (claims.otpUuid() == null || claims.otpUuid().isBlank()) {
+            log.warn("Invalid verification token: missing otpUuid claim");
+            throw AccountError.INVALID_VERIFICATION_TOKEN.exception();
+        }
 
         // Account might have been removed after the verification token was minted.
         Account account = accountRepository.findById(claims.accountId())
@@ -67,9 +69,11 @@ public class CompleteSessionVerificationUseCase implements UseCaseService {
         Long accountId = account.getId();
         // Pairs with the LOGIN OTP emailed during issueLoginVerificationChallenge.
         AccountOtp otp = accountOtpRepository
-                .findLatestActiveByAccountIdAndPurpose(accountId, OtpPurpose.LOGIN)
+                .findByUuid(claims.otpUuid())
+                .filter(candidate -> accountId.equals(candidate.getAccountId()))
+                .filter(candidate -> OtpPurpose.LOGIN.equals(candidate.getPurpose()))
                 .orElseThrow(() -> {
-                    log.warn("No active login OTP for accountId={}", accountId);
+                    log.warn("No matching login OTP challenge for accountId={}", accountId);
                     return AccountError.INVALID_OTP.exception();
                 });
 
@@ -89,7 +93,11 @@ public class CompleteSessionVerificationUseCase implements UseCaseService {
                     return AccountError.INVALID_VERIFICATION_TOKEN.exception();
                 });
 
-        authenticationPolicyService.applySuccessfulLogin(account, device, ipAddress, true);
+        if (!Boolean.TRUE.equals(device.getIsTrusted())) {
+            device.markTrusted();
+        }
+        device.touch();
+        account.recordLogin(ipAddress);
         accountDeviceRepository.save(device);
         account = accountRepository.save(account);
 

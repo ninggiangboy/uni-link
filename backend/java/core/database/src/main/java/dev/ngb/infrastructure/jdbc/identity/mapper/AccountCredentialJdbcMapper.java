@@ -21,9 +21,7 @@ public final class AccountCredentialJdbcMapper implements JdbcMapper<AccountCred
                 entity.getUpdatedAt(),
                 entity.getAccountId(),
                 entity.getProvider(),
-                entity.getProviderAccountId(),
-                entity.getAccessToken(),
-                entity.getRefreshToken()
+                entity.getProviderAccountId()
         );
     }
 
@@ -39,8 +37,6 @@ public final class AccountCredentialJdbcMapper implements JdbcMapper<AccountCred
                 .accountId(domain.getAccountId())
                 .provider(domain.getProvider())
                 .providerAccountId(domain.getProviderAccountId())
-                .accessToken(domain.getAccessToken())
-                .refreshToken(domain.getRefreshToken())
                 .build();
     }
 }

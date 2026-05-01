@@ -13,6 +13,7 @@ import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class AccountCredentialJdbcRepository
@@ -38,5 +39,21 @@ public class AccountCredentialJdbcRepository
                 .where("account_id").is(accountId)
                 .and("provider").is(provider.name());
         return exists(criteria);
+    }
+
+    @Override
+    public Optional<AccountCredential> findByAccountIdAndProvider(Long accountId, AuthProvider provider) {
+        Criteria criteria = Criteria
+                .where("account_id").is(accountId)
+                .and("provider").is(provider.name());
+        return findFirst(criteria);
+    }
+
+    @Override
+    public Optional<AccountCredential> findByProviderAndProviderAccountId(AuthProvider provider, String providerAccountId) {
+        Criteria criteria = Criteria
+                .where("provider").is(provider.name())
+                .and("provider_account_id").is(providerAccountId);
+        return findFirst(criteria);
     }
 }

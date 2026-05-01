@@ -14,13 +14,11 @@ import dev.ngb.domain.identity.model.otp.OtpPurpose;
 import dev.ngb.domain.identity.repository.AccountDeviceRepository;
 import dev.ngb.domain.identity.repository.AccountOtpRepository;
 import dev.ngb.domain.identity.repository.AccountRepository;
-import dev.ngb.domain.identity.service.AuthenticationPolicyService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
@@ -45,8 +43,6 @@ class CompleteEmailVerificationUseCaseTest {
     private AccountOtpRepository accountOtpRepository;
     @Mock
     private AccountSessionTokenService accountSessionTokenService;
-    @Spy
-    private AuthenticationPolicyService authenticationPolicyService;
 
     @InjectMocks
     private CompleteEmailVerificationUseCase useCase;

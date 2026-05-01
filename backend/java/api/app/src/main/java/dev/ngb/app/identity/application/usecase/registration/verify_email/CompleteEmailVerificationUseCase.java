@@ -12,7 +12,6 @@ import dev.ngb.domain.identity.model.otp.OtpPurpose;
 import dev.ngb.domain.identity.repository.AccountDeviceRepository;
 import dev.ngb.domain.identity.repository.AccountOtpRepository;
 import dev.ngb.domain.identity.repository.AccountRepository;
-import dev.ngb.domain.identity.service.AuthenticationPolicyService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,7 +35,6 @@ public class CompleteEmailVerificationUseCase implements UseCaseService {
     private final AccountDeviceRepository accountDeviceRepository;
     private final AccountOtpRepository accountOtpRepository;
     private final AccountSessionTokenService accountSessionTokenService;
-    private final AuthenticationPolicyService authenticationPolicyService;
 
     public AuthTokenResponse execute(String verificationId, CompleteEmailVerificationRequest request, String ipAddress) {
         log.info("Verify email attempt for verificationId={}", verificationId);
@@ -77,12 +75,13 @@ public class CompleteEmailVerificationUseCase implements UseCaseService {
         accountRepository.save(account);
 
         // Inbox proof counts as strong enough to trust this device on first session.
-        AccountDevice device = authenticationPolicyService.decideTrustedDeviceAfterEmailVerification(
+        AccountDevice device = AccountDevice.create(
                 account.getId(),
                 request.deviceInfo().deviceType(),
                 request.deviceInfo().deviceName(),
                 request.deviceInfo().fingerprint()
         );
+        device.markTrusted();
         AccountDevice savedDevice = accountDeviceRepository.save(device);
 
         AuthTokenResponse tokens = accountSessionTokenService.createSessionAndIssueTokens(account, savedDevice.getId(), ipAddress);

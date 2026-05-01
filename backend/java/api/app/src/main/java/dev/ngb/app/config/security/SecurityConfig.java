@@ -1,4 +1,4 @@
-package dev.ngb.app.identity.infrastructure.security;
+package dev.ngb.app.config.security;
 
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;

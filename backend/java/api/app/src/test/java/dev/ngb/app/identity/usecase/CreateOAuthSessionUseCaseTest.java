@@ -14,14 +14,11 @@ import dev.ngb.domain.identity.model.auth.AuthProvider;
 import dev.ngb.domain.identity.repository.AccountCredentialRepository;
 import dev.ngb.domain.identity.repository.AccountDeviceRepository;
 import dev.ngb.domain.identity.repository.AccountRepository;
-import dev.ngb.domain.identity.service.AuthenticationPolicyService;
-import dev.ngb.domain.identity.service.OAuthAccountDomainService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
@@ -30,6 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -47,10 +45,6 @@ class CreateOAuthSessionUseCaseTest {
     private OAuthProviderVerifier oAuthProviderVerifier;
     @Mock
     private AccountSessionTokenService accountSessionTokenService;
-    @Spy
-    private OAuthAccountDomainService oAuthAccountDomainService;
-    @Spy
-    private AuthenticationPolicyService authenticationPolicyService;
 
     @InjectMocks
     private CreateOAuthSessionUseCase useCase;
@@ -76,6 +70,8 @@ class CreateOAuthSessionUseCaseTest {
         var userInfo = new OAuthProviderVerifier.OAuthUserInfo(IdentityUseCaseTestFixtures.EMAIL, "sub-1");
         when(oAuthProviderVerifier.verify(AuthProvider.GOOGLE, "provider-jwt")).thenReturn(userInfo);
         when(accountRepository.findByEmail(IdentityUseCaseTestFixtures.EMAIL)).thenReturn(Optional.empty());
+        when(accountCredentialRepository.findByProviderAndProviderAccountId(AuthProvider.GOOGLE, "sub-1"))
+                .thenReturn(Optional.empty());
         when(accountRepository.save(any(Account.class))).thenAnswer(invocation -> {
             Account a = invocation.getArgument(0);
             if (a.getId() == null) {
@@ -141,6 +137,8 @@ class CreateOAuthSessionUseCaseTest {
         var pending = IdentityUseCaseTestFixtures.pendingAccount(5L);
         when(oAuthProviderVerifier.verify(AuthProvider.GOOGLE, "provider-jwt")).thenReturn(userInfo);
         when(accountRepository.findByEmail(IdentityUseCaseTestFixtures.EMAIL)).thenReturn(Optional.of(pending));
+        when(accountCredentialRepository.findByProviderAndProviderAccountId(AuthProvider.GOOGLE, "sub-1"))
+                .thenReturn(Optional.empty());
 
         var ex = assertThrows(DomainException.class, () -> useCase.execute(request(), IdentityUseCaseTestFixtures.IP));
 
@@ -156,7 +154,10 @@ class CreateOAuthSessionUseCaseTest {
 
         when(oAuthProviderVerifier.verify(AuthProvider.GOOGLE, "provider-jwt")).thenReturn(userInfo);
         when(accountRepository.findByEmail(IdentityUseCaseTestFixtures.EMAIL)).thenReturn(Optional.of(account));
-        when(accountCredentialRepository.existsByAccountIdAndProvider(7L, AuthProvider.GOOGLE)).thenReturn(true);
+        when(accountCredentialRepository.findByProviderAndProviderAccountId(AuthProvider.GOOGLE, "sub-1"))
+                .thenReturn(Optional.empty());
+        when(accountCredentialRepository.findByAccountIdAndProvider(7L, AuthProvider.GOOGLE))
+                .thenReturn(Optional.of(dev.ngb.domain.identity.model.auth.AccountCredential.create(7L, AuthProvider.GOOGLE, "sub-1")));
         when(accountDeviceRepository.findByAccountIdAndFingerprint(7L, IdentityUseCaseTestFixtures.FINGERPRINT))
                 .thenReturn(Optional.of(device));
         when(accountDeviceRepository.save(any(AccountDevice.class))).thenAnswer(inv -> inv.getArgument(0));
@@ -168,5 +169,27 @@ class CreateOAuthSessionUseCaseTest {
 
         assertThat(response.isNewAccount()).isFalse();
         assertThat(response.accountUuid()).isEqualTo(account.getUuid());
+        verify(accountCredentialRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Provider account already linked to another email account → OAUTH_EMAIL_CONFLICT")
+    void executeWhenProviderSubjectLinkedToAnotherAccountThrowsConflict() {
+        var userInfo = new OAuthProviderVerifier.OAuthUserInfo(IdentityUseCaseTestFixtures.EMAIL, "sub-1");
+        var emailAccount = IdentityUseCaseTestFixtures.activeAccount(7L);
+        var otherAccount = IdentityUseCaseTestFixtures.activeAccount(99L);
+        var existingCredential = dev.ngb.domain.identity.model.auth.AccountCredential.create(
+                99L, AuthProvider.GOOGLE, "sub-1"
+        );
+
+        when(oAuthProviderVerifier.verify(AuthProvider.GOOGLE, "provider-jwt")).thenReturn(userInfo);
+        when(accountCredentialRepository.findByProviderAndProviderAccountId(AuthProvider.GOOGLE, "sub-1"))
+                .thenReturn(Optional.of(existingCredential));
+        when(accountRepository.findByEmail(IdentityUseCaseTestFixtures.EMAIL)).thenReturn(Optional.of(emailAccount));
+        when(accountRepository.findById(99L)).thenReturn(Optional.of(otherAccount));
+
+        var ex = assertThrows(DomainException.class, () -> useCase.execute(request(), IdentityUseCaseTestFixtures.IP));
+
+        assertThat(ex.getError()).isEqualTo(AccountError.OAUTH_EMAIL_CONFLICT);
     }
 }

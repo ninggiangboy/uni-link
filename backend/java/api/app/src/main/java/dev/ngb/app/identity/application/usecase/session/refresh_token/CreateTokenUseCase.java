@@ -9,9 +9,10 @@ import dev.ngb.domain.identity.model.auth.Account;
 import dev.ngb.domain.identity.model.session.AccountSession;
 import dev.ngb.domain.identity.repository.AccountRepository;
 import dev.ngb.domain.identity.repository.AccountSessionRepository;
-import dev.ngb.domain.identity.service.SessionRotationDomainService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import java.time.Instant;
 
 /*
  * Refreshes the access token using a valid refresh token with rotation. The presented refresh is
@@ -30,7 +31,6 @@ public class CreateTokenUseCase implements UseCaseService {
     private final AccountRepository accountRepository;
     private final AccountSessionRepository accountSessionRepository;
     private final TokenProvider tokenProvider;
-    private final SessionRotationDomainService sessionRotationDomainService;
 
     public AuthTokenResponse execute(CreateTokenRequest request) {
         log.debug("Refresh token attempt");
@@ -44,9 +44,8 @@ public class CreateTokenUseCase implements UseCaseService {
                     return AccountError.INVALID_REFRESH_TOKEN.exception();
                 });
 
-        // Revoked or expired rows reuse the same error as unknown hash.
-        if (!session.isValid()) {
-            log.warn("Refresh token failed: session revoked or expired sessionId={}", session.getId());
+        if (!accountSessionRepository.revokeIfActiveByTokenHash(tokenHash, Instant.now())) {
+            log.warn("Refresh token failed: session revoked, expired, or already rotated sessionId={}", session.getId());
             throw AccountError.INVALID_REFRESH_TOKEN.exception();
         }
 
@@ -57,18 +56,16 @@ public class CreateTokenUseCase implements UseCaseService {
                     return AccountError.ACCOUNT_NOT_FOUND.exception();
                 });
 
-        if (!account.isActive()) {
-            log.warn("Refresh token failed: account not active accountId={}", account.getId());
-            throw AccountError.ACCOUNT_NOT_ACTIVE.exception();
-        }
+        account.ensureCanLogin();
 
         String newRefreshToken = tokenProvider.generateRefreshToken();
-        SessionRotationDomainService.SessionRotation rotation = sessionRotationDomainService.rotate(
-                session,
-                tokenProvider.hashToken(newRefreshToken)
+        AccountSession newSession = AccountSession.create(
+                session.getAccountId(),
+                session.getDeviceId(),
+                tokenProvider.hashToken(newRefreshToken),
+                session.getIpAddress()
         );
-        accountSessionRepository.save(rotation.revokedSession());
-        accountSessionRepository.save(rotation.newSession());
+        accountSessionRepository.save(newSession);
 
         String accessToken = tokenProvider.generateAccessToken(
                 account.getId(), account.getUuid(), account.getEmail()

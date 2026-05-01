@@ -14,6 +14,9 @@ public record AppPropertiesConfig(
         @Value("${app.security.jwt.refresh-token-expiry:300}")
         long securityJwtRefreshTokenExpiry,
 
+        @Value("${app.security.jwt.verification-token-expiry:600}")
+        long securityJwtVerificationTokenExpiry,
+
         @Value("${app.security.jwt.public-key-base64}")
         String securityJwtPublicKeyBase64,
 

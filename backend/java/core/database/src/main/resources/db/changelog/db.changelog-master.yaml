@@ -29,3 +29,11 @@ databaseChangeLog:
       file: db/changelog/migrations/014-create-message-event-publications.sql
   - include:
       file: db/changelog/migrations/015-add-profile-indexes.sql
+  - include:
+      file: db/changelog/migrations/016-add-identity-uniqueness-constraints.sql
+  - include:
+      file: db/changelog/migrations/017-drop-oauth-provider-token-columns.sql
+  - include:
+      file: db/changelog/migrations/018-add-account-provider-unique-constraint.sql
+  - include:
+      file: db/changelog/migrations/019-expand-account-otp-code-column.sql
