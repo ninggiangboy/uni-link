@@ -62,13 +62,15 @@ public interface IdentityAuthEndpoint {
     ResponseEntity<CreateOAuthSessionResponse> createOAuthSession(@RequestBody CreateOAuthSessionRequest request,
                                                   HttpServletRequest httpRequest);
 
-    @Operation(summary = "Create token", description = "Creates a new token pair using a valid refresh token.")
+    @Operation(summary = "Create token", description = "Creates a new token pair using a valid refresh token from HTTP-only cookie (or request body for compatibility).")
     @PostMapping("/tokens")
-    ResponseEntity<AuthTokenResponse> createToken(@RequestBody CreateTokenRequest request);
+    ResponseEntity<AuthTokenResponse> createToken(@RequestBody(required = false) CreateTokenRequest request,
+                                                  HttpServletRequest httpRequest);
 
-    @Operation(summary = "Delete current session", description = "Deletes the current session. If a refresh token is provided, only that specific session is revoked.")
+    @Operation(summary = "Delete current session", description = "Deletes the current session identified by refresh token from HTTP-only cookie (or request body for compatibility).")
     @DeleteMapping("/sessions/current")
-    ResponseEntity<Void> deleteCurrentSession(@RequestBody(required = false) DeleteCurrentSessionRequest request);
+    ResponseEntity<Void> deleteCurrentSession(@RequestBody(required = false) DeleteCurrentSessionRequest request,
+                                              HttpServletRequest httpRequest);
 
     @Operation(summary = "Create password reset", description = "Creates a password reset challenge by sending an OTP to the specified email and returns reset ID.")
     @PostMapping("/password-resets")

@@ -3,8 +3,11 @@ package dev.ngb.infrastructure.web;
 import dev.ngb.domain.DomainErrorType;
 import dev.ngb.domain.DomainException;
 import dev.ngb.web.ErrorResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.experimental.UtilityClass;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 
 import java.util.EnumMap;
@@ -41,6 +44,42 @@ public final class ResourceResponse {
         return ResponseEntity.accepted().build();
     }
 
+    public static <T> ResponseEntity<T> okWithCookie(T body, ResponseCookie cookie) {
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(body);
+    }
+
+    public static ResponseEntity<Void> noContentWithCookie(ResponseCookie cookie) {
+        return ResponseEntity.noContent()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .build();
+    }
+
+    public static ResponseCookie buildHttpOnlyCookie(
+            String cookieName,
+            String value,
+            String path,
+            long maxAgeSeconds,
+            HttpServletRequest request
+    ) {
+        return ResponseCookie.from(cookieName, value)
+                .httpOnly(true)
+                .secure(isSecureRequest(request))
+                .path(path)
+                .sameSite("Lax")
+                .maxAge(maxAgeSeconds)
+                .build();
+    }
+
+    public static ResponseCookie buildClearHttpOnlyCookie(
+            String cookieName,
+            String path,
+            HttpServletRequest request
+    ) {
+        return buildHttpOnlyCookie(cookieName, "", path, 0, request);
+    }
+
     public static ResponseEntity<ErrorResponse> domainError(DomainException ex) {
         HttpStatus status = ERROR_MAP.getOrDefault(ex.getError().getType(), HttpStatus.BAD_REQUEST);
         return ResponseEntity.status(status).body(ErrorResponse.of(ex));
@@ -52,5 +91,13 @@ public final class ResourceResponse {
 
     public static ResponseEntity<ErrorResponse> serverError(ErrorResponse error) {
         return ResponseEntity.internalServerError().body(error);
+    }
+
+    private static boolean isSecureRequest(HttpServletRequest request) {
+        String forwardedProto = request.getHeader("X-Forwarded-Proto");
+        if (forwardedProto != null) {
+            return "https".equalsIgnoreCase(forwardedProto);
+        }
+        return request.isSecure();
     }
 }

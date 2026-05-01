@@ -9,7 +9,6 @@ import dev.ngb.app.identity.application.usecase.password.reset_password.dto.Comp
 import dev.ngb.app.identity.application.usecase.registration.register_account.dto.CreateAccountRequest;
 import dev.ngb.app.identity.application.usecase.registration.resend_verification.dto.CreateEmailVerificationRequest;
 import dev.ngb.app.identity.application.usecase.registration.verify_email.dto.CompleteEmailVerificationRequest;
-import dev.ngb.app.identity.application.usecase.session.logout_account.dto.DeleteCurrentSessionRequest;
 import dev.ngb.app.identity.application.usecase.session.refresh_token.dto.CreateTokenRequest;
 import dev.ngb.app.identity.support.IdentityAuthApiClient;
 import dev.ngb.app.identity.support.TestOtpSender;
@@ -82,7 +81,8 @@ class IdentityAuthIntegrationTest extends AbstractIntegrationTest {
                 identityAuth.completeEmailVerification(verificationId, new CompleteEmailVerificationRequest(otpAfterResend, device));
         assertThat(verifyResult.isRight()).isTrue();
         assertThat(verifyResult.get().accessToken()).isNotBlank();
-        assertThat(verifyResult.get().refreshToken()).isNotBlank();
+        assertThat(verifyResult.get().refreshToken()).isNull();
+        assertThat(identityAuth.refreshTokenCookie()).isNotBlank();
     }
 
     @Test
@@ -159,7 +159,8 @@ class IdentityAuthIntegrationTest extends AbstractIntegrationTest {
                 identityAuth.completeSessionVerification(new CompleteSessionVerificationRequest(stepUp.get().verificationToken(), loginOtp));
         assertThat(done.isRight()).isTrue();
         assertThat(done.get().accessToken()).isNotBlank();
-        assertThat(done.get().refreshToken()).isNotBlank();
+        assertThat(done.get().refreshToken()).isNull();
+        assertThat(identityAuth.refreshTokenCookie()).isNotBlank();
     }
 
     @Test
@@ -181,20 +182,26 @@ class IdentityAuthIntegrationTest extends AbstractIntegrationTest {
                 identityAuth.completeEmailVerification(verificationId, new CompleteEmailVerificationRequest(regOtp, device));
         assertThat(verifyResp.isRight()).isTrue();
         assertThat(verifyResp.get().accessToken()).isNotBlank();
-        assertThat(verifyResp.get().refreshToken()).isNotBlank();
+        assertThat(verifyResp.get().refreshToken()).isNull();
+        assertThat(identityAuth.refreshTokenCookie()).isNotBlank();
 
         var loginResp =
                 identityAuth.createSession(new CreateSessionRequest(email, password, device));
         assertThat(loginResp.isRight()).isTrue();
         assertThat(loginResp.get().requiresVerification()).isFalse();
         assertThat(loginResp.get().accessToken()).isNotBlank();
-        var refresh = loginResp.get().refreshToken();
+        assertThat(loginResp.get().refreshToken()).isNull();
+        var refresh = identityAuth.refreshTokenCookie();
+        assertThat(refresh).isNotBlank();
 
-        var refreshResp = identityAuth.createToken(new CreateTokenRequest(refresh));
+        var refreshResp = identityAuth.createToken(null);
         assertThat(refreshResp.isRight()).isTrue();
-        var newRefresh = refreshResp.get().refreshToken();
+        assertThat(refreshResp.get().refreshToken()).isNull();
+        var newRefresh = identityAuth.refreshTokenCookie();
+        assertThat(newRefresh).isNotBlank();
 
-        assertThat(identityAuth.deleteCurrentSession(new DeleteCurrentSessionRequest(newRefresh)).isRight()).isTrue();
+        assertThat(identityAuth.deleteCurrentSession(null).isRight()).isTrue();
+        assertThat(identityAuth.refreshTokenCookie()).isNull();
 
         var staleRefresh = identityAuth.createToken(new CreateTokenRequest(newRefresh));
         assertThat(staleRefresh.isLeft()).isTrue();
@@ -211,7 +218,8 @@ class IdentityAuthIntegrationTest extends AbstractIntegrationTest {
         assertThat(oauth.isRight()).isTrue();
         assertThat(oauth.get().isNewAccount()).isTrue();
         assertThat(oauth.get().accessToken()).isNotBlank();
-        assertThat(oauth.get().refreshToken()).isNotBlank();
+        assertThat(oauth.get().refreshToken()).isNull();
+        assertThat(identityAuth.refreshTokenCookie()).isNotBlank();
     }
 
     @Test

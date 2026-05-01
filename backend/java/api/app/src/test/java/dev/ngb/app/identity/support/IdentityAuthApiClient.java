@@ -38,6 +38,7 @@ public final class IdentityAuthApiClient {
     private static final String CURRENT_SESSION_ENDPOINT = IDENTITY_ENDPOINT + "/sessions/current";
     private static final String OAUTH_SESSIONS_ENDPOINT = IDENTITY_ENDPOINT + "/sessions/oauth";
     private static final String PASSWORD_RESETS_ENDPOINT = IDENTITY_ENDPOINT + "/password-resets";
+    private static final String REFRESH_TOKEN_COOKIE_NAME = "refresh_token";
 
     private final RequestJsonClient json;
 
@@ -83,5 +84,9 @@ public final class IdentityAuthApiClient {
 
     public Either<ErrorResponse, CreateOAuthSessionResponse> createOAuthSession(CreateOAuthSessionRequest request) {
         return json.post(OAUTH_SESSIONS_ENDPOINT, request, CreateOAuthSessionResponse.class);
+    }
+
+    public String refreshTokenCookie() {
+        return json.getCookie(REFRESH_TOKEN_COOKIE_NAME);
     }
 }

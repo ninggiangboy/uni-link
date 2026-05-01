@@ -12,7 +12,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Predicate;
 
@@ -25,6 +27,7 @@ public final class RequestJsonClient {
     private final ObjectMapper objectMapper;
     private final String baseUrl;
     private final RestTemplate restTemplate;
+    private final Map<String, String> cookieJar = new LinkedHashMap<>();
 
     public RequestJsonClient(ObjectMapper objectMapper, String baseUrl, RestTemplate restTemplate) {
         this.objectMapper = Objects.requireNonNull(objectMapper, "objectMapper");
@@ -126,12 +129,22 @@ public final class RequestJsonClient {
     }
 
     private ResponseEntity<String> exchangeJson(String path, HttpMethod method, Object body, HttpHeaders headers) {
-        return restTemplate.exchange(
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.putAll(headers);
+        applyCookieHeader(requestHeaders);
+
+        ResponseEntity<String> response = restTemplate.exchange(
                 baseUrl + path,
                 method,
-                new HttpEntity<>(body, headers),
+                new HttpEntity<>(body, requestHeaders),
                 String.class
         );
+        captureSetCookie(response.getHeaders());
+        return response;
+    }
+
+    public String getCookie(String cookieName) {
+        return cookieJar.get(cookieName);
     }
 
     private static HttpHeaders defaultJsonHeaders() {
@@ -139,6 +152,44 @@ public final class RequestJsonClient {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
         return headers;
+    }
+
+    private void applyCookieHeader(HttpHeaders headers) {
+        if (cookieJar.isEmpty() || headers.getFirst(HttpHeaders.COOKIE) != null) {
+            return;
+        }
+        String cookieValue = cookieJar.entrySet().stream()
+                .map(entry -> entry.getKey() + "=" + entry.getValue())
+                .reduce((left, right) -> left + "; " + right)
+                .orElse("");
+        if (!cookieValue.isEmpty()) {
+            headers.add(HttpHeaders.COOKIE, cookieValue);
+        }
+    }
+
+    private void captureSetCookie(HttpHeaders responseHeaders) {
+        List<String> setCookies = responseHeaders.get(HttpHeaders.SET_COOKIE);
+        if (setCookies == null || setCookies.isEmpty()) {
+            return;
+        }
+        for (String setCookie : setCookies) {
+            if (setCookie == null || setCookie.isBlank()) {
+                continue;
+            }
+            String[] parts = setCookie.split(";", 2);
+            String nameValue = parts[0];
+            int separator = nameValue.indexOf('=');
+            if (separator <= 0) {
+                continue;
+            }
+            String name = nameValue.substring(0, separator).trim();
+            String value = nameValue.substring(separator + 1).trim();
+            if (value.isEmpty()) {
+                cookieJar.remove(name);
+            } else {
+                cookieJar.put(name, value);
+            }
+        }
     }
 
     private static void requireNonBlankBody(String path, HttpStatusCode status, String responseBody) {
