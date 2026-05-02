@@ -1,9 +1,9 @@
-package dev.ngb.domain.profile.repository;
+package dev.ngb.worker.profile.application.port;
 
 /**
  * Ensures each {@link dev.ngb.event.ProfileFollowStatsDeltaEvent} is applied at most once.
  */
-public interface ProfileStatsDeltaEventDedupeRepository {
+public interface ProfileStatsDeltaEventDedupePort {
 
     /**
      * @return {@code true} if this uuid was newly recorded and the caller should apply deltas;

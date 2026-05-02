@@ -1,11 +1,11 @@
 package dev.ngb.worker.attachment.application;
 
-import dev.ngb.worker.attachment.application.sweep.SweepStalePendingAttachmentsUseCase;
-import dev.ngb.worker.shared.public_api.AttachmentJobHandlers;
+import dev.ngb.worker.attachment.application.usecase.sweep.SweepStalePendingAttachmentsUseCase;
+import dev.ngb.worker.shared.public_api.AttachmentPublicApi;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class AttachmentJobHandlersImpl implements AttachmentJobHandlers {
+public class AttachmentPublicApiImpl implements AttachmentPublicApi {
 
     private final SweepStalePendingAttachmentsUseCase sweepStalePendingAttachmentsUseCase;
 

@@ -1,4 +1,4 @@
-package dev.ngb.worker.attachment.application.sweep;
+package dev.ngb.worker.attachment.application.usecase.sweep;
 
 import dev.ngb.application.port.storage.ObjectStorage;
 import dev.ngb.domain.attachment.model.AttachmentUploadStatus;

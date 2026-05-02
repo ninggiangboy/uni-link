@@ -13,3 +13,9 @@ spring:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
       password: ${REDIS_PASSWORD:}
+
+# Redisson client (RBloomFilter, etc.). Enable on services that use it (e.g. worker follow-stats Bloom dedupe).
+ngb:
+  redis:
+    redisson:
+      enabled: ${NGB_REDIS_REDISSON_ENABLED:false}
