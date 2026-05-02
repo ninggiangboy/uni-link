@@ -1,0 +1,82 @@
+scalar Instant
+scalar Long
+
+enum ProfileVisibility {
+    PUBLIC
+    PRIVATE
+    HIDDEN
+}
+
+enum ProfileLinkType {
+    WEBSITE
+    TWITTER
+    YOUTUBE
+    GITHUB
+    INSTAGRAM
+    TIKTOK
+    OTHER
+}
+
+type ProfileSummary {
+    profileUuid: String!
+    username: String!
+    displayName: String!
+    bio: String
+    website: String
+    location: String
+    avatarUrl: String
+    bannerUrl: String
+    visibility: ProfileVisibility!
+    isVerified: Boolean
+    followerCount: Long!
+    followingCount: Long!
+    threadCount: Long!
+    likeCount: Long!
+    createdAt: Instant!
+}
+
+type ProfileBrief {
+    profileUuid: String!
+    username: String!
+    displayName: String!
+    avatarUrl: String
+    isVerified: Boolean
+}
+
+type FollowRequestResponse {
+    followRequestUuid: String!
+    requester: ProfileBrief
+    createdAt: Instant!
+}
+
+type ProfileLinkResponse {
+    linkUuid: String!
+    type: ProfileLinkType!
+    url: String!
+    orderIndex: Int
+}
+
+type ProfileMetadataResponse {
+    key: String!
+    value: String!
+}
+
+type ProfileSettingResponse {
+    allowMentions: Boolean!
+    allowMessages: Boolean!
+    allowTagging: Boolean!
+    showActivityStatus: Boolean!
+}
+
+type Query {
+    myProfile: ProfileSummary!
+    profile(username: String!): ProfileSummary!
+    followers(username: String!, limit: Int, offset: Int): [ProfileBrief!]!
+    following(username: String!, limit: Int, offset: Int): [ProfileBrief!]!
+    pendingFollowRequests(limit: Int, offset: Int): [FollowRequestResponse!]!
+    profileLinks(username: String!): [ProfileLinkResponse!]!
+    myMetadata: [ProfileMetadataResponse!]!
+    mySettings: ProfileSettingResponse!
+    blockedProfiles(limit: Int, offset: Int): [ProfileBrief!]!
+    mutedProfiles(limit: Int, offset: Int): [ProfileBrief!]!
+}

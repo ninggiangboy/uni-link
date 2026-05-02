@@ -10,6 +10,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public class ProfileJdbcRepository extends JdbcRepository<Profile, ProfileJdbcEntity, Long> implements ProfileRepository {
 
@@ -24,5 +26,20 @@ public class ProfileJdbcRepository extends JdbcRepository<Profile, ProfileJdbcEn
     @Override
     public boolean existsByUsername(String username) {
         return existsByFieldEqual("username", username);
+    }
+
+    @Override
+    public boolean existsByAccountId(Long accountId) {
+        return existsByFieldEqual("account_id", accountId);
+    }
+
+    @Override
+    public Optional<Profile> findByUsername(String username) {
+        return findFirstByFieldEqual("username", username);
+    }
+
+    @Override
+    public Optional<Profile> findByAccountId(Long accountId) {
+        return findFirstByFieldEqual("account_id", accountId);
     }
 }

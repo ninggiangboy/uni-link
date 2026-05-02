@@ -7,7 +7,13 @@ import dev.ngb.domain.DomainException;
 import dev.ngb.domain.profile.error.ProfileError;
 import dev.ngb.domain.profile.model.profile.Profile;
 import dev.ngb.domain.profile.model.profile.ProfileVisibility;
+import dev.ngb.domain.profile.model.setting.ProfileSetting;
+import dev.ngb.domain.profile.model.stats.ProfileStats;
+import dev.ngb.domain.profile.model.username.ProfileUsername;
 import dev.ngb.domain.profile.repository.ProfileRepository;
+import dev.ngb.domain.profile.repository.ProfileSettingRepository;
+import dev.ngb.domain.profile.repository.ProfileStatsRepository;
+import dev.ngb.domain.profile.repository.ProfileUsernameRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,17 +27,20 @@ import java.time.Instant;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("CreateProfileUseCase")
 class CreateProfileUseCaseTest {
 
-    @Mock
-    private ProfileRepository profileRepository;
-
-    @Mock
-    private IdentityPublicApi identityPublicApi;
+    @Mock private ProfileRepository profileRepository;
+    @Mock private ProfileStatsRepository profileStatsRepository;
+    @Mock private ProfileSettingRepository profileSettingRepository;
+    @Mock private ProfileUsernameRepository profileUsernameRepository;
+    @Mock private IdentityPublicApi identityPublicApi;
 
     @InjectMocks
     private CreateProfileUseCase useCase;
@@ -46,15 +55,31 @@ class CreateProfileUseCaseTest {
         var ex = assertThrows(DomainException.class, () -> useCase.execute(accountId, request));
 
         assertThat(ex.getError()).isEqualTo(ProfileError.ACCOUNT_NOT_ACTIVE);
-        verifyNoInteractions(profileRepository);
+        verifyNoInteractions(profileRepository, profileStatsRepository, profileSettingRepository, profileUsernameRepository);
+    }
+
+    @Test
+    @DisplayName("Account already owns a profile -> PROFILE_ALREADY_EXISTS_FOR_ACCOUNT")
+    void executeWhenAccountAlreadyHasProfileThrowsConflict() {
+        var accountId = 11L;
+        var request = new CreateProfileRequest("user.two", "User Two", null, ProfileVisibility.PUBLIC);
+        when(identityPublicApi.isAccountActive(accountId)).thenReturn(true);
+        when(profileRepository.existsByAccountId(accountId)).thenReturn(true);
+
+        var ex = assertThrows(DomainException.class, () -> useCase.execute(accountId, request));
+
+        assertThat(ex.getError()).isEqualTo(ProfileError.PROFILE_ALREADY_EXISTS_FOR_ACCOUNT);
+        verify(profileRepository, never()).save(any(Profile.class));
+        verifyNoInteractions(profileStatsRepository, profileSettingRepository, profileUsernameRepository);
     }
 
     @Test
     @DisplayName("Duplicate username -> USERNAME_ALREADY_EXISTS")
     void executeWhenUsernameExistsThrowsConflict() {
-        var accountId = 11L;
+        var accountId = 12L;
         var request = new CreateProfileRequest("user.one", "User One", "bio", ProfileVisibility.PUBLIC);
         when(identityPublicApi.isAccountActive(accountId)).thenReturn(true);
+        when(profileRepository.existsByAccountId(accountId)).thenReturn(false);
         when(profileRepository.existsByUsername("user.one")).thenReturn(true);
 
         var ex = assertThrows(DomainException.class, () -> useCase.execute(accountId, request));
@@ -64,11 +89,12 @@ class CreateProfileUseCaseTest {
     }
 
     @Test
-    @DisplayName("Active account + available username -> profile created")
-    void executeWhenValidCreatesProfile() {
-        var accountId = 12L;
+    @DisplayName("Active account + available username -> profile + satellite rows persisted")
+    void executeWhenValidCreatesProfileAndBootstrapsSatellites() {
+        var accountId = 13L;
         var request = new CreateProfileRequest("user.one", "User One", "bio", ProfileVisibility.PRIVATE);
         when(identityPublicApi.isAccountActive(accountId)).thenReturn(true);
+        when(profileRepository.existsByAccountId(accountId)).thenReturn(false);
         when(profileRepository.existsByUsername("user.one")).thenReturn(false);
         when(profileRepository.save(any(Profile.class))).thenAnswer(invocation -> {
             Profile p = invocation.getArgument(0);
@@ -100,27 +126,24 @@ class CreateProfileUseCaseTest {
         assertThat(response.displayName()).isEqualTo("User One");
         assertThat(response.visibility()).isEqualTo(ProfileVisibility.PRIVATE);
 
-        var savedCaptor = ArgumentCaptor.forClass(Profile.class);
-        verify(profileRepository).save(savedCaptor.capture());
-        assertThat(savedCaptor.getValue().getAccountId()).isEqualTo(accountId);
-    }
+        var savedProfile = ArgumentCaptor.forClass(Profile.class);
+        verify(profileRepository).save(savedProfile.capture());
+        assertThat(savedProfile.getValue().getAccountId()).isEqualTo(accountId);
 
-    @Test
-    @DisplayName("Same active account can create multiple profiles with different usernames")
-    void executeWhenSameAccountCreatesDifferentUsernamesSucceeds() {
-        var accountId = 13L;
-        var requestOne = new CreateProfileRequest("user.one", "User One", null, ProfileVisibility.PUBLIC);
-        var requestTwo = new CreateProfileRequest("user.two", "User Two", null, ProfileVisibility.PUBLIC);
-        when(identityPublicApi.isAccountActive(accountId)).thenReturn(true);
-        when(profileRepository.existsByUsername("user.one")).thenReturn(false);
-        when(profileRepository.existsByUsername("user.two")).thenReturn(false);
-        when(profileRepository.save(any(Profile.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        var statsCaptor = ArgumentCaptor.forClass(ProfileStats.class);
+        verify(profileStatsRepository).save(statsCaptor.capture());
+        assertThat(statsCaptor.getValue().getProfileId()).isEqualTo(200L);
+        assertThat(statsCaptor.getValue().getFollowerCount()).isZero();
 
-        var first = useCase.execute(accountId, requestOne);
-        var second = useCase.execute(accountId, requestTwo);
+        var settingCaptor = ArgumentCaptor.forClass(ProfileSetting.class);
+        verify(profileSettingRepository).save(settingCaptor.capture());
+        assertThat(settingCaptor.getValue().getProfileId()).isEqualTo(200L);
+        assertThat(settingCaptor.getValue().getAllowMentions()).isTrue();
 
-        assertThat(first.username()).isEqualTo("user.one");
-        assertThat(second.username()).isEqualTo("user.two");
-        verify(profileRepository, times(2)).save(any(Profile.class));
+        var usernameCaptor = ArgumentCaptor.forClass(ProfileUsername.class);
+        verify(profileUsernameRepository).save(usernameCaptor.capture());
+        assertThat(usernameCaptor.getValue().getProfileId()).isEqualTo(200L);
+        assertThat(usernameCaptor.getValue().getIsCurrent()).isTrue();
+        assertThat(usernameCaptor.getValue().getUsername()).isEqualTo("user.one");
     }
 }

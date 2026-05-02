@@ -37,6 +37,10 @@ public interface ProfileRelationshipRepository {
 
     List<Long> findFollowingProfileIds(Long profileId, int limit, int offset, ProfileRelationshipSort sort);
 
+    List<Long> findBlockedProfileIds(Long profileId, int limit, int offset, ProfileRelationshipSort sort);
+
+    List<Long> findMutedProfileIds(Long profileId, int limit, int offset, ProfileRelationshipSort sort);
+
     List<Long> findMutualFollowingProfileIds(Long profileId, Long otherProfileId, int limit, ProfileRelationshipSort sort);
 
     List<Long> findFollowedHashtagIds(Long profileId, int limit, int offset, ProfileRelationshipSort sort);

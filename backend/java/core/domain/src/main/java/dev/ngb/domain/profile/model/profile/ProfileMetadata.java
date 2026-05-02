@@ -33,4 +33,20 @@ public class ProfileMetadata extends DomainEntity<Long> {
         obj.value = value;
         return obj;
     }
+
+    public static ProfileMetadata create(Long profileId, String key, String value) {
+        ProfileMetadata obj = new ProfileMetadata();
+        Instant now = Instant.now(obj.clock);
+        obj.createdAt = now;
+        obj.updatedAt = now;
+        obj.profileId = profileId;
+        obj.key = key;
+        obj.value = value;
+        return obj;
+    }
+
+    public void updateValue(String value) {
+        this.value = value;
+        this.updatedAt = Instant.now(clock);
+    }
 }

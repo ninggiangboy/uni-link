@@ -145,6 +145,38 @@ public class ProfileRelationshipNeo4jRepository implements ProfileRelationshipRe
     }
 
     @Override
+    public List<Long> findBlockedProfileIds(Long profileId, int limit, int offset, ProfileRelationshipSort sort) {
+        String sortClause = switch (sort) {
+            case LATEST -> "ORDER BY r.since DESC, f.profileId DESC";
+            case OLDEST -> "ORDER BY r.since ASC, f.profileId ASC";
+            case PROFILE_ID_ASC -> "ORDER BY f.profileId ASC";
+            case PROFILE_ID_DESC -> "ORDER BY f.profileId DESC";
+            case null -> "ORDER BY r.since DESC, f.profileId DESC";
+        };
+        return queryExecutor.queryLongList(ProfileRelationshipCypher.FIND_BLOCKED_PROFILE_IDS.formatted(sortClause), Map.of(
+                "profileId", profileId,
+                "limit", limit,
+                "offset", offset
+        ), "profileId");
+    }
+
+    @Override
+    public List<Long> findMutedProfileIds(Long profileId, int limit, int offset, ProfileRelationshipSort sort) {
+        String sortClause = switch (sort) {
+            case LATEST -> "ORDER BY r.since DESC, f.profileId DESC";
+            case OLDEST -> "ORDER BY r.since ASC, f.profileId ASC";
+            case PROFILE_ID_ASC -> "ORDER BY f.profileId ASC";
+            case PROFILE_ID_DESC -> "ORDER BY f.profileId DESC";
+            case null -> "ORDER BY r.since DESC, f.profileId DESC";
+        };
+        return queryExecutor.queryLongList(ProfileRelationshipCypher.FIND_MUTED_PROFILE_IDS.formatted(sortClause), Map.of(
+                "profileId", profileId,
+                "limit", limit,
+                "offset", offset
+        ), "profileId");
+    }
+
+    @Override
     public List<Long> findMutualFollowingProfileIds(Long profileId, Long otherProfileId, int limit, ProfileRelationshipSort sort) {
         String sortClause = switch (sort) {
             case LATEST -> "ORDER BY since DESC, profileId DESC";

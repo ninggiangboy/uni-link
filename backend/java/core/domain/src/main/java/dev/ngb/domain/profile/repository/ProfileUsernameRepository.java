@@ -4,6 +4,7 @@ import dev.ngb.domain.Repository;
 import dev.ngb.domain.profile.model.username.ProfileUsername;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Repository for managing {@link ProfileUsername} entities (separate from Profile aggregate).
@@ -11,4 +12,6 @@ import java.util.List;
 public interface ProfileUsernameRepository extends Repository<ProfileUsername, Long> {
 
     List<ProfileUsername> findByProfileId(Long profileId);
+
+    Optional<ProfileUsername> findCurrentByProfileId(Long profileId);
 }

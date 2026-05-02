@@ -1,6 +1,7 @@
 package dev.ngb.domain.profile.model.username;
 
 import dev.ngb.domain.DomainEntity;
+import dev.ngb.util.StringUtils;
 import lombok.Getter;
 
 import java.time.Instant;
@@ -32,5 +33,27 @@ public class ProfileUsername extends DomainEntity<Long> {
         obj.username = username;
         obj.isCurrent = isCurrent;
         return obj;
+    }
+
+    /**
+     * Creates a new history row marked as the active username.
+     */
+    public static ProfileUsername createCurrent(Long profileId, String username) {
+        ProfileUsername obj = new ProfileUsername();
+        Instant now = Instant.now(obj.clock);
+        obj.createdAt = now;
+        obj.updatedAt = now;
+        obj.profileId = profileId;
+        obj.username = StringUtils.trim(username);
+        obj.isCurrent = Boolean.TRUE;
+        return obj;
+    }
+
+    /**
+     * Demotes this row to a historical (non-current) entry.
+     */
+    public void markHistorical() {
+        this.isCurrent = Boolean.FALSE;
+        this.updatedAt = Instant.now(clock);
     }
 }

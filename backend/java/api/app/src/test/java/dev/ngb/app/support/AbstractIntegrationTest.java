@@ -18,6 +18,7 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 import org.testcontainers.postgresql.PostgreSQLContainer;
+import org.testcontainers.neo4j.Neo4jContainer;
 import org.testcontainers.utility.DockerImageName;
 
 import java.util.List;
@@ -35,8 +36,16 @@ public abstract class AbstractIntegrationTest {
             .withUsername("postgres")
             .withPassword("postgres");
 
+    /**
+     * Neo4j for graph-backed profile relationships ({@code FOLLOWS}, {@code BLOCKS}, {@code MUTES}, …).
+     * Uses the same credentials Spring Boot expects when {@link Neo4jContainer#withAdminPassword} is set.
+     */
+    static final Neo4jContainer NEO4J = new Neo4jContainer(DockerImageName.parse("neo4j:5-community"))
+            .withAdminPassword("uni-link-test-neo4j");
+
     static {
         POSTGRES.start();
+        NEO4J.start();
     }
 
     @LocalServerPort
@@ -48,10 +57,14 @@ public abstract class AbstractIntegrationTest {
     protected final RestTemplate restTemplate = createRestTemplate();
 
     @DynamicPropertySource
-    static void configureDatasource(DynamicPropertyRegistry registry) {
+    static void configureTestcontainers(DynamicPropertyRegistry registry) {
         registry.add("spring.datasource.url", POSTGRES::getJdbcUrl);
         registry.add("spring.datasource.username", POSTGRES::getUsername);
         registry.add("spring.datasource.password", POSTGRES::getPassword);
+
+        registry.add("spring.neo4j.uri", NEO4J::getBoltUrl);
+        registry.add("spring.neo4j.authentication.username", () -> "neo4j");
+        registry.add("spring.neo4j.authentication.password", NEO4J::getAdminPassword);
     }
 
     protected String baseUrl() {

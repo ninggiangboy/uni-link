@@ -121,6 +121,22 @@ public final class ProfileRelationshipCypher {
             LIMIT $limit
             """;
 
+    public static final String FIND_BLOCKED_PROFILE_IDS = """
+            MATCH (p:Profile {profileId: $profileId})-[r:BLOCKS]->(f:Profile)
+            RETURN f.profileId AS profileId
+            %s
+            SKIP $offset
+            LIMIT $limit
+            """;
+
+    public static final String FIND_MUTED_PROFILE_IDS = """
+            MATCH (p:Profile {profileId: $profileId})-[r:MUTES]->(f:Profile)
+            RETURN f.profileId AS profileId
+            %s
+            SKIP $offset
+            LIMIT $limit
+            """;
+
     public static final String FIND_FOLLOWED_HASHTAG_IDS = """
             MATCH (p:Profile {profileId: $profileId})-[r:FOLLOWS_TAG]->(h:Hashtag)
             RETURN h.hashtagId AS hashtagId

@@ -1,6 +1,7 @@
 package dev.ngb.domain.profile.model.setting;
 
 import dev.ngb.domain.DomainEntity;
+import dev.ngb.util.NullUtils;
 import lombok.Getter;
 
 import java.time.Instant;
@@ -37,5 +38,32 @@ public class ProfileSetting extends DomainEntity<Long> {
         obj.allowTagging = allowTagging;
         obj.showActivityStatus = showActivityStatus;
         return obj;
+    }
+
+    /**
+     * Creates a fresh setting row with all interaction toggles enabled.
+     */
+    public static ProfileSetting createDefault(Long profileId) {
+        ProfileSetting obj = new ProfileSetting();
+        Instant now = Instant.now(obj.clock);
+        obj.createdAt = now;
+        obj.updatedAt = now;
+        obj.profileId = profileId;
+        obj.allowMentions = Boolean.TRUE;
+        obj.allowMessages = Boolean.TRUE;
+        obj.allowTagging = Boolean.TRUE;
+        obj.showActivityStatus = Boolean.TRUE;
+        return obj;
+    }
+
+    /**
+     * Partial update: each {@code null} parameter leaves the corresponding flag unchanged.
+     */
+    public void update(Boolean allowMentions, Boolean allowMessages, Boolean allowTagging, Boolean showActivityStatus) {
+        this.allowMentions = NullUtils.getOr(allowMentions, this.allowMentions);
+        this.allowMessages = NullUtils.getOr(allowMessages, this.allowMessages);
+        this.allowTagging = NullUtils.getOr(allowTagging, this.allowTagging);
+        this.showActivityStatus = NullUtils.getOr(showActivityStatus, this.showActivityStatus);
+        this.updatedAt = Instant.now(clock);
     }
 }

@@ -111,6 +111,53 @@ public final class HttpJsonClient {
         return cookieStore.get(cookieName);
     }
 
+    public <R> Either<ErrorResponse, R> get(String path, HttpHeaders headers, Class<R> type) {
+        Objects.requireNonNull(headers, "headers");
+        try {
+            HttpHeaders requestHeaders = new HttpHeaders();
+            requestHeaders.putAll(headers);
+            cookieStore.apply(requestHeaders);
+            ResponseEntity<String> response = restTemplate.exchange(
+                    resolveRequestUrl(path),
+                    HttpMethod.GET,
+                    new HttpEntity<>(requestHeaders),
+                    String.class
+            );
+            cookieStore.captureFrom(response.getHeaders());
+            return codec.deserialize(path, response, type, HttpStatusCode::is2xxSuccessful);
+        } catch (RestClientException e) {
+            return Either.left(ErrorResponse.of(
+                    "TRANSPORT_ERROR",
+                    "HTTP GET failed for " + path + ": " + e.getMessage()
+            ));
+        }
+    }
+
+    /**
+     * DELETE without a JSON body (e.g. {@code DELETE /resource/id}).
+     */
+    public <R> Either<ErrorResponse, R> deleteWithoutBody(String path, HttpHeaders headers, Class<R> type) {
+        Objects.requireNonNull(headers, "headers");
+        try {
+            HttpHeaders requestHeaders = new HttpHeaders();
+            requestHeaders.putAll(headers);
+            cookieStore.apply(requestHeaders);
+            ResponseEntity<String> response = restTemplate.exchange(
+                    resolveRequestUrl(path),
+                    HttpMethod.DELETE,
+                    new HttpEntity<>(requestHeaders),
+                    String.class
+            );
+            cookieStore.captureFrom(response.getHeaders());
+            return codec.deserialize(path, response, type, HttpStatusCode::is2xxSuccessful);
+        } catch (RestClientException e) {
+            return Either.left(ErrorResponse.of(
+                    "TRANSPORT_ERROR",
+                    "HTTP DELETE failed for " + path + ": " + e.getMessage()
+            ));
+        }
+    }
+
     private Either<ErrorResponse, ResponseEntity<String>> exchange(
             HttpMethod method,
             String path,

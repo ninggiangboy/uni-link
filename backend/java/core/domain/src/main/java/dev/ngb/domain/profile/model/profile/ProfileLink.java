@@ -1,6 +1,8 @@
 package dev.ngb.domain.profile.model.profile;
 
 import dev.ngb.domain.DomainEntity;
+import dev.ngb.util.NullUtils;
+import dev.ngb.util.StringUtils;
 import lombok.Getter;
 
 import java.time.Instant;
@@ -33,5 +35,27 @@ public class ProfileLink extends DomainEntity<Long> {
         obj.url = url;
         obj.orderIndex = orderIndex;
         return obj;
+    }
+
+    public static ProfileLink create(Long profileId, ProfileLinkType type, String url, Integer orderIndex) {
+        ProfileLink obj = new ProfileLink();
+        Instant now = Instant.now(obj.clock);
+        obj.createdAt = now;
+        obj.updatedAt = now;
+        obj.profileId = profileId;
+        obj.type = NullUtils.getOr(type, ProfileLinkType.OTHER);
+        obj.url = StringUtils.trim(url);
+        obj.orderIndex = NullUtils.getOrZero(orderIndex);
+        return obj;
+    }
+
+    /**
+     * Partial update: {@code null} parameters leave the corresponding field untouched.
+     */
+    public void update(ProfileLinkType type, String url, Integer orderIndex) {
+        if (type != null) this.type = type;
+        if (url != null) this.url = StringUtils.trim(url);
+        if (orderIndex != null) this.orderIndex = orderIndex;
+        this.updatedAt = Instant.now(clock);
     }
 }

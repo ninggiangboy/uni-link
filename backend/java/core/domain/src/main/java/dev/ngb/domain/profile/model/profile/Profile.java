@@ -67,7 +67,9 @@ public class Profile extends DomainEntity<Long> {
             ProfileVisibility visibility
     ) {
         Profile obj = new Profile();
-        obj.createdAt = Instant.now(obj.clock);
+        Instant now = Instant.now(obj.clock);
+        obj.createdAt = now;
+        obj.updatedAt = now;
         obj.accountId = accountId;
         obj.username = StringUtils.trim(username);
         obj.displayName = StringUtils.trim(displayName);
@@ -75,5 +77,54 @@ public class Profile extends DomainEntity<Long> {
         obj.visibility = NullUtils.getOr(visibility, ProfileVisibility.PUBLIC);
         obj.isVerified = Boolean.FALSE;
         return obj;
+    }
+
+    /**
+     * Updates the editable persona fields. {@code null} values clear optional fields;
+     * {@code displayName} must not be blank.
+     */
+    public void updateInfo(String displayName, String bio, String website, String location) {
+        this.displayName = StringUtils.trim(displayName);
+        this.bio = StringUtils.trim(bio);
+        this.website = StringUtils.trim(website);
+        this.location = StringUtils.trim(location);
+        touch();
+    }
+
+    public void changeVisibility(ProfileVisibility visibility) {
+        this.visibility = NullUtils.getOr(visibility, ProfileVisibility.PUBLIC);
+        touch();
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
+        touch();
+    }
+
+    public void setBannerUrl(String bannerUrl) {
+        this.bannerUrl = bannerUrl;
+        touch();
+    }
+
+    public void changeUsername(String username) {
+        this.username = StringUtils.trim(username);
+        touch();
+    }
+
+    public void registerPublicKey(String publicKey) {
+        this.publicKey = publicKey;
+        touch();
+    }
+
+    public boolean isHidden() {
+        return visibility == ProfileVisibility.HIDDEN;
+    }
+
+    public boolean isPrivate() {
+        return visibility == ProfileVisibility.PRIVATE;
+    }
+
+    private void touch() {
+        this.updatedAt = Instant.now(clock);
     }
 }

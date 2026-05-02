@@ -3,6 +3,8 @@ plugins {
 }
 
 dependencies {
+    implementation 'com.graphql-java:graphql-java-extended-scalars:24.0'
+
     testImplementation 'io.vavr:vavr:0.10.6'
     testImplementation 'org.springframework.modulith:spring-modulith-starter-test'
 

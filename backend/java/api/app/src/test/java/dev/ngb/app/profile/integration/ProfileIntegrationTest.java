@@ -6,6 +6,7 @@ import dev.ngb.app.identity.application.usecase.registration.verify_email.dto.Co
 import dev.ngb.app.identity.support.IdentityAuthApiClient;
 import dev.ngb.app.identity.support.TestOtpSender;
 import dev.ngb.app.profile.application.usecase.create_profile.dto.CreateProfileRequest;
+import dev.ngb.app.profile.application.usecase.update_profile.dto.UpdateProfileRequest;
 import dev.ngb.app.profile.support.ProfileApiClient;
 import dev.ngb.app.support.AbstractIntegrationTest;
 import dev.ngb.app.support.HttpJsonClient;
@@ -18,7 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DisplayName("Profile API")
+@DisplayName("Profile API (core)")
 class ProfileIntegrationTest extends AbstractIntegrationTest {
 
     @Autowired
@@ -32,11 +33,11 @@ class ProfileIntegrationTest extends AbstractIntegrationTest {
         testOtpSender.clear();
         var json = new HttpJsonClient(baseUrl(), restTemplate, objectMapper);
         identityAuth = new IdentityAuthApiClient(json);
-        profiles = new ProfileApiClient(json);
+        profiles = new ProfileApiClient(json, objectMapper);
     }
 
     @Test
-    @DisplayName("POST /api/profiles without token -> 401")
+    @DisplayName("POST /profiles without token -> 401")
     void createProfileWithoutAuthReturnsUnauthorized() {
         var result = profiles.createProfile(
                 new CreateProfileRequest("guest.user", "Guest User", null, null)
@@ -45,24 +46,63 @@ class ProfileIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @DisplayName("Active account can create multiple profiles")
-    void createProfileWithActiveAccountAllowsMultipleProfiles() {
+    @DisplayName("Second POST /profiles for same account -> 409 PROFILE_ALREADY_EXISTS_FOR_ACCOUNT")
+    void createProfileSecondTimeReturnsConflict() {
         var accessToken = registerAndVerifyToGetAccessToken();
         var headers = bearerHeaders(accessToken);
 
         var first = profiles.createProfile(
-                new CreateProfileRequest("multi.user.one", "Multi User One", "bio one", null),
+                new CreateProfileRequest("single.owner", "Single Owner", "bio one", null),
                 headers
         );
         assertThat(first.isRight()).isTrue();
-        assertThat(first.get().username()).isEqualTo("multi.user.one");
 
         var second = profiles.createProfile(
-                new CreateProfileRequest("multi.user.two", "Multi User Two", "bio two", null),
+                new CreateProfileRequest("another.name", "Another Name", "bio two", null),
                 headers
         );
-        assertThat(second.isRight()).isTrue();
-        assertThat(second.get().username()).isEqualTo("multi.user.two");
+        assertThat(second.isLeft()).isTrue();
+        assertThat(second.getLeft().error()).isEqualTo("PROFILE_ALREADY_EXISTS_FOR_ACCOUNT");
+    }
+
+    @Test
+    @DisplayName("GraphQL myProfile returns created profile")
+    void getMyProfileReturnsSummary() {
+        var accessToken = registerAndVerifyToGetAccessToken();
+        var headers = bearerHeaders(accessToken);
+
+        assertThat(profiles.createProfile(
+                new CreateProfileRequest("me.user", "Me User", "hello", null),
+                headers
+        ).isRight()).isTrue();
+
+        var me = profiles.queryMyProfile(headers);
+        assertThat(me.isRight()).isTrue();
+        assertThat(me.get().username()).isEqualTo("me.user");
+        assertThat(me.get().displayName()).isEqualTo("Me User");
+        assertThat(me.get().bio()).isEqualTo("hello");
+    }
+
+    @Test
+    @DisplayName("PATCH /profiles/me updates profile fields")
+    void patchProfileUpdatesFields() {
+        var accessToken = registerAndVerifyToGetAccessToken();
+        var headers = bearerHeaders(accessToken);
+
+        assertThat(profiles.createProfile(
+                new CreateProfileRequest("patch.user", "Patch User", null, null),
+                headers
+        ).isRight()).isTrue();
+
+        var updated = profiles.updateProfile(
+                new UpdateProfileRequest("New Display", "updated bio", "https://site.example", "Moon"),
+                headers
+        );
+        assertThat(updated.isRight()).isTrue();
+        assertThat(updated.get().displayName()).isEqualTo("New Display");
+        assertThat(updated.get().bio()).isEqualTo("updated bio");
+        assertThat(updated.get().website()).isEqualTo("https://site.example");
+        assertThat(updated.get().location()).isEqualTo("Moon");
     }
 
     @Test
@@ -76,9 +116,12 @@ class ProfileIntegrationTest extends AbstractIntegrationTest {
                 headers
         ).isRight()).isTrue();
 
+        var otherToken = registerAndVerifyToGetAccessToken();
+        var otherHeaders = bearerHeaders(otherToken);
+
         var duplicate = profiles.createProfile(
                 new CreateProfileRequest("taken.profile", "Another Display Name", null, null),
-                headers
+                otherHeaders
         );
         assertThat(duplicate.isLeft()).isTrue();
         assertThat(duplicate.getLeft().error()).isEqualTo("USERNAME_ALREADY_EXISTS");
