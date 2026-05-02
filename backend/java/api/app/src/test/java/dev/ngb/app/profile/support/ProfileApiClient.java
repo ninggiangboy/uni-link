@@ -1,13 +1,11 @@
 package dev.ngb.app.profile.support;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.ngb.app.profile.application.usecase.create_profile.dto.CreateProfileRequest;
 import dev.ngb.app.profile.application.usecase.create_profile.dto.CreateProfileResponse;
-import dev.ngb.app.support.RequestJsonClient;
+import dev.ngb.app.support.HttpJsonClient;
 import dev.ngb.web.ErrorResponse;
 import io.vavr.control.Either;
 import org.springframework.http.HttpHeaders;
-import org.springframework.web.client.RestTemplate;
 
 /**
  * Composable HTTP client for {@code /api/profiles}. {@code Left} = {@link ErrorResponse}.
@@ -16,10 +14,10 @@ public final class ProfileApiClient {
 
     private static final String PROFILES_ENDPOINT = "/profiles";
 
-    private final RequestJsonClient json;
+    private final HttpJsonClient json;
 
-    public ProfileApiClient(ObjectMapper objectMapper, RestTemplate restTemplate, String baseUrl) {
-        this.json = new RequestJsonClient(objectMapper, baseUrl, restTemplate);
+    public ProfileApiClient(HttpJsonClient json) {
+        this.json = json;
     }
 
     public Either<ErrorResponse, CreateProfileResponse> createProfile(CreateProfileRequest body) {

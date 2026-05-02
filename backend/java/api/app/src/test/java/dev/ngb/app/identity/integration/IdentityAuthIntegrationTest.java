@@ -13,6 +13,7 @@ import dev.ngb.app.identity.application.usecase.session.refresh_token.dto.Create
 import dev.ngb.app.identity.support.IdentityAuthApiClient;
 import dev.ngb.app.identity.support.TestOtpSender;
 import dev.ngb.app.support.AbstractIntegrationTest;
+import dev.ngb.app.support.HttpJsonClient;
 import dev.ngb.app.support.TestUtils;
 import dev.ngb.domain.identity.model.auth.AuthProvider;
 import dev.ngb.domain.identity.model.auth.DeviceType;
@@ -41,7 +42,8 @@ class IdentityAuthIntegrationTest extends AbstractIntegrationTest {
     @BeforeEach
     void setUp() {
         testOtpSender.clear();
-        identityAuth = new IdentityAuthApiClient(objectMapper, restTemplate, baseUrl());
+        var json = new HttpJsonClient(baseUrl(), restTemplate, objectMapper);
+        identityAuth = new IdentityAuthApiClient(json);
     }
 
     @Test

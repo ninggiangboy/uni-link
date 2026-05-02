@@ -1,6 +1,5 @@
 package dev.ngb.app.identity.support;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.ngb.app.identity.application.dto.AuthTokenResponse;
 import dev.ngb.app.identity.application.usecase.authentication.login_account.dto.CreateSessionRequest;
 import dev.ngb.app.identity.application.usecase.authentication.login_account.dto.CreateSessionResponse;
@@ -17,15 +16,14 @@ import dev.ngb.app.identity.application.usecase.registration.resend_verification
 import dev.ngb.app.identity.application.usecase.registration.verify_email.dto.CompleteEmailVerificationRequest;
 import dev.ngb.app.identity.application.usecase.session.logout_account.dto.DeleteCurrentSessionRequest;
 import dev.ngb.app.identity.application.usecase.session.refresh_token.dto.CreateTokenRequest;
-import dev.ngb.app.support.NoContent;
-import dev.ngb.app.support.RequestJsonClient;
+import dev.ngb.app.support.EmptyBody;
+import dev.ngb.app.support.HttpJsonClient;
 import dev.ngb.web.ErrorResponse;
 import io.vavr.control.Either;
-import org.springframework.web.client.RestTemplate;
 
 /**
  * Composable HTTP client for identity REST endpoints. {@code Left} = {@link ErrorResponse};
- * {@code Right} = success DTO or {@link NoContent} for empty bodies.
+ * {@code Right} = success DTO or {@link EmptyBody} for empty bodies.
  */
 public final class IdentityAuthApiClient {
 
@@ -40,10 +38,10 @@ public final class IdentityAuthApiClient {
     private static final String PASSWORD_RESETS_ENDPOINT = IDENTITY_ENDPOINT + "/password-resets";
     private static final String REFRESH_TOKEN_COOKIE_NAME = "refresh_token";
 
-    private final RequestJsonClient json;
+    private final HttpJsonClient json;
 
-    public IdentityAuthApiClient(ObjectMapper objectMapper, RestTemplate restTemplate, String baseUrl) {
-        this.json = new RequestJsonClient(objectMapper, baseUrl, restTemplate);
+    public IdentityAuthApiClient(HttpJsonClient json) {
+        this.json = json;
     }
 
     public Either<ErrorResponse, CreateAccountResponse> createAccount(CreateAccountRequest request) {
@@ -70,16 +68,16 @@ public final class IdentityAuthApiClient {
         return json.post(EMAIL_VERIFICATIONS_ENDPOINT, request, CreateEmailVerificationResponse.class);
     }
 
-    public Either<ErrorResponse, NoContent> deleteCurrentSession(DeleteCurrentSessionRequest request) {
-        return json.delete(CURRENT_SESSION_ENDPOINT, request, NoContent.class);
+    public Either<ErrorResponse, EmptyBody> deleteCurrentSession(DeleteCurrentSessionRequest request) {
+        return json.delete(CURRENT_SESSION_ENDPOINT, request, EmptyBody.class);
     }
 
     public Either<ErrorResponse, CreatePasswordResetResponse> createPasswordReset(CreatePasswordResetRequest request) {
         return json.post(PASSWORD_RESETS_ENDPOINT, request, CreatePasswordResetResponse.class);
     }
 
-    public Either<ErrorResponse, NoContent> completePasswordReset(String resetId, CompletePasswordResetRequest request) {
-        return json.patch(PASSWORD_RESETS_ENDPOINT + "/" + resetId, request, NoContent.class);
+    public Either<ErrorResponse, EmptyBody> completePasswordReset(String resetId, CompletePasswordResetRequest request) {
+        return json.patch(PASSWORD_RESETS_ENDPOINT + "/" + resetId, request, EmptyBody.class);
     }
 
     public Either<ErrorResponse, CreateOAuthSessionResponse> createOAuthSession(CreateOAuthSessionRequest request) {

@@ -8,6 +8,7 @@ import dev.ngb.app.identity.support.TestOtpSender;
 import dev.ngb.app.profile.application.usecase.create_profile.dto.CreateProfileRequest;
 import dev.ngb.app.profile.support.ProfileApiClient;
 import dev.ngb.app.support.AbstractIntegrationTest;
+import dev.ngb.app.support.HttpJsonClient;
 import dev.ngb.app.support.TestUtils;
 import dev.ngb.domain.identity.model.auth.DeviceType;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,8 +30,9 @@ class ProfileIntegrationTest extends AbstractIntegrationTest {
     @BeforeEach
     void setUp() {
         testOtpSender.clear();
-        identityAuth = new IdentityAuthApiClient(objectMapper, restTemplate, baseUrl());
-        profiles = new ProfileApiClient(objectMapper, restTemplate, baseUrl());
+        var json = new HttpJsonClient(baseUrl(), restTemplate, objectMapper);
+        identityAuth = new IdentityAuthApiClient(json);
+        profiles = new ProfileApiClient(json);
     }
 
     @Test
