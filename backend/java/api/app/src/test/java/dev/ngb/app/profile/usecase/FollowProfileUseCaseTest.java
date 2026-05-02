@@ -1,20 +1,18 @@
 package dev.ngb.app.profile.usecase;
 
+import dev.ngb.app.profile.application.ProfileFollowStatsDeltaPublisher;
 import dev.ngb.app.profile.application.dto.FollowResponse;
 import dev.ngb.app.profile.application.usecase.follow_profile.FollowProfileUseCase;
 import dev.ngb.app.profile.support.ProfileFixtures;
 import dev.ngb.domain.DomainException;
 import dev.ngb.domain.profile.error.ProfileError;
 import dev.ngb.domain.profile.model.profile.ProfileVisibility;
-import dev.ngb.domain.profile.model.stats.ProfileStats;
 import dev.ngb.domain.profile.repository.FollowRequestRepository;
 import dev.ngb.domain.profile.repository.ProfileRelationshipRepository;
 import dev.ngb.domain.profile.repository.ProfileRepository;
-import dev.ngb.domain.profile.repository.ProfileStatsRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -25,10 +23,10 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -37,13 +35,13 @@ import static org.mockito.Mockito.when;
 class FollowProfileUseCaseTest {
 
     @Mock private ProfileRepository profileRepository;
-    @Mock private ProfileStatsRepository profileStatsRepository;
+    @Mock private ProfileFollowStatsDeltaPublisher profileFollowStatsDeltaPublisher;
     @Mock private ProfileRelationshipRepository profileRelationshipRepository;
     @Mock private FollowRequestRepository followRequestRepository;
     @InjectMocks private FollowProfileUseCase useCase;
 
     @Test
-    @DisplayName("Public target + new edge -> stats incremented and FOLLOWING returned")
+    @DisplayName("Public target + new edge -> delta published and FOLLOWING returned")
     void executeWhenPublicCreatesEdge() {
         var follower = ProfileFixtures.profile(1L, 100L, "alice");
         var target = ProfileFixtures.profile(2L, 200L, "bob");
@@ -52,17 +50,11 @@ class FollowProfileUseCaseTest {
         when(profileRelationshipRepository.isBlocked(2L, 1L)).thenReturn(false);
         when(profileRelationshipRepository.isBlocked(1L, 2L)).thenReturn(false);
         when(profileRelationshipRepository.follow(eq(1L), eq(2L), any(Instant.class))).thenReturn(true);
-        when(profileStatsRepository.findByProfileId(2L)).thenReturn(Optional.of(ProfileFixtures.stats(20L, 2L, 0, 0)));
-        when(profileStatsRepository.findByProfileId(1L)).thenReturn(Optional.of(ProfileFixtures.stats(10L, 1L, 0, 0)));
-        when(profileStatsRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         var resp = useCase.execute(100L, "bob");
 
         assertThat(resp.status()).isEqualTo(FollowResponse.Status.FOLLOWING);
-        var captor = ArgumentCaptor.forClass(ProfileStats.class);
-        verify(profileStatsRepository, times(2)).save(captor.capture());
-        assertThat(captor.getAllValues().get(0).getFollowerCount()).isEqualTo(1L);
-        assertThat(captor.getAllValues().get(1).getFollowingCount()).isEqualTo(1L);
+        verify(profileFollowStatsDeltaPublisher).publish(2L, 1, 1L, 1);
     }
 
     @Test
@@ -77,7 +69,7 @@ class FollowProfileUseCaseTest {
 
         var ex = assertThrows(DomainException.class, () -> useCase.execute(100L, "bob"));
         assertThat(ex.getError()).isEqualTo(ProfileError.ALREADY_FOLLOWING);
-        verify(profileStatsRepository, never()).save(any());
+        verify(profileFollowStatsDeltaPublisher, never()).publish(anyLong(), anyInt(), anyLong(), anyInt());
     }
 
     @Test
@@ -146,6 +138,7 @@ class FollowProfileUseCaseTest {
 
         assertThat(resp.status()).isEqualTo(FollowResponse.Status.REQUESTED);
         assertThat(resp.followRequestUuid()).isEqualTo("req-99");
+        verify(profileFollowStatsDeltaPublisher, never()).publish(anyLong(), anyInt(), anyLong(), anyInt());
     }
 
     @Test

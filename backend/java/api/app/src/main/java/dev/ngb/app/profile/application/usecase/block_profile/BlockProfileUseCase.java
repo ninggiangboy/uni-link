@@ -1,26 +1,24 @@
 package dev.ngb.app.profile.application.usecase.block_profile;
 
+import dev.ngb.app.profile.application.ProfileFollowStatsDeltaPublisher;
 import dev.ngb.application.UseCaseService;
 import dev.ngb.domain.profile.error.ProfileError;
 import dev.ngb.domain.profile.model.profile.Profile;
-import dev.ngb.domain.profile.model.stats.ProfileStats;
 import dev.ngb.domain.profile.repository.FollowRequestRepository;
 import dev.ngb.domain.profile.repository.ProfileRelationshipRepository;
 import dev.ngb.domain.profile.repository.ProfileRepository;
-import dev.ngb.domain.profile.repository.ProfileStatsRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Clock;
 import java.time.Instant;
-import java.util.Optional;
 
 /*
  * Block flow:
  *   1. Check whether either party currently follows the other (BEFORE the BLOCK Cypher
  *      removes both follow edges atomically — see ProfileRelationshipCypher.BLOCK).
  *   2. Run the BLOCK Cypher; it MERGEs the BLOCKS edge and DELETEs both FOLLOWS edges.
- *   3. For every follow edge that existed pre-block, decrement the corresponding counters.
+ *   3. For every follow edge that existed pre-block, publish stats deltas for async decrements.
  *   4. Cancel any pending FollowRequest in either direction.
  *
  * The check-then-block window is acceptable because the BLOCK Cypher is the source of truth
@@ -32,7 +30,7 @@ import java.util.Optional;
 public class BlockProfileUseCase implements UseCaseService {
 
     private final ProfileRepository profileRepository;
-    private final ProfileStatsRepository profileStatsRepository;
+    private final ProfileFollowStatsDeltaPublisher profileFollowStatsDeltaPublisher;
     private final ProfileRelationshipRepository profileRelationshipRepository;
     private final FollowRequestRepository followRequestRepository;
 
@@ -56,10 +54,10 @@ public class BlockProfileUseCase implements UseCaseService {
         }
 
         if (blockerFollowsTarget) {
-            decrement(blocker.getId(), target.getId());
+            profileFollowStatsDeltaPublisher.publish(target.getId(), -1, blocker.getId(), -1);
         }
         if (targetFollowsBlocker) {
-            decrement(target.getId(), blocker.getId());
+            profileFollowStatsDeltaPublisher.publish(blocker.getId(), -1, target.getId(), -1);
         }
 
         cancelPending(blocker.getId(), target.getId());
@@ -69,19 +67,6 @@ public class BlockProfileUseCase implements UseCaseService {
                 blocker.getId(), target.getId(),
                 (blockerFollowsTarget ? "blocker→target " : "")
                         + (targetFollowsBlocker ? "target→blocker" : ""));
-    }
-
-    private void decrement(Long followerId, Long followingId) {
-        Optional<ProfileStats> followingStats = profileStatsRepository.findByProfileId(followingId);
-        followingStats.ifPresent(s -> {
-            s.decrementFollower();
-            profileStatsRepository.save(s);
-        });
-        Optional<ProfileStats> followerStats = profileStatsRepository.findByProfileId(followerId);
-        followerStats.ifPresent(s -> {
-            s.decrementFollowing();
-            profileStatsRepository.save(s);
-        });
     }
 
     private void cancelPending(Long requesterId, Long targetId) {

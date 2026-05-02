@@ -1,25 +1,25 @@
 package dev.ngb.app.profile.application.usecase.unfollow_profile;
 
+import dev.ngb.app.profile.application.ProfileFollowStatsDeltaPublisher;
 import dev.ngb.application.UseCaseService;
 import dev.ngb.domain.profile.error.ProfileError;
 import dev.ngb.domain.profile.model.profile.Profile;
 import dev.ngb.domain.profile.repository.FollowRequestRepository;
 import dev.ngb.domain.profile.repository.ProfileRelationshipRepository;
 import dev.ngb.domain.profile.repository.ProfileRepository;
-import dev.ngb.domain.profile.repository.ProfileStatsRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /*
- * Removes the FOLLOWS edge if it exists and decrements the corresponding stats. If the relationship
- * is only a pending FollowRequest (private target), cancel it instead.
+ * Removes the FOLLOWS edge if it exists and publishes stats deltas for async counter decrements.
+ * If the relationship is only a pending FollowRequest (private target), cancel it instead.
  */
 @Slf4j
 @RequiredArgsConstructor
 public class UnfollowProfileUseCase implements UseCaseService {
 
     private final ProfileRepository profileRepository;
-    private final ProfileStatsRepository profileStatsRepository;
+    private final ProfileFollowStatsDeltaPublisher profileFollowStatsDeltaPublisher;
     private final ProfileRelationshipRepository profileRelationshipRepository;
     private final FollowRequestRepository followRequestRepository;
 
@@ -31,8 +31,7 @@ public class UnfollowProfileUseCase implements UseCaseService {
 
         boolean deleted = profileRelationshipRepository.unfollow(follower.getId(), target.getId());
         if (deleted) {
-            decrementFollowerOf(target.getId());
-            decrementFollowingOf(follower.getId());
+            profileFollowStatsDeltaPublisher.publish(target.getId(), -1, follower.getId(), -1);
             log.info("Unfollow ok followerId={}, targetId={}", follower.getId(), target.getId());
             return;
         }
@@ -49,19 +48,5 @@ public class UnfollowProfileUseCase implements UseCaseService {
                     throw ProfileError.NOT_FOLLOWING.exception();
                 }
         );
-    }
-
-    private void decrementFollowerOf(Long targetId) {
-        profileStatsRepository.findByProfileId(targetId).ifPresent(stats -> {
-            stats.decrementFollower();
-            profileStatsRepository.save(stats);
-        });
-    }
-
-    private void decrementFollowingOf(Long followerId) {
-        profileStatsRepository.findByProfileId(followerId).ifPresent(stats -> {
-            stats.decrementFollowing();
-            profileStatsRepository.save(stats);
-        });
     }
 }

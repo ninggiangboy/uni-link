@@ -28,5 +28,39 @@ public class ProfileStatsJdbcRepository extends JdbcRepository<ProfileStats, Pro
     public Optional<ProfileStats> findByProfileId(Long profileId) {
         return findFirstByFieldEqual("profile_id", profileId);
     }
+
+    @Override
+    public void adjustFollowerCount(long profileId, long delta) {
+        if (delta == 0) {
+            return;
+        }
+        jdbcTemplate.update(
+                """
+                        UPDATE prf_profile_stats
+                        SET follower_count = GREATEST(0, follower_count + ?),
+                            updated_at = NOW()
+                        WHERE profile_id = ?
+                        """,
+                delta,
+                profileId
+        );
+    }
+
+    @Override
+    public void adjustFollowingCount(long profileId, long delta) {
+        if (delta == 0) {
+            return;
+        }
+        jdbcTemplate.update(
+                """
+                        UPDATE prf_profile_stats
+                        SET following_count = GREATEST(0, following_count + ?),
+                            updated_at = NOW()
+                        WHERE profile_id = ?
+                        """,
+                delta,
+                profileId
+        );
+    }
 }
 

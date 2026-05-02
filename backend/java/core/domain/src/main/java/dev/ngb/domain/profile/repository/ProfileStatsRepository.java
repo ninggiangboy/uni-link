@@ -11,5 +11,15 @@ import java.util.Optional;
 public interface ProfileStatsRepository extends Repository<ProfileStats, Long> {
 
     Optional<ProfileStats> findByProfileId(Long profileId);
+
+    /**
+     * Atomically adjusts {@code follower_count} for {@code profileId}. Negative deltas clamp at zero.
+     */
+    void adjustFollowerCount(long profileId, long delta);
+
+    /**
+     * Atomically adjusts {@code following_count} for {@code profileId}. Negative deltas clamp at zero.
+     */
+    void adjustFollowingCount(long profileId, long delta);
 }
 

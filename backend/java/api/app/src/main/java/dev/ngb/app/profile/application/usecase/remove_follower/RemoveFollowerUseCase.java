@@ -1,24 +1,24 @@
 package dev.ngb.app.profile.application.usecase.remove_follower;
 
+import dev.ngb.app.profile.application.ProfileFollowStatsDeltaPublisher;
 import dev.ngb.application.UseCaseService;
 import dev.ngb.domain.profile.error.ProfileError;
 import dev.ngb.domain.profile.model.profile.Profile;
 import dev.ngb.domain.profile.repository.ProfileRelationshipRepository;
 import dev.ngb.domain.profile.repository.ProfileRepository;
-import dev.ngb.domain.profile.repository.ProfileStatsRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /*
  * Inverse of unfollow: the profile owner removes someone who was following them.
- * Just deletes the FOLLOWS edge from follower → owner and decrements both counters.
+ * Deletes the FOLLOWS edge from follower → owner and publishes stats deltas.
  */
 @Slf4j
 @RequiredArgsConstructor
 public class RemoveFollowerUseCase implements UseCaseService {
 
     private final ProfileRepository profileRepository;
-    private final ProfileStatsRepository profileStatsRepository;
+    private final ProfileFollowStatsDeltaPublisher profileFollowStatsDeltaPublisher;
     private final ProfileRelationshipRepository profileRelationshipRepository;
 
     public void execute(Long accountId, String followerUsername) {
@@ -32,14 +32,7 @@ public class RemoveFollowerUseCase implements UseCaseService {
             throw ProfileError.NOT_FOLLOWED_BY.exception();
         }
 
-        profileStatsRepository.findByProfileId(owner.getId()).ifPresent(stats -> {
-            stats.decrementFollower();
-            profileStatsRepository.save(stats);
-        });
-        profileStatsRepository.findByProfileId(follower.getId()).ifPresent(stats -> {
-            stats.decrementFollowing();
-            profileStatsRepository.save(stats);
-        });
+        profileFollowStatsDeltaPublisher.publish(owner.getId(), -1, follower.getId(), -1);
         log.info("Follower removed ownerId={}, followerId={}", owner.getId(), follower.getId());
     }
 }

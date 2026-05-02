@@ -1,15 +1,14 @@
 package dev.ngb.app.profile.application.usecase.follow_profile;
 
+import dev.ngb.app.profile.application.ProfileFollowStatsDeltaPublisher;
 import dev.ngb.app.profile.application.dto.FollowResponse;
 import dev.ngb.application.UseCaseService;
 import dev.ngb.domain.profile.error.ProfileError;
 import dev.ngb.domain.profile.model.profile.Profile;
 import dev.ngb.domain.profile.model.relationship.FollowRequest;
-import dev.ngb.domain.profile.model.stats.ProfileStats;
 import dev.ngb.domain.profile.repository.FollowRequestRepository;
 import dev.ngb.domain.profile.repository.ProfileRelationshipRepository;
 import dev.ngb.domain.profile.repository.ProfileRepository;
-import dev.ngb.domain.profile.repository.ProfileStatsRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,8 +19,8 @@ import java.time.Instant;
  * Follow flow:
  *   - Resolves both the follower (via accountId → Profile) and the target (via username).
  *   - Rejects self-follow, follow of HIDDEN profile, and follow when either party blocks the other.
- *   - PUBLIC target: creates the FOLLOWS edge in Neo4j; if a new edge was created, increments the
- *     denormalized follower/following counters in Postgres in the same transaction.
+ *   - PUBLIC target: creates the FOLLOWS edge in Neo4j; if a new edge was created, publishes a stats
+ *     delta event so workers can update denormalized counters in Postgres.
  *   - PRIVATE target: skips the edge and persists a PENDING FollowRequest. Caller approves later.
  */
 @Slf4j
@@ -29,7 +28,7 @@ import java.time.Instant;
 public class FollowProfileUseCase implements UseCaseService {
 
     private final ProfileRepository profileRepository;
-    private final ProfileStatsRepository profileStatsRepository;
+    private final ProfileFollowStatsDeltaPublisher profileFollowStatsDeltaPublisher;
     private final ProfileRelationshipRepository profileRelationshipRepository;
     private final FollowRequestRepository followRequestRepository;
 
@@ -65,8 +64,7 @@ public class FollowProfileUseCase implements UseCaseService {
         if (!created) {
             throw ProfileError.ALREADY_FOLLOWING.exception();
         }
-        incrementFollowerOf(target.getId());
-        incrementFollowingOf(follower.getId());
+        profileFollowStatsDeltaPublisher.publish(target.getId(), 1, follower.getId(), 1);
         log.info("Follow created followerId={}, targetId={}", follower.getId(), target.getId());
         return FollowResponse.following();
     }
@@ -83,19 +81,5 @@ public class FollowProfileUseCase implements UseCaseService {
         log.info("Follow request pending requesterId={}, targetId={}, requestId={}",
                 follower.getId(), target.getId(), pending.getId());
         return FollowResponse.requested(pending.getUuid());
-    }
-
-    private void incrementFollowerOf(Long targetId) {
-        ProfileStats stats = profileStatsRepository.findByProfileId(targetId)
-                .orElseGet(() -> ProfileStats.createForNewProfile(targetId));
-        stats.incrementFollower();
-        profileStatsRepository.save(stats);
-    }
-
-    private void incrementFollowingOf(Long followerId) {
-        ProfileStats stats = profileStatsRepository.findByProfileId(followerId)
-                .orElseGet(() -> ProfileStats.createForNewProfile(followerId));
-        stats.incrementFollowing();
-        profileStatsRepository.save(stats);
     }
 }

@@ -1,12 +1,12 @@
 package dev.ngb.app.profile.usecase;
 
+import dev.ngb.app.profile.application.ProfileFollowStatsDeltaPublisher;
 import dev.ngb.app.profile.application.usecase.remove_follower.RemoveFollowerUseCase;
 import dev.ngb.app.profile.support.ProfileFixtures;
 import dev.ngb.domain.DomainException;
 import dev.ngb.domain.profile.error.ProfileError;
 import dev.ngb.domain.profile.repository.ProfileRelationshipRepository;
 import dev.ngb.domain.profile.repository.ProfileRepository;
-import dev.ngb.domain.profile.repository.ProfileStatsRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,8 +18,6 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -28,25 +26,22 @@ import static org.mockito.Mockito.when;
 class RemoveFollowerUseCaseTest {
 
     @Mock private ProfileRepository profileRepository;
-    @Mock private ProfileStatsRepository profileStatsRepository;
+    @Mock private ProfileFollowStatsDeltaPublisher profileFollowStatsDeltaPublisher;
     @Mock private ProfileRelationshipRepository profileRelationshipRepository;
     @InjectMocks private RemoveFollowerUseCase useCase;
 
     @Test
-    @DisplayName("Existing follower -> removed and stats decremented")
+    @DisplayName("Existing follower -> removed and delta published")
     void executeWhenExisting() {
         var owner = ProfileFixtures.profile(1L, 100L, "alice");
         var follower = ProfileFixtures.profile(2L, 200L, "bob");
         when(profileRepository.findByAccountId(100L)).thenReturn(Optional.of(owner));
         when(profileRepository.findByUsername("bob")).thenReturn(Optional.of(follower));
         when(profileRelationshipRepository.unfollow(2L, 1L)).thenReturn(true);
-        when(profileStatsRepository.findByProfileId(1L)).thenReturn(Optional.of(ProfileFixtures.stats(10L, 1L, 5, 0)));
-        when(profileStatsRepository.findByProfileId(2L)).thenReturn(Optional.of(ProfileFixtures.stats(20L, 2L, 0, 5)));
-        when(profileStatsRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         useCase.execute(100L, "bob");
 
-        verify(profileStatsRepository, times(2)).save(any());
+        verify(profileFollowStatsDeltaPublisher).publish(1L, -1, 2L, -1);
     }
 
     @Test

@@ -1,7 +1,8 @@
 package dev.ngb.app.profile.usecase;
 
-import dev.ngb.app.profile.application.dto.PageQuery;
+import dev.ngb.app.profile.application.ProfileFollowStatsDeltaPublisher;
 import dev.ngb.app.profile.application.ProfileQueryService;
+import dev.ngb.app.profile.application.dto.PageQuery;
 import dev.ngb.app.profile.application.usecase.approve_follow_request.ApproveFollowRequestUseCase;
 import dev.ngb.app.profile.application.usecase.reject_follow_request.RejectFollowRequestUseCase;
 import dev.ngb.app.profile.support.ProfileFixtures;
@@ -32,7 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -42,6 +42,7 @@ class FollowRequestUseCaseTest {
 
     @Mock private ProfileRepository profileRepository;
     @Mock private ProfileStatsRepository profileStatsRepository;
+    @Mock private ProfileFollowStatsDeltaPublisher profileFollowStatsDeltaPublisher;
     @Mock private ProfileRelationshipRepository profileRelationshipRepository;
     @Mock private FollowRequestRepository followRequestRepository;
     @Mock private ProfileLinkRepository profileLinkRepository;
@@ -64,7 +65,7 @@ class FollowRequestUseCaseTest {
                 followRequestRepository
         );
         approveFollowRequestUseCase = new ApproveFollowRequestUseCase(
-                profileRepository, profileStatsRepository, profileRelationshipRepository, followRequestRepository);
+                profileRepository, profileFollowStatsDeltaPublisher, profileRelationshipRepository, followRequestRepository);
         rejectFollowRequestUseCase = new RejectFollowRequestUseCase(profileRepository, followRequestRepository);
     }
 
@@ -101,16 +102,13 @@ class FollowRequestUseCaseTest {
         when(followRequestRepository.findByUuidAndTargetProfileId("req-99", 1L)).thenReturn(Optional.of(request));
         when(followRequestRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
         when(profileRelationshipRepository.follow(eq(2L), eq(1L), any(Instant.class))).thenReturn(true);
-        when(profileStatsRepository.findByProfileId(1L)).thenReturn(Optional.of(ProfileFixtures.stats(10L, 1L, 0, 0)));
-        when(profileStatsRepository.findByProfileId(2L)).thenReturn(Optional.of(ProfileFixtures.stats(20L, 2L, 0, 0)));
-        when(profileStatsRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         approveFollowRequestUseCase.execute(100L, "req-99");
 
         var captor = ArgumentCaptor.forClass(FollowRequest.class);
         verify(followRequestRepository).save(captor.capture());
         assertThat(captor.getValue().getStatus().name()).isEqualTo("APPROVED");
-        verify(profileStatsRepository, times(2)).save(any());
+        verify(profileFollowStatsDeltaPublisher).publish(1L, 1, 2L, 1);
     }
 
     @Test
