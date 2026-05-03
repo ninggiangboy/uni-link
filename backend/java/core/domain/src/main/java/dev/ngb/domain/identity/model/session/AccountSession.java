@@ -25,7 +25,6 @@ public class AccountSession extends DomainEntity<Long> {
 
     public static AccountSession create(Long accountId, Long deviceId, String tokenHash, String ipAddress) {
         AccountSession obj = new AccountSession();
-        obj.createdAt = Instant.now(obj.clock);
         obj.accountId = accountId;
         obj.deviceId = deviceId;
         obj.tokenHash = tokenHash;
@@ -37,7 +36,6 @@ public class AccountSession extends DomainEntity<Long> {
 
     public void revoke() {
         this.isRevoked = true;
-        this.updatedAt = Instant.now(clock);
     }
 
     public boolean isValid() {

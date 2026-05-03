@@ -20,7 +20,6 @@ public class GroupThread extends DomainEntity<Long> {
 
     public static GroupThread create(Long groupId, Long threadId) {
         GroupThread obj = new GroupThread();
-        obj.createdAt = Instant.now(obj.clock);
         obj.groupId = groupId;
         obj.threadId = threadId;
         obj.isPinned = Boolean.FALSE;

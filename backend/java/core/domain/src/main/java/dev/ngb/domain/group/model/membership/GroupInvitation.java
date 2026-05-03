@@ -28,7 +28,6 @@ public class GroupInvitation extends DomainEntity<Long> {
             Instant expiresAt
     ) {
         GroupInvitation obj = new GroupInvitation();
-        obj.createdAt = Instant.now(obj.clock);
         obj.groupId = groupId;
         obj.inviterProfileId = inviterProfileId;
         obj.inviteeProfileId = inviteeProfileId;

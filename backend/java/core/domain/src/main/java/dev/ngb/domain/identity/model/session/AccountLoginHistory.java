@@ -23,7 +23,6 @@ public class AccountLoginHistory extends DomainEntity<Long> {
     public static AccountLoginHistory createSuccess(Long accountId, Long deviceId, String ipAddress,
                                                     String userAgent) {
         AccountLoginHistory obj = new AccountLoginHistory();
-        obj.createdAt = Instant.now(obj.clock);
         obj.accountId = accountId;
         obj.deviceId = deviceId;
         obj.ipAddress = ipAddress;
@@ -36,7 +35,6 @@ public class AccountLoginHistory extends DomainEntity<Long> {
     public static AccountLoginHistory createFailure(Long accountId, Long deviceId, String ipAddress,
                                                     String userAgent, String failureReason) {
         AccountLoginHistory obj = new AccountLoginHistory();
-        obj.createdAt = Instant.now(obj.clock);
         obj.accountId = accountId;
         obj.deviceId = deviceId;
         obj.ipAddress = ipAddress;
@@ -49,7 +47,6 @@ public class AccountLoginHistory extends DomainEntity<Long> {
     public static AccountLoginHistory createBlocked(Long accountId, Long deviceId, String ipAddress,
                                                     String userAgent, String failureReason) {
         AccountLoginHistory obj = new AccountLoginHistory();
-        obj.createdAt = Instant.now(obj.clock);
         obj.accountId = accountId;
         obj.deviceId = deviceId;
         obj.ipAddress = ipAddress;

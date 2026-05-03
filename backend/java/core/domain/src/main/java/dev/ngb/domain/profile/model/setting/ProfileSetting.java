@@ -45,9 +45,7 @@ public class ProfileSetting extends DomainEntity<Long> {
      */
     public static ProfileSetting createDefault(Long profileId) {
         ProfileSetting obj = new ProfileSetting();
-        Instant now = Instant.now(obj.clock);
-        obj.createdAt = now;
-        obj.updatedAt = now;
+
         obj.profileId = profileId;
         obj.allowMentions = Boolean.TRUE;
         obj.allowMessages = Boolean.TRUE;
@@ -64,6 +62,5 @@ public class ProfileSetting extends DomainEntity<Long> {
         this.allowMessages = NullUtils.getOr(allowMessages, this.allowMessages);
         this.allowTagging = NullUtils.getOr(allowTagging, this.allowTagging);
         this.showActivityStatus = NullUtils.getOr(showActivityStatus, this.showActivityStatus);
-        this.updatedAt = Instant.now(clock);
     }
 }

@@ -22,9 +22,7 @@ public class ProfileStats extends DomainEntity<Long> {
 
     public static ProfileStats createForNewProfile(Long profileId) {
         ProfileStats obj = new ProfileStats();
-        Instant now = Instant.now(obj.clock);
-        obj.createdAt = now;
-        obj.updatedAt = now;
+
         obj.profileId = profileId;
         obj.followerCount = 0L;
         obj.followingCount = 0L;
@@ -56,22 +54,18 @@ public class ProfileStats extends DomainEntity<Long> {
 
     public void incrementFollower() {
         this.followerCount = safeIncrement(this.followerCount);
-        touch();
     }
 
     public void decrementFollower() {
         this.followerCount = safeDecrement(this.followerCount);
-        touch();
     }
 
     public void incrementFollowing() {
         this.followingCount = safeIncrement(this.followingCount);
-        touch();
     }
 
     public void decrementFollowing() {
         this.followingCount = safeDecrement(this.followingCount);
-        touch();
     }
 
     private static long safeIncrement(Long current) {
@@ -86,7 +80,4 @@ public class ProfileStats extends DomainEntity<Long> {
         return current - 1L;
     }
 
-    private void touch() {
-        this.updatedAt = Instant.now(clock);
-    }
 }

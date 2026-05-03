@@ -40,7 +40,6 @@ public class Group extends DomainEntity<Long> {
             GroupVisibility visibility
     ) {
         Group obj = new Group();
-        obj.createdAt = Instant.now(obj.clock);
         obj.ownerProfileId = ownerProfileId;
         obj.name = StringUtils.trim(name);
         obj.slug = StringUtils.trim(slug);

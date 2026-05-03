@@ -40,9 +40,7 @@ public class ProfileUsername extends DomainEntity<Long> {
      */
     public static ProfileUsername createCurrent(Long profileId, String username) {
         ProfileUsername obj = new ProfileUsername();
-        Instant now = Instant.now(obj.clock);
-        obj.createdAt = now;
-        obj.updatedAt = now;
+
         obj.profileId = profileId;
         obj.username = StringUtils.trim(username);
         obj.isCurrent = Boolean.TRUE;
@@ -54,6 +52,5 @@ public class ProfileUsername extends DomainEntity<Long> {
      */
     public void markHistorical() {
         this.isCurrent = Boolean.FALSE;
-        this.updatedAt = Instant.now(clock);
     }
 }

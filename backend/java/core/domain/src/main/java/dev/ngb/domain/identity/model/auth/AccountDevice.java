@@ -24,7 +24,6 @@ public class AccountDevice extends DomainEntity<Long> {
 
     public static AccountDevice create(Long accountId, DeviceType deviceType, String deviceName, String fingerprint) {
         AccountDevice obj = new AccountDevice();
-        obj.createdAt = Instant.now(obj.clock);
         obj.accountId = accountId;
         obj.deviceType = deviceType;
         obj.deviceName = deviceName;
@@ -36,12 +35,10 @@ public class AccountDevice extends DomainEntity<Long> {
 
     public void markTrusted() {
         this.isTrusted = true;
-        this.updatedAt = Instant.now(clock);
     }
 
     public void touch() {
         this.lastActiveAt = Instant.now(clock);
-        this.updatedAt = Instant.now(clock);
     }
 
     public static AccountDevice reconstruct(

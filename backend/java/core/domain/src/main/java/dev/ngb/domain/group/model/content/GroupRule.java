@@ -20,7 +20,6 @@ public class GroupRule extends DomainEntity<Long> {
 
     public static GroupRule create(Long groupId, String title, String description, Integer position) {
         GroupRule obj = new GroupRule();
-        obj.createdAt = Instant.now(obj.clock);
         obj.groupId = groupId;
         obj.title = title;
         obj.description = description;

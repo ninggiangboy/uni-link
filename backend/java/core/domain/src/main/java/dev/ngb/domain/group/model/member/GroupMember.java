@@ -44,7 +44,6 @@ public class GroupMember extends DomainEntity<Long> {
      */
     public static GroupMember createOwner(Long groupId, Long profileId) {
         GroupMember obj = new GroupMember();
-        obj.createdAt = Instant.now(obj.clock);
         obj.groupId = groupId;
         obj.profileId = profileId;
         obj.role = GroupMemberRole.OWNER;
@@ -60,7 +59,6 @@ public class GroupMember extends DomainEntity<Long> {
      */
     public static GroupMember createAdmin(Long groupId, Long profileId, long permissions) {
         GroupMember obj = new GroupMember();
-        obj.createdAt = Instant.now(obj.clock);
         obj.groupId = groupId;
         obj.profileId = profileId;
         obj.role = GroupMemberRole.ADMIN;
@@ -74,7 +72,6 @@ public class GroupMember extends DomainEntity<Long> {
      */
     public static GroupMember createMember(Long groupId, Long profileId) {
         GroupMember obj = new GroupMember();
-        obj.createdAt = Instant.now(obj.clock);
         obj.groupId = groupId;
         obj.profileId = profileId;
         obj.role = GroupMemberRole.MEMBER;

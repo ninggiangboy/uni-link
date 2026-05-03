@@ -42,8 +42,6 @@ public class FollowRequest extends DomainEntity<Long> {
     public static FollowRequest createPending(Long requesterProfileId, Long targetProfileId) {
         FollowRequest obj = new FollowRequest();
         Instant now = Instant.now(obj.clock);
-        obj.createdAt = now;
-        obj.updatedAt = now;
         obj.requesterProfileId = requesterProfileId;
         obj.targetProfileId = targetProfileId;
         obj.status = FollowRequestStatus.PENDING;
@@ -70,6 +68,5 @@ public class FollowRequest extends DomainEntity<Long> {
         Instant now = Instant.now(clock);
         this.status = next;
         this.respondedAt = now;
-        this.updatedAt = now;
     }
 }

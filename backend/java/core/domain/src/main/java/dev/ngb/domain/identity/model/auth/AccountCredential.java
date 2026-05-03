@@ -19,7 +19,6 @@ public class AccountCredential extends DomainEntity<Long> {
 
     public static AccountCredential create(Long accountId, AuthProvider provider, String providerAccountId) {
         AccountCredential obj = new AccountCredential();
-        obj.createdAt = Instant.now(obj.clock);
         obj.accountId = accountId;
         obj.provider = provider;
         obj.providerAccountId = providerAccountId;

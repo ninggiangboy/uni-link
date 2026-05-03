@@ -49,8 +49,6 @@ public class Attachment extends DomainEntity<Long> {
         a.uploadStatus = AttachmentUploadStatus.PENDING_PUT;
         a.createdBy = createdBy;
         a.updatedBy = createdBy;
-        a.createdAt = now;
-        a.updatedAt = now;
         return a;
     }
 

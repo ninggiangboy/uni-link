@@ -29,7 +29,6 @@ public class Account extends DomainEntity<Long> {
 
     public static Account create(String email, String passwordHash) {
         Account obj = new Account();
-        obj.createdAt = Instant.now(obj.clock);
         obj.email = email;
         obj.passwordHash = passwordHash;
         obj.status = AccountStatus.PENDING;
@@ -41,7 +40,6 @@ public class Account extends DomainEntity<Long> {
 
     public static Account createFromOAuth(String email) {
         Account obj = new Account();
-        obj.createdAt = Instant.now(obj.clock);
         obj.email = email;
         obj.status = AccountStatus.ACTIVE;
         obj.emailVerified = true;
@@ -56,18 +54,15 @@ public class Account extends DomainEntity<Long> {
         }
         this.status = AccountStatus.ACTIVE;
         this.emailVerified = true;
-        this.updatedAt = Instant.now(clock);
     }
 
     public void recordLogin(String ip) {
         this.lastLoginAt = Instant.now(clock);
         this.lastLoginIp = ip;
-        this.updatedAt = Instant.now(clock);
     }
 
     public void changePassword(String newPasswordHash) {
         this.passwordHash = newPasswordHash;
-        this.updatedAt = Instant.now(clock);
     }
 
     public boolean isActive() {

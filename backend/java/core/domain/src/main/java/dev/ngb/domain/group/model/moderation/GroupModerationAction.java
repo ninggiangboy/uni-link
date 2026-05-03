@@ -30,7 +30,6 @@ public class GroupModerationAction extends DomainEntity<Long> {
             Instant expiresAt
     ) {
         GroupModerationAction obj = new GroupModerationAction();
-        obj.createdAt = Instant.now(obj.clock);
         obj.groupId = groupId;
         obj.targetProfileId = targetProfileId;
         obj.moderatorProfileId = moderatorProfileId;

@@ -39,9 +39,7 @@ public class ProfileLink extends DomainEntity<Long> {
 
     public static ProfileLink create(Long profileId, ProfileLinkType type, String url, Integer orderIndex) {
         ProfileLink obj = new ProfileLink();
-        Instant now = Instant.now(obj.clock);
-        obj.createdAt = now;
-        obj.updatedAt = now;
+
         obj.profileId = profileId;
         obj.type = NullUtils.getOr(type, ProfileLinkType.OTHER);
         obj.url = StringUtils.trim(url);
@@ -56,6 +54,5 @@ public class ProfileLink extends DomainEntity<Long> {
         if (type != null) this.type = type;
         if (url != null) this.url = StringUtils.trim(url);
         if (orderIndex != null) this.orderIndex = orderIndex;
-        this.updatedAt = Instant.now(clock);
     }
 }

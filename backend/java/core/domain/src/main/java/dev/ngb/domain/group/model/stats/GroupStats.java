@@ -19,7 +19,6 @@ public class GroupStats extends DomainEntity<Long> {
 
     public static GroupStats createForNewGroup(Long groupId) {
         GroupStats obj = new GroupStats();
-        obj.createdAt = Instant.now(obj.clock);
         obj.groupId = groupId;
         obj.memberCount = 0L;
         obj.threadCount = 0L;

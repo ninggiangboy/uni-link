@@ -37,9 +37,7 @@ public class ProfileMedia extends DomainEntity<Long> {
 
     public static ProfileMedia create(Long profileId, ProfileMediaType type, String url, String metadata) {
         ProfileMedia obj = new ProfileMedia();
-        Instant now = Instant.now(obj.clock);
-        obj.createdAt = now;
-        obj.updatedAt = now;
+
         obj.profileId = profileId;
         obj.type = type;
         obj.url = url;

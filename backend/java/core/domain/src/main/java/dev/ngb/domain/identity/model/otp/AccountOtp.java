@@ -29,7 +29,6 @@ public class AccountOtp extends DomainEntity<Long> {
 
     public static AccountOtp create(Long accountId, String code, OtpPurpose purpose, OtpChannel channel) {
         AccountOtp obj = new AccountOtp();
-        obj.createdAt = Instant.now(obj.clock);
         obj.accountId = accountId;
         obj.code = HashUtils.sha256Hex(code);
         obj.purpose = purpose;
@@ -56,7 +55,6 @@ public class AccountOtp extends DomainEntity<Long> {
             throw AccountError.INVALID_OTP.exception();
         }
         this.isUsed = true;
-        this.updatedAt = Instant.now(clock);
     }
 
     public boolean isExpired() {

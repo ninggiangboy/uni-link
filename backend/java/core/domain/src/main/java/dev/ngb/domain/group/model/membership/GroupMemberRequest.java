@@ -21,7 +21,6 @@ public class GroupMemberRequest extends DomainEntity<Long> {
 
     public static GroupMemberRequest create(Long groupId, Long requesterProfileId) {
         GroupMemberRequest obj = new GroupMemberRequest();
-        obj.createdAt = Instant.now(obj.clock);
         obj.groupId = groupId;
         obj.requesterProfileId = requesterProfileId;
         obj.status = GroupMemberRequestStatus.PENDING;
