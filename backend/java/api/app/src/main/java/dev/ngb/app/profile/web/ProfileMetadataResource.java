@@ -5,9 +5,9 @@ import dev.ngb.app.profile.application.usecase.remove_profile_metadata.RemovePro
 import dev.ngb.app.profile.application.usecase.upsert_profile_metadata.UpsertProfileMetadataUseCase;
 import dev.ngb.app.profile.application.usecase.upsert_profile_metadata.dto.UpsertProfileMetadataRequest;
 import dev.ngb.infrastructure.web.ResourceResponse;
+import dev.ngb.infrastructure.web.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,15 +20,15 @@ public class ProfileMetadataResource implements ProfileMetadataEndpoint {
 
     @Override
     @Transactional
-    public ResponseEntity<ProfileMetadataResponse> upsertMetadata(String key, UpsertProfileMetadataRequest request, Jwt jwt) {
-        Long accountId = jwt.getClaim("account_id");
+    public ResponseEntity<ProfileMetadataResponse> upsertMetadata(String key, UpsertProfileMetadataRequest request) {
+        Long accountId = SecurityUtils.getCurrentAccountId();
         return ResourceResponse.ok(upsertProfileMetadataUseCase.execute(accountId, key, request));
     }
 
     @Override
     @Transactional
-    public ResponseEntity<Void> removeMetadata(String key, Jwt jwt) {
-        Long accountId = jwt.getClaim("account_id");
+    public ResponseEntity<Void> removeMetadata(String key) {
+        Long accountId = SecurityUtils.getCurrentAccountId();
         removeProfileMetadataUseCase.execute(accountId, key);
         return ResourceResponse.noContent();
     }

@@ -29,6 +29,7 @@ public final class ProfileJdbcMapper implements JdbcMapper<Profile, ProfileJdbcE
                 entity.getBannerUrl(),
                 entity.getVisibility(),
                 entity.getIsVerified(),
+                entity.getIsCeleb(),
                 entity.getPublicKey()
         );
     }
@@ -52,6 +53,7 @@ public final class ProfileJdbcMapper implements JdbcMapper<Profile, ProfileJdbcE
                 .bannerUrl(domain.getBannerUrl())
                 .visibility(domain.getVisibility())
                 .isVerified(domain.getIsVerified())
+                .isCeleb(domain.getIsCeleb())
                 .publicKey(domain.getPublicKey())
                 .build();
     }

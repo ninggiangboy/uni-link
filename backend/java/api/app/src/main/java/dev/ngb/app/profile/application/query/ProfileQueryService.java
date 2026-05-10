@@ -1,4 +1,4 @@
-package dev.ngb.app.profile.application;
+package dev.ngb.app.profile.application.query;
 
 import dev.ngb.app.profile.application.dto.FollowRequestResponse;
 import dev.ngb.app.profile.application.dto.PageQuery;
@@ -23,7 +23,6 @@ import dev.ngb.domain.profile.repository.ProfileRepository;
 import dev.ngb.domain.profile.repository.ProfileSettingRepository;
 import dev.ngb.domain.profile.repository.ProfileStatsRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -41,7 +40,6 @@ public class ProfileQueryService implements UseCaseService {
     private final ProfileSettingRepository profileSettingRepository;
     private final FollowRequestRepository followRequestRepository;
 
-    @Transactional(readOnly = true)
     public ProfileSummary getMyProfile(Long accountId) {
         Profile profile = profileRepository.findByAccountId(accountId)
                 .orElseThrow(ProfileError.PROFILE_NOT_FOUND::exception);
@@ -52,7 +50,6 @@ public class ProfileQueryService implements UseCaseService {
     /**
      * Visibility-aware profile lookup for any username.
      */
-    @Transactional(readOnly = true)
     public ProfileSummary getProfileByUsername(String username, Optional<Long> viewerAccountId) {
         Profile profile = profileRepository.findByUsername(username)
                 .orElseThrow(ProfileError.PROFILE_NOT_FOUND::exception);
@@ -87,7 +84,6 @@ public class ProfileQueryService implements UseCaseService {
     /**
      * Paginated follower list with visibility rules for non-owners.
      */
-    @Transactional(readOnly = true)
     public List<ProfileBrief> listFollowers(String username, Optional<Long> viewerAccountId, PageQuery page) {
         Profile profile = profileRepository.findByUsername(username)
                 .orElseThrow(ProfileError.PROFILE_NOT_FOUND::exception);
@@ -120,7 +116,6 @@ public class ProfileQueryService implements UseCaseService {
                 .toList();
     }
 
-    @Transactional(readOnly = true)
     public List<ProfileBrief> listFollowing(String username, Optional<Long> viewerAccountId, PageQuery page) {
         Profile profile = profileRepository.findByUsername(username)
                 .orElseThrow(ProfileError.PROFILE_NOT_FOUND::exception);
@@ -153,7 +148,6 @@ public class ProfileQueryService implements UseCaseService {
                 .toList();
     }
 
-    @Transactional(readOnly = true)
     public List<FollowRequestResponse> listPendingFollowRequests(Long accountId, PageQuery page) {
         Profile owner = profileRepository.findByAccountId(accountId)
                 .orElseThrow(ProfileError.PROFILE_NOT_FOUND::exception);
@@ -172,7 +166,6 @@ public class ProfileQueryService implements UseCaseService {
                 .toList();
     }
 
-    @Transactional(readOnly = true)
     public List<ProfileLinkResponse> listProfileLinks(String username) {
         Profile profile = profileRepository.findByUsername(username)
                 .orElseThrow(ProfileError.PROFILE_NOT_FOUND::exception);
@@ -188,7 +181,6 @@ public class ProfileQueryService implements UseCaseService {
                 .toList();
     }
 
-    @Transactional(readOnly = true)
     public List<ProfileMetadataResponse> listMetadata(Long accountId) {
         Profile profile = profileRepository.findByAccountId(accountId)
                 .orElseThrow(ProfileError.PROFILE_NOT_FOUND::exception);
@@ -197,7 +189,6 @@ public class ProfileQueryService implements UseCaseService {
                 .toList();
     }
 
-    @Transactional(readOnly = true)
     public ProfileSettingResponse getSettings(Long accountId) {
         Profile profile = profileRepository.findByAccountId(accountId)
                 .orElseThrow(ProfileError.PROFILE_NOT_FOUND::exception);
@@ -206,7 +197,6 @@ public class ProfileQueryService implements UseCaseService {
         return ProfileSettingResponse.of(setting);
     }
 
-    @Transactional(readOnly = true)
     public List<ProfileBrief> listBlocked(Long accountId, PageQuery page) {
         Profile owner = profileRepository.findByAccountId(accountId)
                 .orElseThrow(ProfileError.PROFILE_NOT_FOUND::exception);
@@ -221,7 +211,6 @@ public class ProfileQueryService implements UseCaseService {
         return ids.stream().map(byId::get).filter(Objects::nonNull).map(ProfileBrief::of).toList();
     }
 
-    @Transactional(readOnly = true)
     public List<ProfileBrief> listMuted(Long accountId, PageQuery page) {
         Profile owner = profileRepository.findByAccountId(accountId)
                 .orElseThrow(ProfileError.PROFILE_NOT_FOUND::exception);

@@ -1,6 +1,6 @@
 package dev.ngb.app.profile.usecase;
 
-import dev.ngb.app.profile.application.ProfileFollowStatsDeltaPublisher;
+import dev.ngb.app.profile.application.service.FollowStatsSyncService;
 import dev.ngb.app.profile.application.usecase.unfollow_profile.UnfollowProfileUseCase;
 import dev.ngb.app.profile.support.ProfileFixtures;
 import dev.ngb.domain.DomainException;
@@ -22,10 +22,9 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.never;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -33,7 +32,7 @@ import static org.mockito.Mockito.when;
 class UnfollowProfileUseCaseTest {
 
     @Mock private ProfileRepository profileRepository;
-    @Mock private ProfileFollowStatsDeltaPublisher profileFollowStatsDeltaPublisher;
+    @Mock private FollowStatsSyncService followStatsSyncService;
     @Mock private ProfileRelationshipRepository profileRelationshipRepository;
     @Mock private FollowRequestRepository followRequestRepository;
     @InjectMocks private UnfollowProfileUseCase useCase;
@@ -49,7 +48,7 @@ class UnfollowProfileUseCaseTest {
 
         useCase.execute(100L, "bob");
 
-        verify(profileFollowStatsDeltaPublisher).publish(2L, -1, 1L, -1);
+        verify(followStatsSyncService).unfollow(eq(target), eq(follower));
     }
 
     @Test
@@ -69,7 +68,7 @@ class UnfollowProfileUseCaseTest {
         var captor = ArgumentCaptor.forClass(FollowRequest.class);
         verify(followRequestRepository).save(captor.capture());
         assertThat(captor.getValue().getStatus().name()).isEqualTo("CANCELLED");
-        verify(profileFollowStatsDeltaPublisher, never()).publish(anyLong(), anyInt(), anyLong(), anyInt());
+        verifyNoInteractions(followStatsSyncService);
     }
 
     @Test

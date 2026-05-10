@@ -4,9 +4,9 @@ import dev.ngb.app.attachment.application.usecase.complete_attachment.CompleteAt
 import dev.ngb.app.attachment.application.usecase.presign_attachment.PresignAttachmentUseCase;
 import dev.ngb.app.attachment.application.usecase.presign_attachment.dto.PresignAttachmentRequest;
 import dev.ngb.app.attachment.application.usecase.presign_attachment.dto.PresignAttachmentResponse;
+import dev.ngb.infrastructure.web.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
@@ -17,16 +17,16 @@ public class AttachmentResource implements AttachmentApi {
 
     @Override
     @Transactional
-    public ResponseEntity<PresignAttachmentResponse> presign(PresignAttachmentRequest request, Jwt jwt) {
-        Long accountId = jwt.getClaim("account_id");
+    public ResponseEntity<PresignAttachmentResponse> presign(PresignAttachmentRequest request) {
+        Long accountId = SecurityUtils.getCurrentAccountId();
         PresignAttachmentResponse body = presignAttachmentUseCase.execute(accountId, request);
         return ResponseEntity.ok(body);
     }
 
     @Override
     @Transactional
-    public ResponseEntity<Void> complete(String attachmentUuid, Jwt jwt) {
-        Long accountId = jwt.getClaim("account_id");
+    public ResponseEntity<Void> complete(String attachmentUuid) {
+        Long accountId = SecurityUtils.getCurrentAccountId();
         completeAttachmentUseCase.execute(accountId, attachmentUuid);
         return ResponseEntity.noContent().build();
     }

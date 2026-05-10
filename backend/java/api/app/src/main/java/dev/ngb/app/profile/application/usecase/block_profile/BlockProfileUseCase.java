@@ -1,6 +1,6 @@
 package dev.ngb.app.profile.application.usecase.block_profile;
 
-import dev.ngb.app.profile.application.ProfileFollowStatsDeltaPublisher;
+import dev.ngb.app.profile.application.service.FollowStatsSyncService;
 import dev.ngb.application.UseCaseService;
 import dev.ngb.domain.profile.error.ProfileError;
 import dev.ngb.domain.profile.model.profile.Profile;
@@ -10,18 +10,15 @@ import dev.ngb.domain.profile.repository.ProfileRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.time.Clock;
-import java.time.Instant;
-
 /*
  * Block flow:
- *   1. Check whether either party currently follows the other (BEFORE the BLOCK Cypher
- *      removes both follow edges atomically — see ProfileRelationshipCypher.BLOCK).
- *   2. Run the BLOCK Cypher; it MERGEs the BLOCKS edge and DELETEs both FOLLOWS edges.
+ *   1. Check whether either party currently follows the other (BEFORE the BLOCK_AND_CLEANUP_FOLLOWS Cypher
+ *      removes both follow edges atomically — see ProfileRelationshipCypher.BLOCK_AND_CLEANUP_FOLLOWS).
+ *   2. Run the BLOCK_AND_CLEANUP_FOLLOWS Cypher; it MERGEs the BLOCKS edge and DELETEs both FOLLOWS edges.
  *   3. For every follow edge that existed pre-block, publish stats deltas for async decrements.
  *   4. Cancel any pending FollowRequest in either direction.
  *
- * The check-then-block window is acceptable because the BLOCK Cypher is the source of truth
+ * The check-then-block window is acceptable because the BLOCK_AND_CLEANUP_FOLLOWS Cypher is the source of truth
  * for edge removal; if a FOLLOWS edge appears between step 1 and step 2 it will be removed
  * but the counters won't reflect it. In practice users don't follow + block within ms.
  */
@@ -30,7 +27,7 @@ import java.time.Instant;
 public class BlockProfileUseCase implements UseCaseService {
 
     private final ProfileRepository profileRepository;
-    private final ProfileFollowStatsDeltaPublisher profileFollowStatsDeltaPublisher;
+    private final FollowStatsSyncService followStatsSyncService;
     private final ProfileRelationshipRepository profileRelationshipRepository;
     private final FollowRequestRepository followRequestRepository;
 
@@ -44,20 +41,26 @@ public class BlockProfileUseCase implements UseCaseService {
             throw ProfileError.CANNOT_BLOCK_SELF.exception();
         }
 
-        boolean blockerFollowsTarget = profileRelationshipRepository.isFollowing(blocker.getId(), target.getId());
-        boolean targetFollowsBlocker = profileRelationshipRepository.isFollowing(target.getId(), blocker.getId());
+        var relState = profileRelationshipRepository.findRelationshipsBetween(blocker.getId(), target.getId());
 
-        boolean created = profileRelationshipRepository.block(
-                blocker.getId(), target.getId(), Instant.now(Clock.systemUTC()));
+        boolean created = profileRelationshipRepository.blockAndCleanupFollows(
+                blocker.getId(), target.getId());
         if (!created) {
             throw ProfileError.ALREADY_BLOCKED.exception();
         }
 
-        if (blockerFollowsTarget) {
-            profileFollowStatsDeltaPublisher.publish(target.getId(), -1, blocker.getId(), -1);
-        }
-        if (targetFollowsBlocker) {
-            profileFollowStatsDeltaPublisher.publish(blocker.getId(), -1, target.getId(), -1);
+        boolean sourceFollowed = relState.sourceFollowsTarget();
+        boolean targetFollowed = relState.targetFollowsSource();
+
+        if (sourceFollowed && targetFollowed) {
+            followStatsSyncService.cleanUpFollow(target, blocker);
+        } else {
+            if (sourceFollowed) {
+                followStatsSyncService.unfollow(target, blocker);
+            }
+            if (targetFollowed) {
+                followStatsSyncService.unfollow(blocker, target);
+            }
         }
 
         cancelPending(blocker.getId(), target.getId());
@@ -65,8 +68,8 @@ public class BlockProfileUseCase implements UseCaseService {
 
         log.info("Block created blockerId={}, targetId={}, removedFollows=[{}]",
                 blocker.getId(), target.getId(),
-                (blockerFollowsTarget ? "blocker→target " : "")
-                        + (targetFollowsBlocker ? "target→blocker" : ""));
+                (relState.sourceFollowsTarget() ? "blocker→target " : "")
+                        + (relState.targetFollowsSource() ? "target→blocker" : ""));
     }
 
     private void cancelPending(Long requesterId, Long targetId) {

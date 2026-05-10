@@ -1,6 +1,6 @@
 package dev.ngb.app.profile.application.usecase.approve_follow_request;
 
-import dev.ngb.app.profile.application.ProfileFollowStatsDeltaPublisher;
+import dev.ngb.app.profile.application.service.FollowStatsSyncService;
 import dev.ngb.application.UseCaseService;
 import dev.ngb.domain.profile.error.ProfileError;
 import dev.ngb.domain.profile.model.profile.Profile;
@@ -10,9 +10,6 @@ import dev.ngb.domain.profile.repository.ProfileRelationshipRepository;
 import dev.ngb.domain.profile.repository.ProfileRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import java.time.Clock;
-import java.time.Instant;
 
 /*
  * Approves a pending FollowRequest:
@@ -26,7 +23,7 @@ import java.time.Instant;
 public class ApproveFollowRequestUseCase implements UseCaseService {
 
     private final ProfileRepository profileRepository;
-    private final ProfileFollowStatsDeltaPublisher profileFollowStatsDeltaPublisher;
+    private final FollowStatsSyncService followStatsSyncService;
     private final ProfileRelationshipRepository profileRelationshipRepository;
     private final FollowRequestRepository followRequestRepository;
 
@@ -45,9 +42,11 @@ public class ApproveFollowRequestUseCase implements UseCaseService {
         followRequestRepository.save(request);
 
         boolean created = profileRelationshipRepository.follow(
-                request.getRequesterProfileId(), owner.getId(), Instant.now(Clock.systemUTC()));
+                request.getRequesterProfileId(), owner.getId());
         if (created) {
-            profileFollowStatsDeltaPublisher.publish(owner.getId(), 1, request.getRequesterProfileId(), 1);
+            Profile requester = profileRepository.findById(request.getRequesterProfileId())
+                    .orElseThrow(ProfileError.PROFILE_NOT_FOUND::exception);
+            followStatsSyncService.follow(owner, requester);
         }
         log.info("Follow request approved requestId={}, requesterId={}, ownerId={}, edgeCreated={}",
                 request.getId(), request.getRequesterProfileId(), owner.getId(), created);

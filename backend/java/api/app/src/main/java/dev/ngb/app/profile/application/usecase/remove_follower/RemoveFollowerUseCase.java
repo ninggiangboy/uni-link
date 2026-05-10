@@ -1,6 +1,6 @@
 package dev.ngb.app.profile.application.usecase.remove_follower;
 
-import dev.ngb.app.profile.application.ProfileFollowStatsDeltaPublisher;
+import dev.ngb.app.profile.application.service.FollowStatsSyncService;
 import dev.ngb.application.UseCaseService;
 import dev.ngb.domain.profile.error.ProfileError;
 import dev.ngb.domain.profile.model.profile.Profile;
@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 public class RemoveFollowerUseCase implements UseCaseService {
 
     private final ProfileRepository profileRepository;
-    private final ProfileFollowStatsDeltaPublisher profileFollowStatsDeltaPublisher;
+    private final FollowStatsSyncService followStatsSyncService;
     private final ProfileRelationshipRepository profileRelationshipRepository;
 
     public void execute(Long accountId, String followerUsername) {
@@ -32,7 +32,7 @@ public class RemoveFollowerUseCase implements UseCaseService {
             throw ProfileError.NOT_FOLLOWED_BY.exception();
         }
 
-        profileFollowStatsDeltaPublisher.publish(owner.getId(), -1, follower.getId(), -1);
+        followStatsSyncService.unfollow(owner, follower);
         log.info("Follower removed ownerId={}, followerId={}", owner.getId(), follower.getId());
     }
 }

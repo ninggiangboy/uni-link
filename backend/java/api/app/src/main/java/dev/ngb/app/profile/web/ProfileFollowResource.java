@@ -7,9 +7,9 @@ import dev.ngb.app.profile.application.usecase.reject_follow_request.RejectFollo
 import dev.ngb.app.profile.application.usecase.remove_follower.RemoveFollowerUseCase;
 import dev.ngb.app.profile.application.usecase.unfollow_profile.UnfollowProfileUseCase;
 import dev.ngb.infrastructure.web.ResourceResponse;
+import dev.ngb.infrastructure.web.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,39 +25,39 @@ public class ProfileFollowResource implements ProfileFollowEndpoint {
 
     @Override
     @Transactional
-    public ResponseEntity<FollowResponse> follow(String username, Jwt jwt) {
-        Long accountId = jwt.getClaim("account_id");
+    public ResponseEntity<FollowResponse> follow(String username) {
+        Long accountId = SecurityUtils.getCurrentAccountId();
         return ResourceResponse.ok(followProfileUseCase.execute(accountId, username));
     }
 
     @Override
     @Transactional
-    public ResponseEntity<Void> unfollow(String username, Jwt jwt) {
-        Long accountId = jwt.getClaim("account_id");
+    public ResponseEntity<Void> unfollow(String username) {
+        Long accountId = SecurityUtils.getCurrentAccountId();
         unfollowProfileUseCase.execute(accountId, username);
         return ResourceResponse.noContent();
     }
 
     @Override
     @Transactional
-    public ResponseEntity<Void> removeFollower(String username, Jwt jwt) {
-        Long accountId = jwt.getClaim("account_id");
+    public ResponseEntity<Void> removeFollower(String username) {
+        Long accountId = SecurityUtils.getCurrentAccountId();
         removeFollowerUseCase.execute(accountId, username);
         return ResourceResponse.noContent();
     }
 
     @Override
     @Transactional
-    public ResponseEntity<Void> approveFollowRequest(String requestUuid, Jwt jwt) {
-        Long accountId = jwt.getClaim("account_id");
+    public ResponseEntity<Void> approveFollowRequest(String requestUuid) {
+        Long accountId = SecurityUtils.getCurrentAccountId();
         approveFollowRequestUseCase.execute(accountId, requestUuid);
         return ResourceResponse.noContent();
     }
 
     @Override
     @Transactional
-    public ResponseEntity<Void> rejectFollowRequest(String requestUuid, Jwt jwt) {
-        Long accountId = jwt.getClaim("account_id");
+    public ResponseEntity<Void> rejectFollowRequest(String requestUuid) {
+        Long accountId = SecurityUtils.getCurrentAccountId();
         rejectFollowRequestUseCase.execute(accountId, requestUuid);
         return ResourceResponse.noContent();
     }

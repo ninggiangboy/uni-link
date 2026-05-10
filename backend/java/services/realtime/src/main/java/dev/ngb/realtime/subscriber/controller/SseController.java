@@ -3,7 +3,7 @@ package dev.ngb.realtime.subscriber.controller;
 import dev.ngb.realtime.connection.EmitterRegistry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,7 +19,8 @@ public class SseController {
     private final EmitterRegistry emitterRegistry;
 
     @GetMapping(value = "/connect", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter connect(@AuthenticationPrincipal Jwt jwt) {
+    public SseEmitter connect() {
+        Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String userId = jwt.getSubject();
         SseEmitter emitter = new SseEmitter(0L);
         emitterRegistry.registerUser(userId, emitter);
@@ -27,7 +28,7 @@ public class SseController {
     }
 
     @GetMapping(value = "/topic/{topicId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter topic(@AuthenticationPrincipal Jwt jwt, @PathVariable String topicId) {
+    public SseEmitter topic(@PathVariable String topicId) {
         SseEmitter emitter = new SseEmitter(0L);
         emitterRegistry.registerTopic(topicId, emitter);
         return emitter;

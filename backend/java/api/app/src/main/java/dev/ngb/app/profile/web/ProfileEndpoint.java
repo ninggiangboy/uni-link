@@ -12,8 +12,6 @@ import dev.ngb.app.profile.application.usecase.update_profile_visibility.dto.Upd
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -27,49 +25,42 @@ public interface ProfileEndpoint {
     @Operation(summary = "Create a profile for the current account")
     @PostMapping
     ResponseEntity<CreateProfileResponse> createProfile(
-            @RequestBody CreateProfileRequest request,
-            @AuthenticationPrincipal Jwt jwt
+            @RequestBody CreateProfileRequest request
     );
 
     @Operation(summary = "Update the current account's profile (display name, bio, website, location)")
     @PatchMapping("/me")
     ResponseEntity<ProfileSummary> updateProfile(
-            @RequestBody UpdateProfileRequest request,
-            @AuthenticationPrincipal Jwt jwt
+            @RequestBody UpdateProfileRequest request
     );
 
     @Operation(summary = "Update profile visibility")
     @PatchMapping("/me/visibility")
     ResponseEntity<Void> updateVisibility(
-            @RequestBody UpdateProfileVisibilityRequest request,
-            @AuthenticationPrincipal Jwt jwt
+            @RequestBody UpdateProfileVisibilityRequest request
     );
 
     @Operation(summary = "Change the current account's username")
     @PatchMapping("/me/username")
     ResponseEntity<Void> changeUsername(
-            @RequestBody ChangeUsernameRequest request,
-            @AuthenticationPrincipal Jwt jwt
+            @RequestBody ChangeUsernameRequest request
     );
 
     @Operation(summary = "Update profile avatar from a previously uploaded attachment")
     @PutMapping("/me/avatar")
     ResponseEntity<Void> updateAvatar(
-            @RequestBody UpdateProfileAvatarRequest request,
-            @AuthenticationPrincipal Jwt jwt
+            @RequestBody UpdateProfileAvatarRequest request
     );
 
     @Operation(summary = "Update profile banner from a previously uploaded attachment")
     @PutMapping("/me/banner")
     ResponseEntity<Void> updateBanner(
-            @RequestBody UpdateProfileBannerRequest request,
-            @AuthenticationPrincipal Jwt jwt
+            @RequestBody UpdateProfileBannerRequest request
     );
 
     @Operation(summary = "Register an X25519 ECDH public key for end-to-end encryption")
     @PutMapping("/me/public-key")
     ResponseEntity<Void> registerPublicKey(
-            @RequestBody RegisterProfilePublicKeyRequest request,
-            @AuthenticationPrincipal Jwt jwt
+            @RequestBody RegisterProfilePublicKeyRequest request
     );
 }

@@ -8,9 +8,6 @@ import dev.ngb.domain.profile.repository.ProfileRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.time.Clock;
-import java.time.Instant;
-
 @Slf4j
 @RequiredArgsConstructor
 public class MuteProfileUseCase implements UseCaseService {
@@ -29,7 +26,7 @@ public class MuteProfileUseCase implements UseCaseService {
         }
 
         boolean created = profileRelationshipRepository.mute(
-                muter.getId(), target.getId(), Instant.now(Clock.systemUTC()));
+                muter.getId(), target.getId());
         if (!created) {
             throw ProfileError.ALREADY_MUTED.exception();
         }

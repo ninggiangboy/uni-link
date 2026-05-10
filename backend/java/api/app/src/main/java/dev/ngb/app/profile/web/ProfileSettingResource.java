@@ -4,9 +4,9 @@ import dev.ngb.app.profile.application.dto.ProfileSettingResponse;
 import dev.ngb.app.profile.application.usecase.update_profile_setting.UpdateProfileSettingUseCase;
 import dev.ngb.app.profile.application.usecase.update_profile_setting.dto.UpdateProfileSettingRequest;
 import dev.ngb.infrastructure.web.ResourceResponse;
+import dev.ngb.infrastructure.web.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,8 +18,8 @@ public class ProfileSettingResource implements ProfileSettingEndpoint {
 
     @Override
     @Transactional
-    public ResponseEntity<ProfileSettingResponse> updateSettings(UpdateProfileSettingRequest request, Jwt jwt) {
-        Long accountId = jwt.getClaim("account_id");
+    public ResponseEntity<ProfileSettingResponse> updateSettings(UpdateProfileSettingRequest request) {
+        Long accountId = SecurityUtils.getCurrentAccountId();
         return ResourceResponse.ok(updateProfileSettingUseCase.execute(accountId, request));
     }
 }

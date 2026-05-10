@@ -1,6 +1,6 @@
 package dev.ngb.app.profile.usecase;
 
-import dev.ngb.app.profile.application.ProfileQueryService;
+import dev.ngb.app.profile.application.query.ProfileQueryService;
 import dev.ngb.app.profile.application.usecase.remove_profile_metadata.RemoveProfileMetadataUseCase;
 import dev.ngb.app.profile.application.usecase.upsert_profile_metadata.UpsertProfileMetadataUseCase;
 import dev.ngb.app.profile.application.usecase.upsert_profile_metadata.dto.UpsertProfileMetadataRequest;

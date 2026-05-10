@@ -1,13 +1,14 @@
 package dev.ngb.infrastructure.neo4j.profile.repository;
 
+import dev.ngb.domain.profile.model.relationship.ProfileRelationshipState;
 import dev.ngb.domain.profile.repository.ProfileRelationshipRepository;
 import dev.ngb.domain.profile.repository.ProfileRelationshipSort;
 import dev.ngb.infrastructure.neo4j.profile.query.ProfileRelationshipCypher;
 import dev.ngb.infrastructure.neo4j.support.Neo4jQueryExecutor;
+import dev.ngb.util.TimeProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
@@ -18,11 +19,11 @@ public class ProfileRelationshipNeo4jRepository implements ProfileRelationshipRe
     private final Neo4jQueryExecutor queryExecutor;
 
     @Override
-    public boolean follow(Long followerProfileId, Long followingProfileId, Instant since) {
+    public boolean follow(Long followerProfileId, Long followingProfileId) {
         return queryExecutor.queryBoolean(ProfileRelationshipCypher.FOLLOW, Map.of(
                 "sourceId", followerProfileId,
                 "targetId", followingProfileId,
-                "since", since
+                "since", TimeProvider.now()
         ));
     }
 
@@ -43,11 +44,11 @@ public class ProfileRelationshipNeo4jRepository implements ProfileRelationshipRe
     }
 
     @Override
-    public boolean block(Long blockerProfileId, Long blockedProfileId, Instant since) {
-        return queryExecutor.queryBoolean(ProfileRelationshipCypher.BLOCK, Map.of(
+    public boolean blockAndCleanupFollows(Long blockerProfileId, Long blockedProfileId) {
+        return queryExecutor.queryBoolean(ProfileRelationshipCypher.BLOCK_AND_CLEANUP_FOLLOWS, Map.of(
                 "sourceId", blockerProfileId,
                 "targetId", blockedProfileId,
-                "since", since
+                "since", TimeProvider.now()
         ));
     }
 
@@ -68,11 +69,11 @@ public class ProfileRelationshipNeo4jRepository implements ProfileRelationshipRe
     }
 
     @Override
-    public boolean mute(Long muterProfileId, Long mutedProfileId, Instant since) {
+    public boolean mute(Long muterProfileId, Long mutedProfileId) {
         return queryExecutor.queryBoolean(ProfileRelationshipCypher.MUTE, Map.of(
                 "sourceId", muterProfileId,
                 "targetId", mutedProfileId,
-                "since", since
+                "since", TimeProvider.now()
         ));
     }
 
@@ -93,11 +94,30 @@ public class ProfileRelationshipNeo4jRepository implements ProfileRelationshipRe
     }
 
     @Override
-    public boolean followHashtag(Long profileId, Long hashtagId, Instant since) {
+    public ProfileRelationshipState findRelationshipsBetween(Long profileIdA, Long profileIdB) {
+        return queryExecutor.queryOne(ProfileRelationshipCypher.FIND_RELATIONSHIPS_BETWEEN, Map.of(
+                "sourceId", profileIdA,
+                "targetId", profileIdB
+        ), (_, record) -> {
+            List<String> sourceToTarget = record.get("sourceToTarget").asList(v -> v.asString());
+            List<String> targetToSource = record.get("targetToSource").asList(v -> v.asString());
+            return new ProfileRelationshipState(
+                    sourceToTarget.contains("FOLLOWS"),
+                    targetToSource.contains("FOLLOWS"),
+                    sourceToTarget.contains("BLOCKS"),
+                    targetToSource.contains("BLOCKS"),
+                    sourceToTarget.contains("MUTES"),
+                    targetToSource.contains("MUTES")
+            );
+        }, ProfileRelationshipState.class).orElse(ProfileRelationshipState.empty());
+    }
+
+    @Override
+    public boolean followHashtag(Long profileId, Long hashtagId) {
         return queryExecutor.queryBoolean(ProfileRelationshipCypher.FOLLOW_HASHTAG, Map.of(
                 "profileId", profileId,
                 "hashtagId", hashtagId,
-                "since", since
+                "since", TimeProvider.now()
         ));
     }
 

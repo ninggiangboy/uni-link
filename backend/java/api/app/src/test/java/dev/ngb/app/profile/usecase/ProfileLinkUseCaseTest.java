@@ -1,7 +1,7 @@
 package dev.ngb.app.profile.usecase;
 
 import dev.ngb.app.profile.ProfileConstants;
-import dev.ngb.app.profile.application.ProfileQueryService;
+import dev.ngb.app.profile.application.query.ProfileQueryService;
 import dev.ngb.app.profile.application.usecase.add_profile_link.AddProfileLinkUseCase;
 import dev.ngb.app.profile.application.usecase.add_profile_link.dto.AddProfileLinkRequest;
 import dev.ngb.app.profile.application.usecase.remove_profile_link.RemoveProfileLinkUseCase;

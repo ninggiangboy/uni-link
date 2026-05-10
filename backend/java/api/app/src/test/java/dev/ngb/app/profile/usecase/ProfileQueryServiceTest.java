@@ -1,6 +1,6 @@
 package dev.ngb.app.profile.usecase;
 
-import dev.ngb.app.profile.application.ProfileQueryService;
+import dev.ngb.app.profile.application.query.ProfileQueryService;
 import dev.ngb.app.profile.application.dto.PageQuery;
 import dev.ngb.app.profile.support.ProfileFixtures;
 import dev.ngb.domain.DomainException;

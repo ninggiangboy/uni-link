@@ -1,6 +1,7 @@
 package dev.ngb.domain.profile.repository;
 
-import java.time.Instant;
+import dev.ngb.domain.profile.model.relationship.ProfileRelationshipState;
+
 import java.util.List;
 
 /**
@@ -11,25 +12,27 @@ import java.util.List;
  */
 public interface ProfileRelationshipRepository {
 
-    boolean follow(Long followerProfileId, Long followingProfileId, Instant since);
+    boolean follow(Long followerProfileId, Long followingProfileId);
 
     boolean unfollow(Long followerProfileId, Long followingProfileId);
 
     boolean isFollowing(Long followerProfileId, Long followingProfileId);
 
-    boolean block(Long blockerProfileId, Long blockedProfileId, Instant since);
+    boolean blockAndCleanupFollows(Long blockerProfileId, Long blockedProfileId);
 
     boolean unblock(Long blockerProfileId, Long blockedProfileId);
 
     boolean isBlocked(Long blockerProfileId, Long blockedProfileId);
 
-    boolean mute(Long muterProfileId, Long mutedProfileId, Instant since);
+    boolean mute(Long muterProfileId, Long mutedProfileId);
 
     boolean unmute(Long muterProfileId, Long mutedProfileId);
 
     boolean isMuted(Long muterProfileId, Long mutedProfileId);
 
-    boolean followHashtag(Long profileId, Long hashtagId, Instant since);
+    ProfileRelationshipState findRelationshipsBetween(Long profileIdA, Long profileIdB);
+
+    boolean followHashtag(Long profileId, Long hashtagId);
 
     boolean unfollowHashtag(Long profileId, Long hashtagId);
 

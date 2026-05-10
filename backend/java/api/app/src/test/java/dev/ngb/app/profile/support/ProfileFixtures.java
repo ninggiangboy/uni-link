@@ -24,6 +24,10 @@ public final class ProfileFixtures {
     }
 
     public static Profile profile(Long id, Long accountId, String username, ProfileVisibility visibility) {
+        return profile(id, accountId, username, visibility, Boolean.FALSE);
+    }
+
+    public static Profile profile(Long id, Long accountId, String username, ProfileVisibility visibility, Boolean isCeleb) {
         Instant now = Instant.parse("2025-01-01T00:00:00Z");
         return Profile.reconstruct(
                 id,
@@ -42,6 +46,7 @@ public final class ProfileFixtures {
                 null,
                 visibility,
                 Boolean.FALSE,
+                isCeleb,
                 null
         );
     }

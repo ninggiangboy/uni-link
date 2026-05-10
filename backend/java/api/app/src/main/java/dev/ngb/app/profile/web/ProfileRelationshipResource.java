@@ -5,9 +5,9 @@ import dev.ngb.app.profile.application.usecase.mute_profile.MuteProfileUseCase;
 import dev.ngb.app.profile.application.usecase.unblock_profile.UnblockProfileUseCase;
 import dev.ngb.app.profile.application.usecase.unmute_profile.UnmuteProfileUseCase;
 import dev.ngb.infrastructure.web.ResourceResponse;
+import dev.ngb.infrastructure.web.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,32 +22,32 @@ public class ProfileRelationshipResource implements ProfileRelationshipEndpoint 
 
     @Override
     @Transactional
-    public ResponseEntity<Void> block(String username, Jwt jwt) {
-        Long accountId = jwt.getClaim("account_id");
+    public ResponseEntity<Void> block(String username) {
+        Long accountId = SecurityUtils.getCurrentAccountId();
         blockProfileUseCase.execute(accountId, username);
         return ResourceResponse.noContent();
     }
 
     @Override
     @Transactional
-    public ResponseEntity<Void> unblock(String username, Jwt jwt) {
-        Long accountId = jwt.getClaim("account_id");
+    public ResponseEntity<Void> unblock(String username) {
+        Long accountId = SecurityUtils.getCurrentAccountId();
         unblockProfileUseCase.execute(accountId, username);
         return ResourceResponse.noContent();
     }
 
     @Override
     @Transactional
-    public ResponseEntity<Void> mute(String username, Jwt jwt) {
-        Long accountId = jwt.getClaim("account_id");
+    public ResponseEntity<Void> mute(String username) {
+        Long accountId = SecurityUtils.getCurrentAccountId();
         muteProfileUseCase.execute(accountId, username);
         return ResourceResponse.noContent();
     }
 
     @Override
     @Transactional
-    public ResponseEntity<Void> unmute(String username, Jwt jwt) {
-        Long accountId = jwt.getClaim("account_id");
+    public ResponseEntity<Void> unmute(String username) {
+        Long accountId = SecurityUtils.getCurrentAccountId();
         unmuteProfileUseCase.execute(accountId, username);
         return ResourceResponse.noContent();
     }

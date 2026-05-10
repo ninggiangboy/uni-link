@@ -41,3 +41,5 @@ databaseChangeLog:
       file: db/changelog/migrations/020-create-prf-follow-requests.sql
   - include:
       file: db/changelog/migrations/021-create-prf-profile-stats-delta-processed.sql
+  - include:
+      file: db/changelog/migrations/022-add-prf-profiles-is-celeb.sql

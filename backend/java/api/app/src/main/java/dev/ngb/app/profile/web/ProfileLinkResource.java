@@ -7,9 +7,9 @@ import dev.ngb.app.profile.application.usecase.remove_profile_link.RemoveProfile
 import dev.ngb.app.profile.application.usecase.update_profile_link.UpdateProfileLinkUseCase;
 import dev.ngb.app.profile.application.usecase.update_profile_link.dto.UpdateProfileLinkRequest;
 import dev.ngb.infrastructure.web.ResourceResponse;
+import dev.ngb.infrastructure.web.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,22 +23,22 @@ public class ProfileLinkResource implements ProfileLinkEndpoint {
 
     @Override
     @Transactional
-    public ResponseEntity<ProfileLinkResponse> addLink(AddProfileLinkRequest request, Jwt jwt) {
-        Long accountId = jwt.getClaim("account_id");
+    public ResponseEntity<ProfileLinkResponse> addLink(AddProfileLinkRequest request) {
+        Long accountId = SecurityUtils.getCurrentAccountId();
         return ResourceResponse.created(addProfileLinkUseCase.execute(accountId, request));
     }
 
     @Override
     @Transactional
-    public ResponseEntity<ProfileLinkResponse> updateLink(String linkUuid, UpdateProfileLinkRequest request, Jwt jwt) {
-        Long accountId = jwt.getClaim("account_id");
+    public ResponseEntity<ProfileLinkResponse> updateLink(String linkUuid, UpdateProfileLinkRequest request) {
+        Long accountId = SecurityUtils.getCurrentAccountId();
         return ResourceResponse.ok(updateProfileLinkUseCase.execute(accountId, linkUuid, request));
     }
 
     @Override
     @Transactional
-    public ResponseEntity<Void> removeLink(String linkUuid, Jwt jwt) {
-        Long accountId = jwt.getClaim("account_id");
+    public ResponseEntity<Void> removeLink(String linkUuid) {
+        Long accountId = SecurityUtils.getCurrentAccountId();
         removeProfileLinkUseCase.execute(accountId, linkUuid);
         return ResourceResponse.noContent();
     }

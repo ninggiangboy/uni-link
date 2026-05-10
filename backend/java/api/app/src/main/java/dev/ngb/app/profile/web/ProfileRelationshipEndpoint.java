@@ -3,8 +3,6 @@ package dev.ngb.app.profile.web;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,28 +15,24 @@ public interface ProfileRelationshipEndpoint {
     @Operation(summary = "Block a profile (auto-removes any follow edges and pending requests)")
     @PostMapping("/{username}/block")
     ResponseEntity<Void> block(
-            @PathVariable String username,
-            @AuthenticationPrincipal Jwt jwt
+            @PathVariable String username
     );
 
     @Operation(summary = "Unblock a previously-blocked profile")
     @DeleteMapping("/{username}/block")
     ResponseEntity<Void> unblock(
-            @PathVariable String username,
-            @AuthenticationPrincipal Jwt jwt
+            @PathVariable String username
     );
 
     @Operation(summary = "Mute a profile (suppresses notifications without affecting follow state)")
     @PostMapping("/{username}/mute")
     ResponseEntity<Void> mute(
-            @PathVariable String username,
-            @AuthenticationPrincipal Jwt jwt
+            @PathVariable String username
     );
 
     @Operation(summary = "Unmute a previously-muted profile")
     @DeleteMapping("/{username}/mute")
     ResponseEntity<Void> unmute(
-            @PathVariable String username,
-            @AuthenticationPrincipal Jwt jwt
+            @PathVariable String username
     );
 }

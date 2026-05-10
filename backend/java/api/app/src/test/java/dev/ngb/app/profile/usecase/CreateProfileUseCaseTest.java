@@ -115,6 +115,7 @@ class CreateProfileUseCaseTest {
                     p.getBannerUrl(),
                     p.getVisibility(),
                     p.getIsVerified(),
+                    p.getIsCeleb(),
                     p.getPublicKey()
             );
         });

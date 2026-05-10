@@ -10,4 +10,7 @@ dependencies {
     implementation project(':libs:infrastructure')
     implementation project(':libs:utils')
     implementation project(':libs:constant')
+
+    implementation 'org.apache.kafka:kafka-streams'
+    testImplementation 'org.apache.kafka:kafka-streams-test-utils'
 }

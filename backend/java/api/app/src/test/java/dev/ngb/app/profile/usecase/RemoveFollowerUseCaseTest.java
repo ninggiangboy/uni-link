@@ -1,6 +1,6 @@
 package dev.ngb.app.profile.usecase;
 
-import dev.ngb.app.profile.application.ProfileFollowStatsDeltaPublisher;
+import dev.ngb.app.profile.application.service.FollowStatsSyncService;
 import dev.ngb.app.profile.application.usecase.remove_follower.RemoveFollowerUseCase;
 import dev.ngb.app.profile.support.ProfileFixtures;
 import dev.ngb.domain.DomainException;
@@ -18,6 +18,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -26,7 +27,7 @@ import static org.mockito.Mockito.when;
 class RemoveFollowerUseCaseTest {
 
     @Mock private ProfileRepository profileRepository;
-    @Mock private ProfileFollowStatsDeltaPublisher profileFollowStatsDeltaPublisher;
+    @Mock private FollowStatsSyncService followStatsSyncService;
     @Mock private ProfileRelationshipRepository profileRelationshipRepository;
     @InjectMocks private RemoveFollowerUseCase useCase;
 
@@ -41,7 +42,7 @@ class RemoveFollowerUseCaseTest {
 
         useCase.execute(100L, "bob");
 
-        verify(profileFollowStatsDeltaPublisher).publish(1L, -1, 2L, -1);
+        verify(followStatsSyncService).unfollow(eq(owner), eq(follower));
     }
 
     @Test

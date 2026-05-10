@@ -1,6 +1,6 @@
 package dev.ngb.app.profile.application.usecase.unfollow_profile;
 
-import dev.ngb.app.profile.application.ProfileFollowStatsDeltaPublisher;
+import dev.ngb.app.profile.application.service.FollowStatsSyncService;
 import dev.ngb.application.UseCaseService;
 import dev.ngb.domain.profile.error.ProfileError;
 import dev.ngb.domain.profile.model.profile.Profile;
@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 public class UnfollowProfileUseCase implements UseCaseService {
 
     private final ProfileRepository profileRepository;
-    private final ProfileFollowStatsDeltaPublisher profileFollowStatsDeltaPublisher;
+    private final FollowStatsSyncService followStatsSyncService;
     private final ProfileRelationshipRepository profileRelationshipRepository;
     private final FollowRequestRepository followRequestRepository;
 
@@ -31,7 +31,7 @@ public class UnfollowProfileUseCase implements UseCaseService {
 
         boolean deleted = profileRelationshipRepository.unfollow(follower.getId(), target.getId());
         if (deleted) {
-            profileFollowStatsDeltaPublisher.publish(target.getId(), -1, follower.getId(), -1);
+            followStatsSyncService.unfollow(target, follower);
             log.info("Unfollow ok followerId={}, targetId={}", follower.getId(), target.getId());
             return;
         }

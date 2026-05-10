@@ -1,19 +1,17 @@
 package dev.ngb.app.profile.application.usecase.follow_profile;
 
-import dev.ngb.app.profile.application.ProfileFollowStatsDeltaPublisher;
+import dev.ngb.app.profile.application.service.FollowStatsSyncService;
 import dev.ngb.app.profile.application.dto.FollowResponse;
 import dev.ngb.application.UseCaseService;
 import dev.ngb.domain.profile.error.ProfileError;
 import dev.ngb.domain.profile.model.profile.Profile;
 import dev.ngb.domain.profile.model.relationship.FollowRequest;
+import dev.ngb.domain.profile.model.relationship.ProfileRelationshipState;
 import dev.ngb.domain.profile.repository.FollowRequestRepository;
 import dev.ngb.domain.profile.repository.ProfileRelationshipRepository;
 import dev.ngb.domain.profile.repository.ProfileRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import java.time.Clock;
-import java.time.Instant;
 
 /*
  * Follow flow:
@@ -28,7 +26,7 @@ import java.time.Instant;
 public class FollowProfileUseCase implements UseCaseService {
 
     private final ProfileRepository profileRepository;
-    private final ProfileFollowStatsDeltaPublisher profileFollowStatsDeltaPublisher;
+    private final FollowStatsSyncService followStatsSyncService;
     private final ProfileRelationshipRepository profileRelationshipRepository;
     private final FollowRequestRepository followRequestRepository;
 
@@ -45,32 +43,35 @@ public class FollowProfileUseCase implements UseCaseService {
             // HIDDEN profiles are invisible to everyone but the owner.
             throw ProfileError.PROFILE_NOT_FOUND.exception();
         }
-        if (profileRelationshipRepository.isBlocked(target.getId(), follower.getId())) {
+        ProfileRelationshipState relState = profileRelationshipRepository
+                .findRelationshipsBetween(follower.getId(), target.getId());
+
+        if (relState.targetBlocksSource()) {
             throw ProfileError.BLOCKED_BY_TARGET.exception();
         }
-        if (profileRelationshipRepository.isBlocked(follower.getId(), target.getId())) {
+        if (relState.sourceBlocksTarget()) {
             throw ProfileError.TARGET_BLOCKED.exception();
         }
 
         if (target.isPrivate()) {
-            return createPendingRequest(follower, target);
+            return createPendingRequest(follower, target, relState);
         }
         return createDirectFollow(follower, target);
     }
 
     private FollowResponse createDirectFollow(Profile follower, Profile target) {
         boolean created = profileRelationshipRepository.follow(
-                follower.getId(), target.getId(), Instant.now(Clock.systemUTC()));
+                follower.getId(), target.getId());
         if (!created) {
             throw ProfileError.ALREADY_FOLLOWING.exception();
         }
-        profileFollowStatsDeltaPublisher.publish(target.getId(), 1, follower.getId(), 1);
+        followStatsSyncService.follow(target, follower);
         log.info("Follow created followerId={}, targetId={}", follower.getId(), target.getId());
         return FollowResponse.following();
     }
 
-    private FollowResponse createPendingRequest(Profile follower, Profile target) {
-        if (profileRelationshipRepository.isFollowing(follower.getId(), target.getId())) {
+    private FollowResponse createPendingRequest(Profile follower, Profile target, ProfileRelationshipState relState) {
+        if (relState.sourceFollowsTarget()) {
             throw ProfileError.ALREADY_FOLLOWING.exception();
         }
         if (followRequestRepository.existsPending(follower.getId(), target.getId())) {

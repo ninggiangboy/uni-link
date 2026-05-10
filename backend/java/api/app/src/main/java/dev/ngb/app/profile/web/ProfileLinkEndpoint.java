@@ -6,8 +6,6 @@ import dev.ngb.app.profile.application.usecase.update_profile_link.dto.UpdatePro
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,22 +20,19 @@ public interface ProfileLinkEndpoint {
     @Operation(summary = "Add an external link to the current account's profile")
     @PostMapping("/me/links")
     ResponseEntity<ProfileLinkResponse> addLink(
-            @RequestBody AddProfileLinkRequest request,
-            @AuthenticationPrincipal Jwt jwt
+            @RequestBody AddProfileLinkRequest request
     );
 
     @Operation(summary = "Update an external link on the current account's profile")
     @PatchMapping("/me/links/{linkUuid}")
     ResponseEntity<ProfileLinkResponse> updateLink(
             @PathVariable String linkUuid,
-            @RequestBody UpdateProfileLinkRequest request,
-            @AuthenticationPrincipal Jwt jwt
+            @RequestBody UpdateProfileLinkRequest request
     );
 
     @Operation(summary = "Remove an external link from the current account's profile")
     @DeleteMapping("/me/links/{linkUuid}")
     ResponseEntity<Void> removeLink(
-            @PathVariable String linkUuid,
-            @AuthenticationPrincipal Jwt jwt
+            @PathVariable String linkUuid
     );
 }

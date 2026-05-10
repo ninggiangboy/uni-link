@@ -5,8 +5,6 @@ import dev.ngb.app.profile.application.usecase.upsert_profile_metadata.dto.Upser
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -21,14 +19,12 @@ public interface ProfileMetadataEndpoint {
     @PutMapping("/{key}")
     ResponseEntity<ProfileMetadataResponse> upsertMetadata(
             @PathVariable String key,
-            @RequestBody UpsertProfileMetadataRequest request,
-            @AuthenticationPrincipal Jwt jwt
+            @RequestBody UpsertProfileMetadataRequest request
     );
 
     @Operation(summary = "Remove a metadata key from the current account's profile")
     @DeleteMapping("/{key}")
     ResponseEntity<Void> removeMetadata(
-            @PathVariable String key,
-            @AuthenticationPrincipal Jwt jwt
+            @PathVariable String key
     );
 }

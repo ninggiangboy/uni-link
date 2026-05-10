@@ -27,7 +27,7 @@ public final class ProfileRelationshipCypher {
             RETURN count(r) > 0 AS exists
             """;
 
-    public static final String BLOCK = """
+    public static final String BLOCK_AND_CLEANUP_FOLLOWS = """
             MERGE (src:Profile {profileId: $sourceId})
             MERGE (dst:Profile {profileId: $targetId})
             OPTIONAL MATCH (src)-[existing:BLOCKS]->(dst)
@@ -135,6 +135,13 @@ public final class ProfileRelationshipCypher {
             %s
             SKIP $offset
             LIMIT $limit
+            """;
+
+    public static final String FIND_RELATIONSHIPS_BETWEEN = """
+            MATCH (a:Profile {profileId: $sourceId}), (b:Profile {profileId: $targetId})
+            RETURN
+              [(a)-[r]->(b) | type(r)] AS sourceToTarget,
+              [(b)-[s]->(a) | type(s)] AS targetToSource
             """;
 
     public static final String FIND_FOLLOWED_HASHTAG_IDS = """

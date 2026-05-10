@@ -3,8 +3,8 @@ package dev.ngb.domain.profile.model.profile;
 import dev.ngb.domain.DomainEntity;
 import dev.ngb.util.NullUtils;
 import dev.ngb.util.StringUtils;
-import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.time.Instant;
 
@@ -28,12 +28,13 @@ public class Profile extends DomainEntity<Long> {
     private String website;
     private String location;
 
+    @Setter
     private String avatarUrl;
+    @Setter
     private String bannerUrl;
 
     private ProfileVisibility visibility;
     private Boolean isVerified;
-    @Getter(AccessLevel.NONE)
     private Boolean isCeleb;
     private String publicKey;
 
@@ -98,14 +99,6 @@ public class Profile extends DomainEntity<Long> {
         this.visibility = NullUtils.getOr(visibility, ProfileVisibility.PUBLIC);
     }
 
-    public void setAvatarUrl(String avatarUrl) {
-        this.avatarUrl = avatarUrl;
-    }
-
-    public void setBannerUrl(String bannerUrl) {
-        this.bannerUrl = bannerUrl;
-    }
-
     public void changeUsername(String username) {
         this.username = StringUtils.trim(username);
     }
@@ -122,18 +115,14 @@ public class Profile extends DomainEntity<Long> {
         return visibility == ProfileVisibility.PRIVATE;
     }
 
-    public boolean isCeleb() {
-        return Boolean.TRUE.equals(isCeleb);
-    }
-
     public void promoteToCeleb() {
-        if (!isCeleb()) {
+        if (!isCeleb) {
             this.isCeleb = Boolean.TRUE;
         }
     }
 
     public void demoteFromCeleb() {
-        if (isCeleb()) {
+        if (isCeleb) {
             this.isCeleb = Boolean.FALSE;
         }
     }
