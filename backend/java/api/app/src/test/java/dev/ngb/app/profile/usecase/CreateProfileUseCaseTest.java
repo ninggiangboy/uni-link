@@ -21,7 +21,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.dao.DataIntegrityViolationException;
 
 import java.time.Instant;
 
@@ -57,25 +56,25 @@ class CreateProfileUseCaseTest {
     }
 
     @Test
-    @DisplayName("Duplicate account_id on save race → DataIntegrityViolation → USERNAME_ALREADY_EXISTS")
+    @DisplayName("Duplicate account_id on save → repository translates → PROFILE_ALREADY_EXISTS_FOR_ACCOUNT")
     void executeWhenAccountIdDuplicateOnSaveThrowsConflict() {
         var accountId = 11L;
         var request = new CreateProfileRequest("user.one", "User One", "bio", ProfileVisibility.PUBLIC);
         when(identityPublicApi.isAccountActive(accountId)).thenReturn(true);
-        when(profileRepository.save(any(Profile.class))).thenThrow(new DataIntegrityViolationException("duplicate account_id"));
+        when(profileRepository.save(any(Profile.class))).thenThrow(ProfileError.PROFILE_ALREADY_EXISTS_FOR_ACCOUNT.exception());
 
         var ex = assertThrows(DomainException.class, () -> useCase.execute(accountId, request));
 
-        assertThat(ex.getError()).isEqualTo(ProfileError.USERNAME_ALREADY_EXISTS);
+        assertThat(ex.getError()).isEqualTo(ProfileError.PROFILE_ALREADY_EXISTS_FOR_ACCOUNT);
     }
 
     @Test
-    @DisplayName("Duplicate username on save race → DataIntegrityViolation → USERNAME_ALREADY_EXISTS")
+    @DisplayName("Duplicate username on save → repository translates → USERNAME_ALREADY_EXISTS")
     void executeWhenUsernameDuplicateOnSaveThrowsConflict() {
         var accountId = 12L;
         var request = new CreateProfileRequest("user.one", "User One", "bio", ProfileVisibility.PUBLIC);
         when(identityPublicApi.isAccountActive(accountId)).thenReturn(true);
-        when(profileRepository.save(any(Profile.class))).thenThrow(new DataIntegrityViolationException("duplicate username"));
+        when(profileRepository.save(any(Profile.class))).thenThrow(ProfileError.USERNAME_ALREADY_EXISTS.exception());
 
         var ex = assertThrows(DomainException.class, () -> useCase.execute(accountId, request));
 

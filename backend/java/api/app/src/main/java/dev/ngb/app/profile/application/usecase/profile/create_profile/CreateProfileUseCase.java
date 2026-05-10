@@ -15,7 +15,6 @@ import dev.ngb.domain.profile.repository.ProfileStatsRepository;
 import dev.ngb.domain.profile.repository.ProfileUsernameRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Transactional;
 
 /*
@@ -50,17 +49,7 @@ public class CreateProfileUseCase implements UseCaseService {
                 request.visibility()
         );
 
-        Profile savedProfile;
-        try {
-            savedProfile = profileRepository.save(profile);
-        } catch (DataIntegrityViolationException e) {
-            String message = e.getMostSpecificCause().getMessage();
-            log.warn("Create profile failed: integrity violation accountId={}, username={}, detail={}", accountId, request.username(), message);
-            if (message != null && message.contains("uq_prf_profiles_account_id")) {
-                throw ProfileError.PROFILE_ALREADY_EXISTS_FOR_ACCOUNT.exception();
-            }
-            throw ProfileError.USERNAME_ALREADY_EXISTS.exception();
-        }
+        Profile savedProfile = profileRepository.save(profile);
 
         profileStatsRepository.save(ProfileStats.createForNewProfile(savedProfile.getId()));
         profileSettingRepository.save(ProfileSetting.createDefault(savedProfile.getId()));

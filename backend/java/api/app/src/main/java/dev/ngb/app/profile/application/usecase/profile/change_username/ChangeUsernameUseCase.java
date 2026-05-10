@@ -9,7 +9,6 @@ import dev.ngb.domain.profile.repository.ProfileRepository;
 import dev.ngb.domain.profile.repository.ProfileUsernameRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataIntegrityViolationException;
 
 /*
  * Renames a profile's username:
@@ -43,12 +42,7 @@ public class ChangeUsernameUseCase implements UseCaseService {
         });
 
         profile.changeUsername(newUsername);
-        try {
-            profileRepository.save(profile);
-        } catch (DataIntegrityViolationException e) {
-            log.warn("Change username race detected accountId={}, username={}", accountId, newUsername);
-            throw ProfileError.USERNAME_ALREADY_EXISTS.exception();
-        }
+        profileRepository.save(profile);
         profileUsernameRepository.save(ProfileUsername.createCurrent(profile.getId(), newUsername));
 
         log.info("Username changed profileId={}, accountId={}, newUsername={}",

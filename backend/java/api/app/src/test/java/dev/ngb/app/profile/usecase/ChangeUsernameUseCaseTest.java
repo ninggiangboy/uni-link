@@ -16,7 +16,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.dao.DataIntegrityViolationException;
 
 import java.util.List;
 import java.util.Optional;
@@ -74,11 +73,11 @@ class ChangeUsernameUseCaseTest {
     }
 
     @Test
-    @DisplayName("Username taken on save race → DataIntegrityViolation → USERNAME_ALREADY_EXISTS")
+    @DisplayName("Username taken on save → repository translates → USERNAME_ALREADY_EXISTS")
     void executeWhenUsernameTakenOnSaveThrowsConflict() {
         var profile = ProfileFixtures.profile(1L, 100L, "alice");
         when(profileRepository.findByAccountId(100L)).thenReturn(Optional.of(profile));
-        when(profileRepository.save(any(Profile.class))).thenThrow(new DataIntegrityViolationException("duplicate"));
+        when(profileRepository.save(any(Profile.class))).thenThrow(ProfileError.USERNAME_ALREADY_EXISTS.exception());
 
         var ex = assertThrows(DomainException.class,
                 () -> useCase.execute(100L, new ChangeUsernameRequest("bob")));

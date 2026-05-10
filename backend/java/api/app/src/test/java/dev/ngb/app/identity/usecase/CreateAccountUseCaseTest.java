@@ -20,7 +20,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.dao.DataIntegrityViolationException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -89,10 +88,10 @@ class CreateAccountUseCaseTest {
     }
 
     @Test
-    @DisplayName("Duplicate email on save race → DataIntegrityViolation → EMAIL_ALREADY_EXISTS")
-    void executeWhenConcurrentEmailSaveThrowsConflict() {
+    @DisplayName("Duplicate email on save → repository translates → EMAIL_ALREADY_EXISTS")
+    void executeWhenDuplicateEmailThrowsConflict() {
         when(passwordEncoder.encode("plain-secret")).thenReturn("hashed-secret");
-        when(accountRepository.save(any(Account.class))).thenThrow(new DataIntegrityViolationException("duplicate email"));
+        when(accountRepository.save(any(Account.class))).thenThrow(AccountError.EMAIL_ALREADY_EXISTS.exception());
 
         var ex = assertThrows(DomainException.class, () -> useCase.execute(request));
 

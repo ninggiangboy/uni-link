@@ -5,7 +5,6 @@ import dev.ngb.app.identity.application.service.AccountOtpDeliveryService;
 import dev.ngb.app.identity.application.usecase.registration.register_account.dto.CreateAccountRequest;
 import dev.ngb.app.identity.application.usecase.registration.register_account.dto.CreateAccountResponse;
 import dev.ngb.application.UseCaseService;
-import dev.ngb.domain.identity.error.AccountError;
 import dev.ngb.domain.identity.model.auth.Account;
 import dev.ngb.domain.identity.model.otp.AccountOtp;
 import dev.ngb.domain.identity.model.otp.OtpPurpose;
@@ -13,7 +12,6 @@ import dev.ngb.domain.identity.repository.AccountRepository;
 import dev.ngb.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataIntegrityViolationException;
 
 /*
  * Registers a new account with email and password. The account stays pending until the user
@@ -36,13 +34,7 @@ public class CreateAccountUseCase implements UseCaseService {
         log.info("Register account attempt for email={}", StringUtils.maskEmail(request.email()));
 
         String passwordHash = passwordEncoder.encode(request.password());
-        Account account = Account.create(request.email(), passwordHash);
-        try {
-            account = accountRepository.save(account);
-        } catch (DataIntegrityViolationException e) {
-            log.warn("Register failed: duplicate email race detected");
-            throw AccountError.EMAIL_ALREADY_EXISTS.exception();
-        }
+        Account account = accountRepository.save(Account.create(request.email(), passwordHash));
         log.debug("Account created accountId={}", account.getId());
 
         AccountOtp otp = accountOtpDeliveryService.sendEmailOtp(account.getId(), request.email(), OtpPurpose.REGISTRATION);
