@@ -36,16 +36,16 @@ public class SimpleKafkaEventPublisher implements EventPublisher {
         log.info("Publishing event topic: {} type: {}", topic, eventClass.getSimpleName());
         ProducerRecord<String, String> record = new ProducerRecord<>(topic, event.uuid(), payload);
         record.headers().add(new RecordHeader("__TypeId__", eventClass.getName().getBytes(StandardCharsets.UTF_8)));
-        kafkaTemplate.send(record).whenComplete((result, ex) -> {
-            if (ex != null) {
-                log.error("Failed to send event to topic {}", topic, ex);
-            } else {
-                log.debug("Sent event to topic {} partition {} offset {}",
-                        result.getRecordMetadata().topic(),
-                        result.getRecordMetadata().partition(),
-                        result.getRecordMetadata().offset());
-            }
-        });
+        try {
+            var result = kafkaTemplate.send(record).get(10, java.util.concurrent.TimeUnit.SECONDS);
+            log.debug("Sent event to topic {} partition {} offset {}",
+                    result.getRecordMetadata().topic(),
+                    result.getRecordMetadata().partition(),
+                    result.getRecordMetadata().offset());
+        } catch (Exception ex) {
+            log.error("Failed to send event to topic {}", topic, ex);
+            throw new RuntimeException("Failed to send event to topic " + topic, ex);
+        }
     }
 
 }

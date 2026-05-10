@@ -22,7 +22,9 @@ public class SseHeartbeatScheduler {
             sendHeartbeat(emitter);
         }
         for (var set : emitterRegistry.getAllTopicEmitterSets()) {
-            for (SseEmitter emitter : set) {
+            var snapshot = new java.util.ArrayList<SseEmitter>();
+            set.forEach(snapshot::add);
+            for (SseEmitter emitter : snapshot) {
                 sendHeartbeat(emitter);
             }
         }

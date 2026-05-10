@@ -16,6 +16,7 @@ import dev.ngb.domain.profile.repository.ProfileUsernameRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.transaction.annotation.Transactional;
 
 /*
  * Creates the public Profile aggregate for an authenticated account. Enforces:
@@ -35,18 +36,10 @@ public class CreateProfileUseCase implements UseCaseService {
     private final ProfileUsernameRepository profileUsernameRepository;
     private final IdentityPublicApi identityPublicApi;
 
+    @Transactional
     public CreateProfileResponse execute(Long accountId, CreateProfileRequest request) {
         if (!identityPublicApi.isAccountActive(accountId)) {
             throw ProfileError.ACCOUNT_NOT_ACTIVE.exception();
-        }
-
-        if (profileRepository.existsByAccountId(accountId)) {
-            log.warn("Create profile failed: accountId={} already owns a profile", accountId);
-            throw ProfileError.PROFILE_ALREADY_EXISTS_FOR_ACCOUNT.exception();
-        }
-
-        if (profileRepository.existsByUsername(request.username())) {
-            throw ProfileError.USERNAME_ALREADY_EXISTS.exception();
         }
 
         Profile profile = Profile.createForNewAccount(
@@ -61,7 +54,6 @@ public class CreateProfileUseCase implements UseCaseService {
         try {
             savedProfile = profileRepository.save(profile);
         } catch (DataIntegrityViolationException e) {
-            // Race against the unique-username/account index; surface a friendlier conflict.
             log.warn("Create profile failed: integrity violation accountId={}, username={}", accountId, request.username());
             throw ProfileError.USERNAME_ALREADY_EXISTS.exception();
         }

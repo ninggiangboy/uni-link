@@ -6,23 +6,34 @@ import java.time.Duration;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 @UtilityClass
 public final class AsyncUtils {
 
+    private static final Executor DEFAULT_EXECUTOR = Executors.newVirtualThreadPerTaskExecutor();
+
     public static void runAsync(
             Runnable task,
             Duration timeout
     ) {
+        runAsync(task, timeout, DEFAULT_EXECUTOR);
+    }
+
+    public static void runAsync(
+            Runnable task,
+            Duration timeout,
+            Executor executor
+    ) {
         CompletableFuture<Void> future =
-                CompletableFuture.runAsync(task);
+                CompletableFuture.runAsync(task, executor);
 
         if (timeout != null) {
             future.orTimeout(timeout.toMillis(), TimeUnit.MILLISECONDS);
         }
 
-        // Trigger execution and surface exception
         future.exceptionally(ex -> {
             throw unwrap(ex);
         });
@@ -32,7 +43,14 @@ public final class AsyncUtils {
             Collection<? extends Runnable> tasks,
             Duration timeout
     ) {
+        runAllAsync(tasks, timeout, DEFAULT_EXECUTOR);
+    }
 
+    public static void runAllAsync(
+            Collection<? extends Runnable> tasks,
+            Duration timeout,
+            Executor executor
+    ) {
         if (tasks.isEmpty()) {
             return;
         }
@@ -40,7 +58,7 @@ public final class AsyncUtils {
         var futures = tasks.stream()
                 .map(task -> {
                     CompletableFuture<Void> f =
-                            CompletableFuture.runAsync(task);
+                            CompletableFuture.runAsync(task, executor);
 
                     if (timeout != null) {
                         f = f.orTimeout(timeout.toMillis(), TimeUnit.MILLISECONDS);

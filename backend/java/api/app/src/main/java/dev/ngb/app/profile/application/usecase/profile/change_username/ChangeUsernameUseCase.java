@@ -36,9 +36,6 @@ public class ChangeUsernameUseCase implements UseCaseService {
         if (newUsername.equalsIgnoreCase(profile.getUsername())) {
             throw ProfileError.USERNAME_UNCHANGED.exception();
         }
-        if (profileRepository.existsByUsername(newUsername)) {
-            throw ProfileError.USERNAME_ALREADY_EXISTS.exception();
-        }
 
         profileUsernameRepository.findCurrentByProfileId(profile.getId()).ifPresent(current -> {
             current.markHistorical();

@@ -40,6 +40,9 @@ public abstract class JdbcEntity<ID> {
     @LastModifiedDate
     protected Instant updatedAt;
 
+    @Version
+    protected Long version;
+
     /**
      * Compares this entity to another object based on identity.
      *

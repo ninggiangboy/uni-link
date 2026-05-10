@@ -26,7 +26,11 @@ public class RedisPushEventPublisher implements PushEventPublisher {
         } catch (JacksonException ex) {
             throw new IllegalStateException("Failed to serialize PushEvent", ex);
         }
-        redisTemplate.convertAndSend(TopicNames.REALTIME_PUSH_CHANNEL, payload);
+        try {
+            redisTemplate.convertAndSend(TopicNames.REALTIME_PUSH_CHANNEL, payload);
+        } catch (Exception ex) {
+            log.warn("Failed to send push event targetId={}", event.targetId(), ex);
+        }
     }
 }
 

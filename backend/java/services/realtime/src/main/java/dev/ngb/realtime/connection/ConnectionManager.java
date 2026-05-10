@@ -96,14 +96,10 @@ public class ConnectionManager implements EmitterRegistry {
 
     @Override
     public void removeTopicEmitter(String topicId, SseEmitter emitter) {
-        Set<SseEmitter> set = topicEmitters.get(topicId);
-        if (set == null) {
-            return;
-        }
-        set.remove(emitter);
-        if (set.isEmpty()) {
-            topicEmitters.remove(topicId, set);
-        }
+        topicEmitters.computeIfPresent(topicId, (key, set) -> {
+            set.remove(emitter);
+            return set.isEmpty() ? null : set;
+        });
     }
 
     private void safeComplete(SseEmitter emitter) {

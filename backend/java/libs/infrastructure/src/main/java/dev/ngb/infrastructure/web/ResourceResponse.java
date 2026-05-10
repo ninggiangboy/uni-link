@@ -10,22 +10,25 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Map;
 
 @UtilityClass
 public final class ResourceResponse {
 
-    private static final Map<DomainErrorType, HttpStatus> ERROR_MAP = new EnumMap<>(DomainErrorType.class);
+    private static final Map<DomainErrorType, HttpStatus> ERROR_MAP;
 
     static {
-        ERROR_MAP.put(DomainErrorType.INVALID, HttpStatus.BAD_REQUEST);
-        ERROR_MAP.put(DomainErrorType.UNAUTHORIZED, HttpStatus.UNAUTHORIZED);
-        ERROR_MAP.put(DomainErrorType.FORBIDDEN, HttpStatus.FORBIDDEN);
-        ERROR_MAP.put(DomainErrorType.NOT_FOUND, HttpStatus.NOT_FOUND);
-        ERROR_MAP.put(DomainErrorType.CONFLICT, HttpStatus.CONFLICT);
-        ERROR_MAP.put(DomainErrorType.VALIDATION, HttpStatus.UNPROCESSABLE_CONTENT);
-        ERROR_MAP.put(DomainErrorType.RATE_LIMITED, HttpStatus.TOO_MANY_REQUESTS);
+        var map = new EnumMap<DomainErrorType, HttpStatus>(DomainErrorType.class);
+        map.put(DomainErrorType.INVALID, HttpStatus.BAD_REQUEST);
+        map.put(DomainErrorType.UNAUTHORIZED, HttpStatus.UNAUTHORIZED);
+        map.put(DomainErrorType.FORBIDDEN, HttpStatus.FORBIDDEN);
+        map.put(DomainErrorType.NOT_FOUND, HttpStatus.NOT_FOUND);
+        map.put(DomainErrorType.CONFLICT, HttpStatus.CONFLICT);
+        map.put(DomainErrorType.VALIDATION, HttpStatus.UNPROCESSABLE_CONTENT);
+        map.put(DomainErrorType.RATE_LIMITED, HttpStatus.TOO_MANY_REQUESTS);
+        ERROR_MAP = Collections.unmodifiableMap(map);
     }
 
     public static <T> ResponseEntity<T> ok(T body) {

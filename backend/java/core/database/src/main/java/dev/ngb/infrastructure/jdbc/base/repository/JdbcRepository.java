@@ -88,6 +88,7 @@ public abstract class JdbcRepository<D extends DomainEntity<ID>, J extends JdbcE
     }
 
     // Criteria-based Queries
+    @Transactional(readOnly = true)
     protected List<D> findAll(@Nullable Criteria criteria, @Nullable Pageable pageable) {
         return jdbcAggregate
                 .findAll(buildQuery(criteria, pageable), clazz)
@@ -100,6 +101,7 @@ public abstract class JdbcRepository<D extends DomainEntity<ID>, J extends JdbcE
         return findAll(criteria, Pageable.unpaged());
     }
 
+    @Transactional(readOnly = true)
     protected Optional<D> findFirst(@Nullable Criteria criteria, @Nullable Sort sort) {
         Pageable pageable = sort != null && sort.isSorted()
                 ? Pageable.unpaged(sort)
@@ -115,10 +117,12 @@ public abstract class JdbcRepository<D extends DomainEntity<ID>, J extends JdbcE
         return findFirst(criteria, Sort.unsorted());
     }
 
+    @Transactional(readOnly = true)
     protected long count(@Nullable Criteria criteria) {
         return jdbcAggregate.count(buildQuery(criteria, Pageable.unpaged()), clazz);
     }
 
+    @Transactional(readOnly = true)
     protected boolean exists(@Nullable Criteria criteria) {
         return jdbcAggregate
                 .findAll(buildQuery(criteria, Pageable.unpaged()).limit(1), clazz)

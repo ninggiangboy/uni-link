@@ -22,14 +22,14 @@ public class SseController {
     public SseEmitter connect() {
         Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String userId = jwt.getSubject();
-        SseEmitter emitter = new SseEmitter(0L);
+        SseEmitter emitter = new SseEmitter(300_000L);
         emitterRegistry.registerUser(userId, emitter);
         return emitter;
     }
 
     @GetMapping(value = "/topic/{topicId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter topic(@PathVariable String topicId) {
-        SseEmitter emitter = new SseEmitter(0L);
+        SseEmitter emitter = new SseEmitter(300_000L);
         emitterRegistry.registerTopic(topicId, emitter);
         return emitter;
     }

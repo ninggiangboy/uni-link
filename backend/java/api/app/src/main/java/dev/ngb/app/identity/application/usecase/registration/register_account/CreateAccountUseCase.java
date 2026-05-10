@@ -35,13 +35,6 @@ public class CreateAccountUseCase implements UseCaseService {
     public CreateAccountResponse execute(CreateAccountRequest request) {
         log.info("Register account attempt for email={}", StringUtils.maskEmail(request.email()));
 
-        // Fast path for common duplicates; save-time catch still handles race conditions.
-        if (accountRepository.existsByEmail(request.email())) {
-            log.warn("Register failed: email already exists");
-            throw AccountError.EMAIL_ALREADY_EXISTS.exception();
-        }
-
-        // Hash before persistence; domain factory builds a pending account until email is verified.
         String passwordHash = passwordEncoder.encode(request.password());
         Account account = Account.create(request.email(), passwordHash);
         try {
