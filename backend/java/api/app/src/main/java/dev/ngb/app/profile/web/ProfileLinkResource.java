@@ -1,11 +1,11 @@
 package dev.ngb.app.profile.web;
 
 import dev.ngb.app.profile.application.dto.ProfileLinkResponse;
-import dev.ngb.app.profile.application.usecase.add_profile_link.AddProfileLinkUseCase;
-import dev.ngb.app.profile.application.usecase.add_profile_link.dto.AddProfileLinkRequest;
-import dev.ngb.app.profile.application.usecase.remove_profile_link.RemoveProfileLinkUseCase;
-import dev.ngb.app.profile.application.usecase.update_profile_link.UpdateProfileLinkUseCase;
-import dev.ngb.app.profile.application.usecase.update_profile_link.dto.UpdateProfileLinkRequest;
+import dev.ngb.app.profile.application.usecase.link.add_profile_link.AddProfileLinkUseCase;
+import dev.ngb.app.profile.application.usecase.link.add_profile_link.dto.AddProfileLinkRequest;
+import dev.ngb.app.profile.application.usecase.link.remove_profile_link.RemoveProfileLinkUseCase;
+import dev.ngb.app.profile.application.usecase.link.update_profile_link.UpdateProfileLinkUseCase;
+import dev.ngb.app.profile.application.usecase.link.update_profile_link.dto.UpdateProfileLinkRequest;
 import dev.ngb.infrastructure.web.ResourceResponse;
 import dev.ngb.infrastructure.web.SecurityUtils;
 import lombok.RequiredArgsConstructor;

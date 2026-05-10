@@ -1,11 +1,11 @@
 package dev.ngb.app.profile.web;
 
-import dev.ngb.app.profile.application.dto.FollowResponse;
-import dev.ngb.app.profile.application.usecase.approve_follow_request.ApproveFollowRequestUseCase;
-import dev.ngb.app.profile.application.usecase.follow_profile.FollowProfileUseCase;
-import dev.ngb.app.profile.application.usecase.reject_follow_request.RejectFollowRequestUseCase;
-import dev.ngb.app.profile.application.usecase.remove_follower.RemoveFollowerUseCase;
-import dev.ngb.app.profile.application.usecase.unfollow_profile.UnfollowProfileUseCase;
+import dev.ngb.app.profile.application.usecase.social.follow_profile.dto.FollowResponse;
+import dev.ngb.app.profile.application.usecase.social.approve_follow_request.ApproveFollowRequestUseCase;
+import dev.ngb.app.profile.application.usecase.social.follow_profile.FollowProfileUseCase;
+import dev.ngb.app.profile.application.usecase.social.reject_follow_request.RejectFollowRequestUseCase;
+import dev.ngb.app.profile.application.usecase.social.remove_follower.RemoveFollowerUseCase;
+import dev.ngb.app.profile.application.usecase.social.unfollow_profile.UnfollowProfileUseCase;
 import dev.ngb.infrastructure.web.ResourceResponse;
 import dev.ngb.infrastructure.web.SecurityUtils;
 import lombok.RequiredArgsConstructor;

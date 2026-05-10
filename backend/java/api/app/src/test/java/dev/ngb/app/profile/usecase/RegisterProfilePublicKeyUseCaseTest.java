@@ -1,7 +1,7 @@
 package dev.ngb.app.profile.usecase;
 
-import dev.ngb.app.profile.application.usecase.register_public_key.RegisterProfilePublicKeyUseCase;
-import dev.ngb.app.profile.application.usecase.register_public_key.dto.RegisterProfilePublicKeyRequest;
+import dev.ngb.app.profile.application.usecase.security.register_public_key.RegisterProfilePublicKeyUseCase;
+import dev.ngb.app.profile.application.usecase.security.register_public_key.dto.RegisterProfilePublicKeyRequest;
 import dev.ngb.app.profile.support.ProfileFixtures;
 import dev.ngb.domain.DomainException;
 import dev.ngb.domain.profile.error.ProfileError;

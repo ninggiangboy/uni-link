@@ -1,9 +1,9 @@
 package dev.ngb.app.profile.web;
 
 import dev.ngb.app.profile.application.dto.ProfileMetadataResponse;
-import dev.ngb.app.profile.application.usecase.remove_profile_metadata.RemoveProfileMetadataUseCase;
-import dev.ngb.app.profile.application.usecase.upsert_profile_metadata.UpsertProfileMetadataUseCase;
-import dev.ngb.app.profile.application.usecase.upsert_profile_metadata.dto.UpsertProfileMetadataRequest;
+import dev.ngb.app.profile.application.usecase.metadata.remove_profile_metadata.RemoveProfileMetadataUseCase;
+import dev.ngb.app.profile.application.usecase.metadata.upsert_profile_metadata.UpsertProfileMetadataUseCase;
+import dev.ngb.app.profile.application.usecase.metadata.upsert_profile_metadata.dto.UpsertProfileMetadataRequest;
 import dev.ngb.infrastructure.web.ResourceResponse;
 import dev.ngb.infrastructure.web.SecurityUtils;
 import lombok.RequiredArgsConstructor;

@@ -1,8 +1,8 @@
 package dev.ngb.app.profile.usecase;
 
 import dev.ngb.app.profile.application.query.ProfileQueryService;
-import dev.ngb.app.profile.application.usecase.update_profile_setting.UpdateProfileSettingUseCase;
-import dev.ngb.app.profile.application.usecase.update_profile_setting.dto.UpdateProfileSettingRequest;
+import dev.ngb.app.profile.application.usecase.profile.update_profile_setting.UpdateProfileSettingUseCase;
+import dev.ngb.app.profile.application.usecase.profile.update_profile_setting.dto.UpdateProfileSettingRequest;
 import dev.ngb.app.profile.support.ProfileFixtures;
 import dev.ngb.domain.DomainException;
 import dev.ngb.domain.profile.error.ProfileError;

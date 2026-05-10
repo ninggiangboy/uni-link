@@ -1,8 +1,8 @@
 package dev.ngb.app.profile.web;
 
 import dev.ngb.app.profile.application.dto.ProfileSettingResponse;
-import dev.ngb.app.profile.application.usecase.update_profile_setting.UpdateProfileSettingUseCase;
-import dev.ngb.app.profile.application.usecase.update_profile_setting.dto.UpdateProfileSettingRequest;
+import dev.ngb.app.profile.application.usecase.profile.update_profile_setting.UpdateProfileSettingUseCase;
+import dev.ngb.app.profile.application.usecase.profile.update_profile_setting.dto.UpdateProfileSettingRequest;
 import dev.ngb.infrastructure.web.ResourceResponse;
 import dev.ngb.infrastructure.web.SecurityUtils;
 import lombok.RequiredArgsConstructor;

@@ -1,7 +1,7 @@
 package dev.ngb.app.profile.usecase;
 
-import dev.ngb.app.profile.application.usecase.update_profile_avatar.UpdateProfileAvatarUseCase;
-import dev.ngb.app.profile.application.usecase.update_profile_avatar.dto.UpdateProfileAvatarRequest;
+import dev.ngb.app.profile.application.usecase.profile.update_profile_avatar.UpdateProfileAvatarUseCase;
+import dev.ngb.app.profile.application.usecase.profile.update_profile_avatar.dto.UpdateProfileAvatarRequest;
 import dev.ngb.app.profile.support.ProfileFixtures;
 import dev.ngb.app.shared.public_api.AttachmentPublicApi;
 import dev.ngb.domain.DomainException;

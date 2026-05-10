@@ -5,8 +5,8 @@ import dev.ngb.app.identity.application.usecase.registration.register_account.dt
 import dev.ngb.app.identity.application.usecase.registration.verify_email.dto.CompleteEmailVerificationRequest;
 import dev.ngb.app.identity.support.IdentityAuthApiClient;
 import dev.ngb.app.identity.support.TestOtpSender;
-import dev.ngb.app.profile.application.usecase.create_profile.dto.CreateProfileRequest;
-import dev.ngb.app.profile.application.usecase.update_profile.dto.UpdateProfileRequest;
+import dev.ngb.app.profile.application.usecase.profile.create_profile.dto.CreateProfileRequest;
+import dev.ngb.app.profile.application.usecase.profile.update_profile.dto.UpdateProfileRequest;
 import dev.ngb.app.profile.support.ProfileApiClient;
 import dev.ngb.app.support.AbstractIntegrationTest;
 import dev.ngb.app.support.HttpJsonClient;

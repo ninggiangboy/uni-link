@@ -1,7 +1,7 @@
 package dev.ngb.app.profile.web;
 
 import dev.ngb.app.profile.application.dto.ProfileMetadataResponse;
-import dev.ngb.app.profile.application.usecase.upsert_profile_metadata.dto.UpsertProfileMetadataRequest;
+import dev.ngb.app.profile.application.usecase.metadata.upsert_profile_metadata.dto.UpsertProfileMetadataRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;

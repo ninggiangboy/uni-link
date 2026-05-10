@@ -1,7 +1,7 @@
 package dev.ngb.app.profile.usecase;
 
-import dev.ngb.app.profile.application.usecase.change_username.ChangeUsernameUseCase;
-import dev.ngb.app.profile.application.usecase.change_username.dto.ChangeUsernameRequest;
+import dev.ngb.app.profile.application.usecase.profile.change_username.ChangeUsernameUseCase;
+import dev.ngb.app.profile.application.usecase.profile.change_username.dto.ChangeUsernameRequest;
 import dev.ngb.app.profile.support.ProfileFixtures;
 import dev.ngb.domain.DomainException;
 import dev.ngb.domain.profile.error.ProfileError;

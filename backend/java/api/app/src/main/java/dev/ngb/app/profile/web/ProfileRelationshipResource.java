@@ -1,9 +1,9 @@
 package dev.ngb.app.profile.web;
 
-import dev.ngb.app.profile.application.usecase.block_profile.BlockProfileUseCase;
-import dev.ngb.app.profile.application.usecase.mute_profile.MuteProfileUseCase;
-import dev.ngb.app.profile.application.usecase.unblock_profile.UnblockProfileUseCase;
-import dev.ngb.app.profile.application.usecase.unmute_profile.UnmuteProfileUseCase;
+import dev.ngb.app.profile.application.usecase.social.block_profile.BlockProfileUseCase;
+import dev.ngb.app.profile.application.usecase.social.mute_profile.MuteProfileUseCase;
+import dev.ngb.app.profile.application.usecase.social.unblock_profile.UnblockProfileUseCase;
+import dev.ngb.app.profile.application.usecase.social.unmute_profile.UnmuteProfileUseCase;
 import dev.ngb.infrastructure.web.ResourceResponse;
 import dev.ngb.infrastructure.web.SecurityUtils;
 import lombok.RequiredArgsConstructor;

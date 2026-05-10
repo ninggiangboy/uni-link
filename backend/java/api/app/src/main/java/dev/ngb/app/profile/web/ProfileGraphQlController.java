@@ -1,9 +1,9 @@
 package dev.ngb.app.profile.web;
 
 import dev.ngb.app.profile.application.query.ProfileQueryService;
-import dev.ngb.app.profile.application.dto.FollowRequestResponse;
-import dev.ngb.app.profile.application.dto.PageQuery;
-import dev.ngb.app.profile.application.dto.ProfileBrief;
+import dev.ngb.app.profile.application.query.dto.FollowRequestResponse;
+import dev.ngb.app.profile.application.query.dto.PageQuery;
+import dev.ngb.app.profile.application.query.dto.ProfileBrief;
 import dev.ngb.app.profile.application.dto.ProfileLinkResponse;
 import dev.ngb.app.profile.application.dto.ProfileMetadataResponse;
 import dev.ngb.app.profile.application.dto.ProfileSettingResponse;

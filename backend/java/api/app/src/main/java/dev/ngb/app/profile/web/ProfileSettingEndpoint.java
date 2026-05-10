@@ -1,7 +1,7 @@
 package dev.ngb.app.profile.web;
 
 import dev.ngb.app.profile.application.dto.ProfileSettingResponse;
-import dev.ngb.app.profile.application.usecase.update_profile_setting.dto.UpdateProfileSettingRequest;
+import dev.ngb.app.profile.application.usecase.profile.update_profile_setting.dto.UpdateProfileSettingRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;

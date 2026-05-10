@@ -2,9 +2,9 @@ package dev.ngb.app.profile.usecase;
 
 import dev.ngb.app.profile.application.service.FollowStatsSyncService;
 import dev.ngb.app.profile.application.query.ProfileQueryService;
-import dev.ngb.app.profile.application.dto.PageQuery;
-import dev.ngb.app.profile.application.usecase.approve_follow_request.ApproveFollowRequestUseCase;
-import dev.ngb.app.profile.application.usecase.reject_follow_request.RejectFollowRequestUseCase;
+import dev.ngb.app.profile.application.query.dto.PageQuery;
+import dev.ngb.app.profile.application.usecase.social.approve_follow_request.ApproveFollowRequestUseCase;
+import dev.ngb.app.profile.application.usecase.social.reject_follow_request.RejectFollowRequestUseCase;
 import dev.ngb.app.profile.support.ProfileFixtures;
 import dev.ngb.domain.DomainException;
 import dev.ngb.domain.profile.error.ProfileError;

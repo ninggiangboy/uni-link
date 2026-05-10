@@ -1,7 +1,7 @@
 package dev.ngb.app.profile.usecase;
 
 import dev.ngb.app.profile.application.service.FollowStatsSyncService;
-import dev.ngb.app.profile.application.usecase.unfollow_profile.UnfollowProfileUseCase;
+import dev.ngb.app.profile.application.usecase.social.unfollow_profile.UnfollowProfileUseCase;
 import dev.ngb.app.profile.support.ProfileFixtures;
 import dev.ngb.domain.DomainException;
 import dev.ngb.domain.profile.error.ProfileError;

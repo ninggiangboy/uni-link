@@ -1,6 +1,6 @@
 package dev.ngb.app.profile.web;
 
-import dev.ngb.app.profile.application.dto.FollowResponse;
+import dev.ngb.app.profile.application.usecase.social.follow_profile.dto.FollowResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;

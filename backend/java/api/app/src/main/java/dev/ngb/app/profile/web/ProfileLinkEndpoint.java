@@ -1,8 +1,8 @@
 package dev.ngb.app.profile.web;
 
 import dev.ngb.app.profile.application.dto.ProfileLinkResponse;
-import dev.ngb.app.profile.application.usecase.add_profile_link.dto.AddProfileLinkRequest;
-import dev.ngb.app.profile.application.usecase.update_profile_link.dto.UpdateProfileLinkRequest;
+import dev.ngb.app.profile.application.usecase.link.add_profile_link.dto.AddProfileLinkRequest;
+import dev.ngb.app.profile.application.usecase.link.update_profile_link.dto.UpdateProfileLinkRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;

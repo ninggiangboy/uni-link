@@ -2,11 +2,11 @@ package dev.ngb.app.profile.usecase;
 
 import dev.ngb.app.profile.ProfileConstants;
 import dev.ngb.app.profile.application.query.ProfileQueryService;
-import dev.ngb.app.profile.application.usecase.add_profile_link.AddProfileLinkUseCase;
-import dev.ngb.app.profile.application.usecase.add_profile_link.dto.AddProfileLinkRequest;
-import dev.ngb.app.profile.application.usecase.remove_profile_link.RemoveProfileLinkUseCase;
-import dev.ngb.app.profile.application.usecase.update_profile_link.UpdateProfileLinkUseCase;
-import dev.ngb.app.profile.application.usecase.update_profile_link.dto.UpdateProfileLinkRequest;
+import dev.ngb.app.profile.application.usecase.link.add_profile_link.AddProfileLinkUseCase;
+import dev.ngb.app.profile.application.usecase.link.add_profile_link.dto.AddProfileLinkRequest;
+import dev.ngb.app.profile.application.usecase.link.remove_profile_link.RemoveProfileLinkUseCase;
+import dev.ngb.app.profile.application.usecase.link.update_profile_link.UpdateProfileLinkUseCase;
+import dev.ngb.app.profile.application.usecase.link.update_profile_link.dto.UpdateProfileLinkRequest;
 import dev.ngb.app.profile.support.ProfileFixtures;
 import dev.ngb.domain.DomainException;
 import dev.ngb.domain.profile.error.ProfileError;

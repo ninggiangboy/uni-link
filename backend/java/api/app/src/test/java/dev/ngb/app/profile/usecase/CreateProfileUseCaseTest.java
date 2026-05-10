@@ -1,7 +1,7 @@
 package dev.ngb.app.profile.usecase;
 
-import dev.ngb.app.profile.application.usecase.create_profile.CreateProfileUseCase;
-import dev.ngb.app.profile.application.usecase.create_profile.dto.CreateProfileRequest;
+import dev.ngb.app.profile.application.usecase.profile.create_profile.CreateProfileUseCase;
+import dev.ngb.app.profile.application.usecase.profile.create_profile.dto.CreateProfileRequest;
 import dev.ngb.app.shared.public_api.IdentityPublicApi;
 import dev.ngb.domain.DomainException;
 import dev.ngb.domain.profile.error.ProfileError;

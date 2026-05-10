@@ -1,7 +1,7 @@
 package dev.ngb.app.profile.usecase;
 
-import dev.ngb.app.profile.application.usecase.update_profile.UpdateProfileUseCase;
-import dev.ngb.app.profile.application.usecase.update_profile.dto.UpdateProfileRequest;
+import dev.ngb.app.profile.application.usecase.profile.update_profile.UpdateProfileUseCase;
+import dev.ngb.app.profile.application.usecase.profile.update_profile.dto.UpdateProfileRequest;
 import dev.ngb.app.profile.support.ProfileFixtures;
 import dev.ngb.domain.DomainException;
 import dev.ngb.domain.profile.error.ProfileError;

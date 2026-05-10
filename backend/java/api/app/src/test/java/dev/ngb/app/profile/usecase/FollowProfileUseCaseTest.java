@@ -1,8 +1,9 @@
 package dev.ngb.app.profile.usecase;
 
 import dev.ngb.app.profile.application.service.FollowStatsSyncService;
-import dev.ngb.app.profile.application.dto.FollowResponse;
-import dev.ngb.app.profile.application.usecase.follow_profile.FollowProfileUseCase;
+import dev.ngb.app.profile.application.usecase.social.follow_profile.dto.FollowResponse;
+import dev.ngb.app.profile.application.usecase.social.follow_profile.FollowProfileUseCase;
+import dev.ngb.domain.profile.model.relationship.ProfileRelationshipState;
 import dev.ngb.app.profile.support.ProfileFixtures;
 import dev.ngb.domain.DomainException;
 import dev.ngb.domain.profile.error.ProfileError;
@@ -22,7 +23,6 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -45,8 +45,8 @@ class FollowProfileUseCaseTest {
         var target = ProfileFixtures.profile(2L, 200L, "bob");
         when(profileRepository.findByAccountId(100L)).thenReturn(Optional.of(follower));
         when(profileRepository.findByUsername("bob")).thenReturn(Optional.of(target));
-        when(profileRelationshipRepository.isBlocked(2L, 1L)).thenReturn(false);
-        when(profileRelationshipRepository.isBlocked(1L, 2L)).thenReturn(false);
+        when(profileRelationshipRepository.findRelationshipsBetween(1L, 2L))
+                .thenReturn(ProfileRelationshipState.empty());
         when(profileRelationshipRepository.follow(eq(1L), eq(2L))).thenReturn(true);
 
         var resp = useCase.execute(100L, "bob");
@@ -62,8 +62,8 @@ class FollowProfileUseCaseTest {
         var target = ProfileFixtures.profile(2L, 200L, "bob", ProfileVisibility.PUBLIC, Boolean.TRUE);
         when(profileRepository.findByAccountId(100L)).thenReturn(Optional.of(follower));
         when(profileRepository.findByUsername("bob")).thenReturn(Optional.of(target));
-        when(profileRelationshipRepository.isBlocked(2L, 1L)).thenReturn(false);
-        when(profileRelationshipRepository.isBlocked(1L, 2L)).thenReturn(false);
+        when(profileRelationshipRepository.findRelationshipsBetween(1L, 2L))
+                .thenReturn(ProfileRelationshipState.empty());
         when(profileRelationshipRepository.follow(eq(1L), eq(2L))).thenReturn(true);
 
         var resp = useCase.execute(100L, "bob");
@@ -79,7 +79,8 @@ class FollowProfileUseCaseTest {
         var target = ProfileFixtures.profile(2L, 200L, "bob");
         when(profileRepository.findByAccountId(100L)).thenReturn(Optional.of(follower));
         when(profileRepository.findByUsername("bob")).thenReturn(Optional.of(target));
-        when(profileRelationshipRepository.isBlocked(anyLong(), anyLong())).thenReturn(false);
+        when(profileRelationshipRepository.findRelationshipsBetween(1L, 2L))
+                .thenReturn(ProfileRelationshipState.empty());
         when(profileRelationshipRepository.follow(eq(1L), eq(2L))).thenReturn(false);
 
         var ex = assertThrows(DomainException.class, () -> useCase.execute(100L, "bob"));
@@ -117,7 +118,8 @@ class FollowProfileUseCaseTest {
         var target = ProfileFixtures.profile(2L, 200L, "bob");
         when(profileRepository.findByAccountId(100L)).thenReturn(Optional.of(follower));
         when(profileRepository.findByUsername("bob")).thenReturn(Optional.of(target));
-        when(profileRelationshipRepository.isBlocked(2L, 1L)).thenReturn(true);
+        when(profileRelationshipRepository.findRelationshipsBetween(1L, 2L))
+                .thenReturn(new ProfileRelationshipState(false, false, false, true, false, false));
 
         var ex = assertThrows(DomainException.class, () -> useCase.execute(100L, "bob"));
         assertThat(ex.getError()).isEqualTo(ProfileError.BLOCKED_BY_TARGET);
@@ -130,8 +132,8 @@ class FollowProfileUseCaseTest {
         var target = ProfileFixtures.profile(2L, 200L, "bob");
         when(profileRepository.findByAccountId(100L)).thenReturn(Optional.of(follower));
         when(profileRepository.findByUsername("bob")).thenReturn(Optional.of(target));
-        when(profileRelationshipRepository.isBlocked(2L, 1L)).thenReturn(false);
-        when(profileRelationshipRepository.isBlocked(1L, 2L)).thenReturn(true);
+        when(profileRelationshipRepository.findRelationshipsBetween(1L, 2L))
+                .thenReturn(new ProfileRelationshipState(false, false, true, false, false, false));
 
         var ex = assertThrows(DomainException.class, () -> useCase.execute(100L, "bob"));
         assertThat(ex.getError()).isEqualTo(ProfileError.TARGET_BLOCKED);
@@ -144,8 +146,8 @@ class FollowProfileUseCaseTest {
         var target = ProfileFixtures.profile(2L, 200L, "bob", ProfileVisibility.PRIVATE);
         when(profileRepository.findByAccountId(100L)).thenReturn(Optional.of(follower));
         when(profileRepository.findByUsername("bob")).thenReturn(Optional.of(target));
-        when(profileRelationshipRepository.isBlocked(anyLong(), anyLong())).thenReturn(false);
-        when(profileRelationshipRepository.isFollowing(1L, 2L)).thenReturn(false);
+        when(profileRelationshipRepository.findRelationshipsBetween(1L, 2L))
+                .thenReturn(ProfileRelationshipState.empty());
         when(followRequestRepository.existsPending(1L, 2L)).thenReturn(false);
         when(followRequestRepository.save(any())).thenAnswer(inv -> ProfileFixtures.pendingRequest(99L, 1L, 2L));
 
@@ -163,8 +165,8 @@ class FollowProfileUseCaseTest {
         var target = ProfileFixtures.profile(2L, 200L, "bob", ProfileVisibility.PRIVATE);
         when(profileRepository.findByAccountId(100L)).thenReturn(Optional.of(follower));
         when(profileRepository.findByUsername("bob")).thenReturn(Optional.of(target));
-        when(profileRelationshipRepository.isBlocked(anyLong(), anyLong())).thenReturn(false);
-        when(profileRelationshipRepository.isFollowing(1L, 2L)).thenReturn(true);
+        when(profileRelationshipRepository.findRelationshipsBetween(1L, 2L))
+                .thenReturn(new ProfileRelationshipState(true, false, false, false, false, false));
 
         var ex = assertThrows(DomainException.class, () -> useCase.execute(100L, "bob"));
         assertThat(ex.getError()).isEqualTo(ProfileError.ALREADY_FOLLOWING);
@@ -177,8 +179,8 @@ class FollowProfileUseCaseTest {
         var target = ProfileFixtures.profile(2L, 200L, "bob", ProfileVisibility.PRIVATE);
         when(profileRepository.findByAccountId(100L)).thenReturn(Optional.of(follower));
         when(profileRepository.findByUsername("bob")).thenReturn(Optional.of(target));
-        when(profileRelationshipRepository.isBlocked(anyLong(), anyLong())).thenReturn(false);
-        when(profileRelationshipRepository.isFollowing(1L, 2L)).thenReturn(false);
+        when(profileRelationshipRepository.findRelationshipsBetween(1L, 2L))
+                .thenReturn(ProfileRelationshipState.empty());
         when(followRequestRepository.existsPending(1L, 2L)).thenReturn(true);
 
         var ex = assertThrows(DomainException.class, () -> useCase.execute(100L, "bob"));
