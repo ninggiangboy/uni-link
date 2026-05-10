@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.Instant;
@@ -20,4 +21,7 @@ public class HashtagStatsJdbcEntity extends JdbcEntity<Long> {
     private Long threadCount;
     private Long usageCount;
     private Instant lastUsedAt;
+
+    @Version
+    private Long version;
 }

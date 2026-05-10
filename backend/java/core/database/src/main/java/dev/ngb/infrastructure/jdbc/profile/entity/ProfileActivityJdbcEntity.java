@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.Instant;
@@ -19,4 +20,7 @@ public class ProfileActivityJdbcEntity extends JdbcEntity<Long> {
     private Long profileId;
     private Instant lastActiveAt;
     private Instant lastPostAt;
+
+    @Version
+    private Long version;
 }

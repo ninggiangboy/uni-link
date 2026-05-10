@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.*;
+import org.springframework.data.domain.Persistable;
 
 import java.time.Instant;
 import java.util.Objects;
@@ -22,9 +23,15 @@ import java.util.Objects;
 @Setter
 @SuperBuilder
 @NoArgsConstructor
-public abstract class JdbcEntity<ID> {
+public abstract class JdbcEntity<ID> implements Persistable<ID> {
     @Id
     protected ID id;
+
+    @Override
+    @Transient
+    public boolean isNew() {
+        return getId() == null;
+    }
 
     protected String uuid;
 
@@ -39,9 +46,6 @@ public abstract class JdbcEntity<ID> {
 
     @LastModifiedDate
     protected Instant updatedAt;
-
-    @Version
-    protected Long version;
 
     /**
      * Compares this entity to another object based on identity.

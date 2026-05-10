@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.relational.core.mapping.Table;
 
 @Getter
@@ -21,4 +22,7 @@ public class ActorInboxJdbcEntity extends JdbcEntity<Long> {
     private Long unreadCount;
     private Boolean pinned;
     private Boolean muted;
+
+    @Version
+    private Long version;
 }

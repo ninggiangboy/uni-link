@@ -65,7 +65,6 @@ dependencies {
     // Modulith
     api 'org.springframework.modulith:spring-modulith-core'
     api 'org.springframework.modulith:spring-modulith-events-api'
-    api 'org.springframework.modulith:spring-modulith-starter-jdbc'
     runtimeOnly 'org.springframework.modulith:spring-modulith-actuator'
     runtimeOnly 'org.springframework.modulith:spring-modulith-observability'
 

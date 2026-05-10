@@ -50,33 +50,8 @@ class CreateAccountUseCaseTest {
     }
 
     @Test
-    @DisplayName("Email already exists (pre-check) → EMAIL_ALREADY_EXISTS")
-    void executeWhenEmailAlreadyExistsThrowsConflict() {
-        when(accountRepository.existsByEmail(IdentityUseCaseTestFixtures.EMAIL)).thenReturn(true);
-
-        var ex = assertThrows(DomainException.class, () -> useCase.execute(request));
-
-        assertThat(ex.getError()).isEqualTo(AccountError.EMAIL_ALREADY_EXISTS);
-        verifyNoInteractions(passwordEncoder, accountOtpDeliveryService);
-    }
-
-    @Test
-    @DisplayName("Duplicate email on save race → EMAIL_ALREADY_EXISTS")
-    void executeWhenDuplicateOnSaveThrowsConflict() {
-        when(accountRepository.existsByEmail(IdentityUseCaseTestFixtures.EMAIL)).thenReturn(false);
-        when(passwordEncoder.encode("plain-secret")).thenReturn("hashed-secret");
-        when(accountRepository.save(any(Account.class))).thenThrow(new DataIntegrityViolationException("duplicate email"));
-
-        var ex = assertThrows(DomainException.class, () -> useCase.execute(request));
-
-        assertThat(ex.getError()).isEqualTo(AccountError.EMAIL_ALREADY_EXISTS);
-        verifyNoInteractions(accountOtpDeliveryService);
-    }
-
-    @Test
     @DisplayName("New email → hash password, save account, REGISTRATION OTP")
     void executeWhenNewEmailHashesPasswordSavesAccountAndSendsRegistrationOtp() {
-        when(accountRepository.existsByEmail(IdentityUseCaseTestFixtures.EMAIL)).thenReturn(false);
         when(passwordEncoder.encode("plain-secret")).thenReturn("hashed-secret");
         when(accountRepository.save(any(Account.class))).thenAnswer(invocation -> {
             Account a = invocation.getArgument(0);
@@ -111,5 +86,17 @@ class CreateAccountUseCaseTest {
         assertThat(saved.getValue().getEmail()).isEqualTo(IdentityUseCaseTestFixtures.EMAIL);
         assertThat(saved.getValue().getPasswordHash()).isEqualTo("hashed-secret");
         verify(accountOtpDeliveryService).sendEmailOtp(eq(99L), eq(IdentityUseCaseTestFixtures.EMAIL), eq(OtpPurpose.REGISTRATION));
+    }
+
+    @Test
+    @DisplayName("Duplicate email on save race → DataIntegrityViolation → EMAIL_ALREADY_EXISTS")
+    void executeWhenConcurrentEmailSaveThrowsConflict() {
+        when(passwordEncoder.encode("plain-secret")).thenReturn("hashed-secret");
+        when(accountRepository.save(any(Account.class))).thenThrow(new DataIntegrityViolationException("duplicate email"));
+
+        var ex = assertThrows(DomainException.class, () -> useCase.execute(request));
+
+        assertThat(ex.getError()).isEqualTo(AccountError.EMAIL_ALREADY_EXISTS);
+        verifyNoInteractions(accountOtpDeliveryService);
     }
 }

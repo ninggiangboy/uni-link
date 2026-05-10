@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.relational.core.mapping.Table;
 
 @Getter
@@ -16,4 +17,7 @@ public class NotificationCounterJdbcEntity extends JdbcEntity<Long> {
 
     private Long profileId;
     private Long unreadCount;
+
+    @Version
+    private Long version;
 }

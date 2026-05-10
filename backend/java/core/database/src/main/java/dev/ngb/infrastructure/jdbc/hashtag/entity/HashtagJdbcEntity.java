@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.relational.core.mapping.Table;
 
 @Getter
@@ -18,4 +19,7 @@ public class HashtagJdbcEntity extends SoftDeletableJdbcEntity<Long> {
     private String normalizedTag;
     private Long usageCount;
     private Long threadCount;
+
+    @Version
+    private Long version;
 }

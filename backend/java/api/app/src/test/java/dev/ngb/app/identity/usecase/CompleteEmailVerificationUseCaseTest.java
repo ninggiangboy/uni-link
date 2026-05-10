@@ -21,6 +21,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ConcurrentModificationException;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -84,6 +85,21 @@ class CompleteEmailVerificationUseCaseTest {
         var ex = assertThrows(DomainException.class, () -> useCase.execute(VERIFICATION_ID, req, IdentityUseCaseTestFixtures.IP));
 
         assertThat(ex.getError()).isEqualTo(AccountError.INVALID_OTP);
+    }
+
+    @Test
+    @DisplayName("Concurrent OTP save → ConcurrentModificationException propagated")
+    void executeWhenOtpSaveThrowsConcurrentModificationException() {
+        var req = new CompleteEmailVerificationRequest("123456", IdentityUseCaseTestFixtures.device());
+        var pending = IdentityUseCaseTestFixtures.pendingAccount(10L);
+        var otp = AccountOtp.create(10L, "123456", OtpPurpose.REGISTRATION, OtpChannel.EMAIL);
+
+        when(accountOtpRepository.findByUuid(VERIFICATION_ID)).thenReturn(Optional.of(otp));
+        when(accountRepository.findById(10L)).thenReturn(Optional.of(pending));
+        when(accountOtpRepository.save(otp)).thenThrow(new ConcurrentModificationException("version conflict"));
+
+        assertThrows(ConcurrentModificationException.class,
+                () -> useCase.execute(VERIFICATION_ID, req, IdentityUseCaseTestFixtures.IP));
     }
 
     @Test

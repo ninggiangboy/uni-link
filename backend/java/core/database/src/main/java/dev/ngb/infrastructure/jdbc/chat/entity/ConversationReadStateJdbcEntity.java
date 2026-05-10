@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.relational.core.mapping.Table;
 
 @Getter
@@ -17,4 +18,7 @@ public class ConversationReadStateJdbcEntity extends JdbcEntity<Long> {
     private Long conversationId;
     private Long profileId;
     private Long lastReadMessageId;
+
+    @Version
+    private Long version;
 }

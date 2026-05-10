@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.relational.core.mapping.Table;
 
 @Getter
@@ -25,4 +26,7 @@ public class NotificationJdbcEntity extends SoftDeletableJdbcEntity<Long> {
     private String groupKey;
     private Long actorCount;
     private Long lastActorProfileId;
+
+    @Version
+    private Long version;
 }

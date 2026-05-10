@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.Instant;
@@ -41,4 +42,7 @@ public class ThreadJdbcEntity extends SoftDeletableJdbcEntity<Long> {
     private Boolean hasHashtags;
     private Boolean hasMedias;
     private Boolean hasPolls;
+
+    @Version
+    private Long version;
 }

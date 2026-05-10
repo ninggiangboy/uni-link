@@ -54,7 +54,11 @@ public class CreateProfileUseCase implements UseCaseService {
         try {
             savedProfile = profileRepository.save(profile);
         } catch (DataIntegrityViolationException e) {
-            log.warn("Create profile failed: integrity violation accountId={}, username={}", accountId, request.username());
+            String message = e.getMostSpecificCause().getMessage();
+            log.warn("Create profile failed: integrity violation accountId={}, username={}, detail={}", accountId, request.username(), message);
+            if (message != null && message.contains("uq_prf_profiles_account_id")) {
+                throw ProfileError.PROFILE_ALREADY_EXISTS_FOR_ACCOUNT.exception();
+            }
             throw ProfileError.USERNAME_ALREADY_EXISTS.exception();
         }
 

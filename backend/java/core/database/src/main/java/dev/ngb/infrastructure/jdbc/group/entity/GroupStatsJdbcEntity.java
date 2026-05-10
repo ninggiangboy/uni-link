@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.relational.core.mapping.Table;
 
 @Getter
@@ -17,4 +18,7 @@ public class GroupStatsJdbcEntity extends JdbcEntity<Long> {
     private Long groupId;
     private Long memberCount;
     private Long threadCount;
+
+    @Version
+    private Long version;
 }

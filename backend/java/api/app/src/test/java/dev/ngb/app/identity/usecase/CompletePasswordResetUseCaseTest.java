@@ -19,6 +19,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.Optional;
 
@@ -68,6 +69,20 @@ class CompletePasswordResetUseCaseTest {
         var ex = assertThrows(DomainException.class, () -> useCase.execute(RESET_ID, request));
 
         assertThat(ex.getError()).isEqualTo(AccountError.INVALID_OTP);
+    }
+
+    @Test
+    @DisplayName("Concurrent OTP save → ConcurrentModificationException propagated")
+    void executeWhenOtpSaveThrowsConcurrentModificationException() {
+        var account = IdentityUseCaseTestFixtures.activeAccount(3L);
+        var otp = AccountOtp.create(3L, "123456", OtpPurpose.PASSWORD_RESET, OtpChannel.EMAIL);
+
+        when(accountOtpRepository.findByUuid(RESET_ID)).thenReturn(Optional.of(otp));
+        when(accountRepository.findById(3L)).thenReturn(Optional.of(account));
+        when(accountOtpRepository.save(otp)).thenThrow(new ConcurrentModificationException("version conflict"));
+
+        assertThrows(ConcurrentModificationException.class,
+                () -> useCase.execute(RESET_ID, request));
     }
 
     @Test

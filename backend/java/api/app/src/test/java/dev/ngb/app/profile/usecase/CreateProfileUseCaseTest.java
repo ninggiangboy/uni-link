@@ -21,16 +21,14 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.time.Instant;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("CreateProfileUseCase")
@@ -59,33 +57,29 @@ class CreateProfileUseCaseTest {
     }
 
     @Test
-    @DisplayName("Account already owns a profile -> PROFILE_ALREADY_EXISTS_FOR_ACCOUNT")
-    void executeWhenAccountAlreadyHasProfileThrowsConflict() {
+    @DisplayName("Duplicate account_id on save race → DataIntegrityViolation → USERNAME_ALREADY_EXISTS")
+    void executeWhenAccountIdDuplicateOnSaveThrowsConflict() {
         var accountId = 11L;
-        var request = new CreateProfileRequest("user.two", "User Two", null, ProfileVisibility.PUBLIC);
-        when(identityPublicApi.isAccountActive(accountId)).thenReturn(true);
-        when(profileRepository.existsByAccountId(accountId)).thenReturn(true);
-
-        var ex = assertThrows(DomainException.class, () -> useCase.execute(accountId, request));
-
-        assertThat(ex.getError()).isEqualTo(ProfileError.PROFILE_ALREADY_EXISTS_FOR_ACCOUNT);
-        verify(profileRepository, never()).save(any(Profile.class));
-        verifyNoInteractions(profileStatsRepository, profileSettingRepository, profileUsernameRepository);
-    }
-
-    @Test
-    @DisplayName("Duplicate username -> USERNAME_ALREADY_EXISTS")
-    void executeWhenUsernameExistsThrowsConflict() {
-        var accountId = 12L;
         var request = new CreateProfileRequest("user.one", "User One", "bio", ProfileVisibility.PUBLIC);
         when(identityPublicApi.isAccountActive(accountId)).thenReturn(true);
-        when(profileRepository.existsByAccountId(accountId)).thenReturn(false);
-        when(profileRepository.existsByUsername("user.one")).thenReturn(true);
+        when(profileRepository.save(any(Profile.class))).thenThrow(new DataIntegrityViolationException("duplicate account_id"));
 
         var ex = assertThrows(DomainException.class, () -> useCase.execute(accountId, request));
 
         assertThat(ex.getError()).isEqualTo(ProfileError.USERNAME_ALREADY_EXISTS);
-        verify(profileRepository, never()).save(any(Profile.class));
+    }
+
+    @Test
+    @DisplayName("Duplicate username on save race → DataIntegrityViolation → USERNAME_ALREADY_EXISTS")
+    void executeWhenUsernameDuplicateOnSaveThrowsConflict() {
+        var accountId = 12L;
+        var request = new CreateProfileRequest("user.one", "User One", "bio", ProfileVisibility.PUBLIC);
+        when(identityPublicApi.isAccountActive(accountId)).thenReturn(true);
+        when(profileRepository.save(any(Profile.class))).thenThrow(new DataIntegrityViolationException("duplicate username"));
+
+        var ex = assertThrows(DomainException.class, () -> useCase.execute(accountId, request));
+
+        assertThat(ex.getError()).isEqualTo(ProfileError.USERNAME_ALREADY_EXISTS);
     }
 
     @Test
@@ -94,8 +88,6 @@ class CreateProfileUseCaseTest {
         var accountId = 13L;
         var request = new CreateProfileRequest("user.one", "User One", "bio", ProfileVisibility.PRIVATE);
         when(identityPublicApi.isAccountActive(accountId)).thenReturn(true);
-        when(profileRepository.existsByAccountId(accountId)).thenReturn(false);
-        when(profileRepository.existsByUsername("user.one")).thenReturn(false);
         when(profileRepository.save(any(Profile.class))).thenAnswer(invocation -> {
             Profile p = invocation.getArgument(0);
             return Profile.reconstruct(

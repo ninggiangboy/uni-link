@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.relational.core.mapping.Table;
 
 @Getter
@@ -18,4 +19,7 @@ public class ThreadPollOptionJdbcEntity extends JdbcEntity<Long> {
     private String option;
     private Integer position;
     private Long voteCount;
+
+    @Version
+    private Long version;
 }

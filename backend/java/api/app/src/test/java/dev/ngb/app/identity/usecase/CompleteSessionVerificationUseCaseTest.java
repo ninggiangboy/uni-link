@@ -23,6 +23,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ConcurrentModificationException;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -105,6 +106,22 @@ class CompleteSessionVerificationUseCaseTest {
         var ex = assertThrows(DomainException.class, () -> useCase.execute(req, IdentityUseCaseTestFixtures.IP));
 
         assertThat(ex.getError()).isEqualTo(AccountError.INVALID_VERIFICATION_TOKEN);
+    }
+
+    @Test
+    @DisplayName("Concurrent OTP save → ConcurrentModificationException propagated")
+    void executeWhenOtpSaveThrowsConcurrentModificationException() {
+        var account = IdentityUseCaseTestFixtures.activeAccount(1L);
+        var otp = AccountOtp.create(1L, "123456", OtpPurpose.LOGIN, OtpChannel.EMAIL);
+        var req = new CompleteSessionVerificationRequest("tok", "123456");
+
+        when(tokenProvider.parseVerificationToken("tok")).thenReturn(new TokenProvider.VerificationClaims(1L, 50L, otp.getUuid()));
+        when(accountRepository.findById(1L)).thenReturn(Optional.of(account));
+        when(accountOtpRepository.findByUuid(otp.getUuid())).thenReturn(Optional.of(otp));
+        when(accountOtpRepository.save(otp)).thenThrow(new ConcurrentModificationException("version conflict"));
+
+        assertThrows(ConcurrentModificationException.class,
+                () -> useCase.execute(req, IdentityUseCaseTestFixtures.IP));
     }
 
     @Test

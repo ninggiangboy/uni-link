@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.relational.core.mapping.Table;
 
 @Getter
@@ -20,4 +21,7 @@ public class ProfileStatsJdbcEntity extends JdbcEntity<Long> {
     private Long threadCount;
     private Long likeCount;
     private Long mediaCount;
+
+    @Version
+    private Long version;
 }

@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.Instant;
@@ -25,4 +26,7 @@ public class AccountOtpJdbcEntity extends JdbcEntity<Long> {
     private Instant expiresAt;
     private Boolean isUsed;
     private Integer attempts;
+
+    @Version
+    private Long version;
 }

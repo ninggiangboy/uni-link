@@ -16,6 +16,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,9 +24,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ChangeUsernameUseCase")
@@ -41,7 +40,6 @@ class ChangeUsernameUseCaseTest {
         var profile = ProfileFixtures.profile(1L, 100L, "alice");
         var prevCurrent = ProfileFixtures.currentUsername(50L, 1L, "alice");
         when(profileRepository.findByAccountId(100L)).thenReturn(Optional.of(profile));
-        when(profileRepository.existsByUsername("alice2")).thenReturn(false);
         when(profileUsernameRepository.findCurrentByProfileId(1L)).thenReturn(Optional.of(prevCurrent));
         when(profileUsernameRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
         when(profileRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
@@ -53,7 +51,7 @@ class ChangeUsernameUseCaseTest {
         assertThat(profileCaptor.getValue().getUsername()).isEqualTo("alice2");
 
         ArgumentCaptor<ProfileUsername> unameCaptor = ArgumentCaptor.forClass(ProfileUsername.class);
-        verify(profileUsernameRepository, org.mockito.Mockito.times(2)).save(unameCaptor.capture());
+        verify(profileUsernameRepository, times(2)).save(unameCaptor.capture());
 
         List<ProfileUsername> saved = unameCaptor.getAllValues();
         assertThat(saved.get(0).getId()).isEqualTo(50L);
@@ -76,11 +74,11 @@ class ChangeUsernameUseCaseTest {
     }
 
     @Test
-    @DisplayName("Username taken -> USERNAME_ALREADY_EXISTS")
-    void executeWhenTakenThrows() {
+    @DisplayName("Username taken on save race → DataIntegrityViolation → USERNAME_ALREADY_EXISTS")
+    void executeWhenUsernameTakenOnSaveThrowsConflict() {
         var profile = ProfileFixtures.profile(1L, 100L, "alice");
         when(profileRepository.findByAccountId(100L)).thenReturn(Optional.of(profile));
-        when(profileRepository.existsByUsername("bob")).thenReturn(true);
+        when(profileRepository.save(any(Profile.class))).thenThrow(new DataIntegrityViolationException("duplicate"));
 
         var ex = assertThrows(DomainException.class,
                 () -> useCase.execute(100L, new ChangeUsernameRequest("bob")));
