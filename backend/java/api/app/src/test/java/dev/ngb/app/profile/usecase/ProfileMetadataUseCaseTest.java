@@ -57,7 +57,8 @@ class ProfileMetadataUseCaseTest {
                 profileLinkRepository,
                 profileMetadataRepository,
                 profileSettingRepository,
-                followRequestRepository
+                followRequestRepository,
+                null
         );
         upsertProfileMetadataUseCase = new UpsertProfileMetadataUseCase(profileRepository, profileMetadataRepository);
         removeProfileMetadataUseCase = new RemoveProfileMetadataUseCase(profileRepository, profileMetadataRepository);

@@ -6,4 +6,6 @@ import lombok.experimental.UtilityClass;
 public final class ScheduledJobNames {
 
     public static final String ATTACHMENT_PENDING_PUT_SWEEP = "attachment.pending_put.sweep";
+
+    public static final String FOLLOWER_COUNT_FLUSH = "follower.count.flush";
 }

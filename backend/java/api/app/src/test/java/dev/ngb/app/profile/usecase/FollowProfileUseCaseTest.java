@@ -56,23 +56,6 @@ class FollowProfileUseCaseTest {
     }
 
     @Test
-    @DisplayName("Public celeb target + new edge -> dispatcher invoked (async path inside dispatcher)")
-    void executeWhenPublicCelebCreatesEdge() {
-        var follower = ProfileFixtures.profile(1L, 100L, "alice");
-        var target = ProfileFixtures.profile(2L, 200L, "bob", ProfileVisibility.PUBLIC, Boolean.TRUE);
-        when(profileRepository.findByAccountId(100L)).thenReturn(Optional.of(follower));
-        when(profileRepository.findByUsername("bob")).thenReturn(Optional.of(target));
-        when(profileRelationshipRepository.findRelationshipsBetween(1L, 2L))
-                .thenReturn(ProfileRelationshipState.empty());
-        when(profileRelationshipRepository.follow(eq(1L), eq(2L))).thenReturn(true);
-
-        var resp = useCase.execute(100L, "bob");
-
-        assertThat(resp.status()).isEqualTo(FollowResponse.Status.FOLLOWING);
-        verify(followStatsSyncService).follow(eq(target), eq(follower));
-    }
-
-    @Test
     @DisplayName("Public target + edge already exists -> ALREADY_FOLLOWING")
     void executeWhenAlreadyFollowingThrows() {
         var follower = ProfileFixtures.profile(1L, 100L, "alice");

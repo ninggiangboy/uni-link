@@ -62,7 +62,8 @@ class ProfileLinkUseCaseTest {
                 profileLinkRepository,
                 profileMetadataRepository,
                 profileSettingRepository,
-                followRequestRepository
+                followRequestRepository,
+                null
         );
         addProfileLinkUseCase = new AddProfileLinkUseCase(profileRepository, profileLinkRepository);
         updateProfileLinkUseCase = new UpdateProfileLinkUseCase(profileRepository, profileLinkRepository);

@@ -16,6 +16,12 @@ public interface RedisClient {
 
     void delete(List<String> keys);
 
+    long increment(String key);
+
+    long increment(String key, long delta);
+
+    void expire(String key, Duration ttl);
+
     Set<String> scan(String pattern, int count);
 
     boolean tryLock(String key, long waitTime, TimeUnit unit) throws InterruptedException;

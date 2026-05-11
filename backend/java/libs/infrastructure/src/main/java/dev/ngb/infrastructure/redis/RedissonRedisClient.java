@@ -2,6 +2,7 @@ package dev.ngb.infrastructure.redis;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RAtomicLong;
 import org.redisson.api.RKeys;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
@@ -42,6 +43,22 @@ public class RedissonRedisClient implements RedisClient {
     @Override
     public void delete(List<String> keys) {
         redissonClient.getKeys().delete(keys.toArray(new String[0]));
+    }
+
+    @Override
+    public long increment(String key) {
+        return increment(key, 1);
+    }
+
+    @Override
+    public long increment(String key, long delta) {
+        RAtomicLong atomic = redissonClient.getAtomicLong(key);
+        return atomic.addAndGet(delta);
+    }
+
+    @Override
+    public void expire(String key, Duration ttl) {
+        redissonClient.getBucket(key).expire(ttl);
     }
 
     @Override

@@ -31,6 +31,12 @@ public record ProfileSummary(
         Instant createdAt
 ) {
     public static ProfileSummary of(Profile profile, ProfileStats stats) {
+        return of(profile, stats, 0L, 0L);
+    }
+
+    public static ProfileSummary of(Profile profile, ProfileStats stats, long followerDelta, long followingDelta) {
+        long baseFollower = stats == null ? 0L : NullUtils.getOrZero(stats.getFollowerCount());
+        long baseFollowing = stats == null ? 0L : NullUtils.getOrZero(stats.getFollowingCount());
         return new ProfileSummary(
                 profile.getUuid(),
                 profile.getUsername(),
@@ -42,8 +48,8 @@ public record ProfileSummary(
                 profile.getBannerUrl(),
                 profile.getVisibility(),
                 NullUtils.getOr(profile.getIsVerified(), Boolean.FALSE),
-                stats == null ? 0L : NullUtils.getOrZero(stats.getFollowerCount()),
-                stats == null ? 0L : NullUtils.getOrZero(stats.getFollowingCount()),
+                Math.max(0, baseFollower + followerDelta),
+                Math.max(0, baseFollowing + followingDelta),
                 stats == null ? 0L : NullUtils.getOrZero(stats.getThreadCount()),
                 stats == null ? 0L : NullUtils.getOrZero(stats.getLikeCount()),
                 profile.getCreatedAt()

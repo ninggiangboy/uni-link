@@ -54,7 +54,8 @@ class ProfileSettingUseCaseTest {
                 profileLinkRepository,
                 profileMetadataRepository,
                 profileSettingRepository,
-                followRequestRepository
+                followRequestRepository,
+                null
         );
         updateProfileSettingUseCase = new UpdateProfileSettingUseCase(profileRepository, profileSettingRepository);
     }

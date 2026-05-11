@@ -10,7 +10,7 @@ public class AttachmentPublicApiImpl implements AttachmentPublicApi {
     private final SweepStalePendingAttachmentsUseCase sweepStalePendingAttachmentsUseCase;
 
     @Override
-    public void executeSweepStalePendingAttachmentsUseCase() {
+    public void executeSweepStalePendingAttachments() {
         sweepStalePendingAttachmentsUseCase.execute();
     }
 }

@@ -5,7 +5,5 @@ public final class TopicNames {
 
     public static final String JOB_TRIGGERED = "job.triggered";
 
-    public static final String PROFILE_FOLLOW = "profile.follows";
-
     public static final String REALTIME_PUSH_CHANNEL = "realtime:push";
 }

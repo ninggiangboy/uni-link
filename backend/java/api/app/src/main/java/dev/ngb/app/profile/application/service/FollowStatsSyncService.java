@@ -1,37 +1,38 @@
 package dev.ngb.app.profile.application.service;
 
+import dev.ngb.app.profile.infrastructure.redis.FollowRateCounter;
 import dev.ngb.application.ApplicationService;
-import dev.ngb.application.port.event.EventPublisher;
+import dev.ngb.application.port.follow.FollowDeltaIncrementPort;
 import dev.ngb.domain.profile.model.profile.Profile;
 import dev.ngb.domain.profile.model.stats.FollowCountChange;
 import dev.ngb.domain.profile.repository.ProfileStatsRepository;
-import dev.ngb.event.ProfileFollowStateEvent;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Follow/unfollow counter updates: applies {@code prf_profile_stats} synchronously for all targets
- * and always publishes {@link ProfileFollowStateEvent} for Kafka Streams.
- * <p>
- * All events carry {@code statsAppliedInApi=true} so the worker batch consumer skips counter
- * adjustments and only runs celeb promotion from DB follower counts.
- * <p>
- * Event publishing can be skipped entirely when Kafka Streams is disabled
+ * Adaptive follow/unfollow counter updates:
+ * <ul>
+ *   <li>Following count → always sync DB update (low frequency per user)</li>
+ *   <li>Follower count → sync DB for normal users, Redis delta for hot users</li>
+ * </ul>
  */
 @Slf4j
 public class FollowStatsSyncService implements ApplicationService {
 
-    private final EventPublisher eventPublisher;
     private final ProfileStatsRepository profileStatsRepository;
+    private final FollowRateCounter followRateCounter;
+    private final FollowDeltaIncrementPort followDeltaIncrementPort;
 
     public FollowStatsSyncService(
-            EventPublisher eventPublisher,
-            ProfileStatsRepository profileStatsRepository
+            ProfileStatsRepository profileStatsRepository,
+            FollowRateCounter followRateCounter,
+            FollowDeltaIncrementPort followDeltaIncrementPort
     ) {
-        this.eventPublisher = eventPublisher;
         this.profileStatsRepository = profileStatsRepository;
+        this.followRateCounter = followRateCounter;
+        this.followDeltaIncrementPort = followDeltaIncrementPort;
     }
 
     public void follow(Profile target, Profile follower) {
@@ -43,40 +44,28 @@ public class FollowStatsSyncService implements ApplicationService {
     }
 
     public void cleanUpFollow(Profile a, Profile b) {
-        boolean aIsCeleb = a.getIsCeleb();
-        boolean bIsCeleb = b.getIsCeleb();
-        List<FollowCountChange> changes = new ArrayList<>(4);
-        if (!aIsCeleb) {
-            changes.add(FollowCountChange.decreaseFollowerCount(a.getId()));
-            changes.add(FollowCountChange.decreaseFollowingCount(b.getId()));
-        }
-        if (!bIsCeleb) {
-            changes.add(FollowCountChange.decreaseFollowerCount(b.getId()));
-            changes.add(FollowCountChange.decreaseFollowingCount(a.getId()));
-        }
-        if (!changes.isEmpty()) {
-            profileStatsRepository.adjustCountsBulk(changes);
-        }
-        eventPublisher.publish(ProfileFollowStateEvent.unfollow(a.getId(), b.getId(), aIsCeleb));
-        eventPublisher.publish(ProfileFollowStateEvent.unfollow(b.getId(), a.getId(), bIsCeleb));
+        apply(a, b, -1);
+        apply(b, a, -1);
     }
 
     private void apply(Profile target, Profile follower, int delta) {
-        boolean targetIsCeleb = target.getIsCeleb();
+        boolean increase = delta > 0;
+        boolean targetHot = followRateCounter.isHot(target.getId());
+
         List<FollowCountChange> changes = new ArrayList<>(2);
-        if (delta > 0) {
-            changes.add(FollowCountChange.increaseFollowerCount(target.getId()));
-            changes.add(FollowCountChange.increaseFollowingCount(follower.getId()));
+
+        if (targetHot) {
+            followDeltaIncrementPort.incrementDelta(target.getId(), delta, 0);
         } else {
-            changes.add(FollowCountChange.decreaseFollowerCount(target.getId()));
-            changes.add(FollowCountChange.decreaseFollowingCount(follower.getId()));
+            changes.add(increase
+                    ? FollowCountChange.increaseFollowerCount(target.getId())
+                    : FollowCountChange.decreaseFollowerCount(target.getId()));
         }
-        if (!targetIsCeleb) {
-            profileStatsRepository.adjustCountsBulk(changes);
-        }
-        var event = delta > 0
-                ? ProfileFollowStateEvent.follow(target.getId(), follower.getId(), targetIsCeleb)
-                : ProfileFollowStateEvent.unfollow(target.getId(), follower.getId(), targetIsCeleb);
-        eventPublisher.publish(event);
+
+        changes.add(increase
+                ? FollowCountChange.increaseFollowingCount(follower.getId())
+                : FollowCountChange.decreaseFollowingCount(follower.getId()));
+
+        profileStatsRepository.adjustCountsBulk(changes);
     }
 }

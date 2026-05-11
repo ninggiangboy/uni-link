@@ -8,6 +8,7 @@ import dev.ngb.app.profile.application.dto.ProfileMetadataResponse;
 import dev.ngb.app.profile.application.dto.ProfileSettingResponse;
 import dev.ngb.app.profile.application.dto.ProfileSummary;
 import dev.ngb.application.UseCaseService;
+import dev.ngb.application.port.follow.FollowDeltaIncrementPort;
 import dev.ngb.domain.profile.error.ProfileError;
 import dev.ngb.domain.profile.model.profile.Profile;
 import dev.ngb.domain.profile.model.profile.ProfileLink;
@@ -39,12 +40,15 @@ public class ProfileQueryService implements UseCaseService {
     private final ProfileMetadataRepository profileMetadataRepository;
     private final ProfileSettingRepository profileSettingRepository;
     private final FollowRequestRepository followRequestRepository;
+    private final FollowDeltaIncrementPort followDeltaIncrementPort;
 
     public ProfileSummary getMyProfile(Long accountId) {
         Profile profile = profileRepository.findByAccountId(accountId)
                 .orElseThrow(ProfileError.PROFILE_NOT_FOUND::exception);
         ProfileStats stats = profileStatsRepository.findByProfileId(profile.getId()).orElse(null);
-        return ProfileSummary.of(profile, stats);
+        long followerDelta = followDeltaIncrementPort.getFollowerDelta(profile.getId());
+        long followingDelta = followDeltaIncrementPort.getFollowingDelta(profile.getId());
+        return ProfileSummary.of(profile, stats, followerDelta, followingDelta);
     }
 
     /**
@@ -68,7 +72,9 @@ public class ProfileQueryService implements UseCaseService {
         }
 
         ProfileStats stats = profileStatsRepository.findByProfileId(profile.getId()).orElse(null);
-        ProfileSummary summary = ProfileSummary.of(profile, stats);
+        long followerDelta = followDeltaIncrementPort.getFollowerDelta(profile.getId());
+        long followingDelta = followDeltaIncrementPort.getFollowingDelta(profile.getId());
+        ProfileSummary summary = ProfileSummary.of(profile, stats, followerDelta, followingDelta);
 
         if (!isOwner && profile.isPrivate()) {
             boolean isFollower = viewerProfile

@@ -61,7 +61,8 @@ class FollowRequestUseCaseTest {
                 profileLinkRepository,
                 profileMetadataRepository,
                 profileSettingRepository,
-                followRequestRepository
+                followRequestRepository,
+                null
         );
         approveFollowRequestUseCase = new ApproveFollowRequestUseCase(
                 profileRepository, followStatsSyncService, profileRelationshipRepository, followRequestRepository);

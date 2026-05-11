@@ -3,6 +3,7 @@ package dev.ngb.app.profile.usecase;
 import dev.ngb.app.profile.application.query.ProfileQueryService;
 import dev.ngb.app.profile.application.query.dto.PageQuery;
 import dev.ngb.app.profile.support.ProfileFixtures;
+import dev.ngb.application.port.follow.FollowDeltaIncrementPort;
 import dev.ngb.domain.DomainException;
 import dev.ngb.domain.profile.error.ProfileError;
 import dev.ngb.domain.profile.model.profile.ProfileVisibility;
@@ -42,6 +43,7 @@ class ProfileQueryServiceTest {
     @Mock private ProfileMetadataRepository profileMetadataRepository;
     @Mock private ProfileSettingRepository profileSettingRepository;
     @Mock private FollowRequestRepository followRequestRepository;
+    @Mock private FollowDeltaIncrementPort followDeltaIncrementPort;
 
     @InjectMocks private ProfileQueryService profileQueryService;
 

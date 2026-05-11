@@ -5,6 +5,7 @@ import dev.ngb.constant.TopicNames;
 import dev.ngb.infrastructure.jdbc.event.entity.EventPublicationEntity;
 import dev.ngb.event.JobTriggeredEvent;
 import dev.ngb.worker.shared.public_api.AttachmentPublicApi;
+import dev.ngb.worker.shared.public_api.ProfilePublicApi;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -19,13 +20,15 @@ public class JobTriggeredConsumer {
 
     private final ObjectMapper objectMapper;
     private final AttachmentPublicApi attachmentPublicApi;
+    private final ProfilePublicApi profilePublicApi;
 
     @KafkaListener(topics = TopicNames.JOB_TRIGGERED)
     public void consume(String message) {
         JobTriggeredEvent scheduledJob = parse(message);
         String name = scheduledJob.scheduledJobName();
         switch (name) {
-            case ScheduledJobNames.ATTACHMENT_PENDING_PUT_SWEEP -> attachmentPublicApi.executeSweepStalePendingAttachmentsUseCase();
+            case ScheduledJobNames.ATTACHMENT_PENDING_PUT_SWEEP -> attachmentPublicApi.executeSweepStalePendingAttachments();
+            case ScheduledJobNames.FOLLOWER_COUNT_FLUSH -> profilePublicApi.flushFollowDeltas();
             case null, default -> log.debug("Unrecognized scheduled job, skipping: {}", name);
         }
     }

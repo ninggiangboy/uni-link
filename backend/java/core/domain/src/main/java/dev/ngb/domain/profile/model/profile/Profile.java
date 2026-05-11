@@ -35,13 +35,12 @@ public class Profile extends DomainEntity<Long> {
 
     private ProfileVisibility visibility;
     private Boolean isVerified;
-    private Boolean isCeleb;
     private String publicKey;
 
     public static Profile reconstruct(
             Long id, String uuid, Long createdBy, Instant createdAt, Long updatedBy, Instant updatedAt,
             Long accountId, String username, String displayName, String bio, String website, String location,
-            String avatarUrl, String bannerUrl, ProfileVisibility visibility, Boolean isVerified, Boolean isCeleb,
+            String avatarUrl, String bannerUrl, ProfileVisibility visibility, Boolean isVerified,
             String publicKey) {
         Profile obj = new Profile();
         obj.id = id;
@@ -60,7 +59,6 @@ public class Profile extends DomainEntity<Long> {
         obj.bannerUrl = bannerUrl;
         obj.visibility = visibility;
         obj.isVerified = isVerified;
-        obj.isCeleb = isCeleb;
         obj.publicKey = publicKey;
         return obj;
     }
@@ -80,7 +78,6 @@ public class Profile extends DomainEntity<Long> {
         obj.bio = StringUtils.trim(bio);
         obj.visibility = NullUtils.getOr(visibility, ProfileVisibility.PUBLIC);
         obj.isVerified = Boolean.FALSE;
-        obj.isCeleb = Boolean.FALSE;
         return obj;
     }
 
@@ -115,15 +112,5 @@ public class Profile extends DomainEntity<Long> {
         return visibility == ProfileVisibility.PRIVATE;
     }
 
-    public void promoteToCeleb() {
-        if (!isCeleb) {
-            this.isCeleb = Boolean.TRUE;
-        }
-    }
 
-    public void demoteFromCeleb() {
-        if (isCeleb) {
-            this.isCeleb = Boolean.FALSE;
-        }
-    }
 }

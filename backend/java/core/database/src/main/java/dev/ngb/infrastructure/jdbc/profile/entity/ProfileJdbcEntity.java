@@ -25,6 +25,5 @@ public class ProfileJdbcEntity extends SoftDeletableJdbcEntity<Long> {
     private String bannerUrl;
     private ProfileVisibility visibility;
     private Boolean isVerified;
-    private Boolean isCeleb;
     private String publicKey;
 }

@@ -1,4 +1,4 @@
-package dev.ngb.scheduler.attachment.job;
+package dev.ngb.scheduler.profile.job;
 
 import dev.ngb.application.BackgroundJob;
 import dev.ngb.application.port.event.EventPublisher;
@@ -9,16 +9,16 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class AttachmentPendingPutSweepJob implements BackgroundJob {
+public class FollowerCountFlushJob implements BackgroundJob {
 
-    private static final String CRON = "0 */15 * * * ?";
+    private static final String CRON = "*/5 * * * * ?";
 
     private final EventPublisher eventPublisher;
 
     @Override
     public void execute() {
         eventPublisher.publish(
-                JobTriggeredEvent.create(ScheduledJobNames.ATTACHMENT_PENDING_PUT_SWEEP));
+                JobTriggeredEvent.create(ScheduledJobNames.FOLLOWER_COUNT_FLUSH));
     }
 
     @Override
@@ -28,6 +28,6 @@ public class AttachmentPendingPutSweepJob implements BackgroundJob {
 
     @Override
     public String jobName() {
-        return ScheduledJobNames.ATTACHMENT_PENDING_PUT_SWEEP;
+        return ScheduledJobNames.FOLLOWER_COUNT_FLUSH;
     }
 }
